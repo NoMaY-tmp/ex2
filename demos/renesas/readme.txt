@@ -59,6 +59,9 @@ I hope this solution will be helpful for embedded system developer in W/W.
 --------------------------------------------------------------------------
 Change Logs
 --------------------------------------------------------------------------
+v0.03:
+[UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.6.
+
 v0.02:
 [UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.5.
 [REMOVED] Getting start step7 from #ifdef 0 to 1.
@@ -207,6 +210,71 @@ RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ
 --------------------------------------------------------------------------
 ¡ƒ|[ƒeƒBƒ“ƒO‹L˜^	šˆó‚ª‰ğŒˆ‚·‚×‚«‰Û‘è
 --------------------------------------------------------------------------
+2018/05/27
+@“Á‚Éi’»‚Í‚µ‚È‚©‚Á‚½B
+@NoMaY‚ªƒR[ƒh‚Ìƒƒ“ƒe‚ği‚ßA–{‰Æv126‚Ö’Ç]‚µ‚Ä‚­‚ê‚Ä‚¢‚éB
+@“®ìŠm”F‚µ‚Äv003‚Æ‚µ‚ÄƒRƒ~ƒbƒg‚·‚éB
+@
+@ŠJ”­i’»‚Æ‚µ‚Ä‚ÍAˆÈ‰º‰Û‘è‚ª‹“‚ª‚èA‘Î‰•û–@‚ğl‚¦‚½B
+@
+@[‰Û‘è]
+@Silex‘¤‚ÌTCP/IP‹@”\‚ğg‚í‚¸Aƒ}ƒCƒRƒ“‘¤‚ÅTCP/IP‚ğÀ‘•‚µ‚½•û®‚É‚µ‚½‚©‚Á‚½‚ª
+@Silex‘¤‚ÌTCP/IP‹@”\‚ğg‚í‚È‚¢ƒIƒvƒVƒ‡ƒ“‚ª–³‚¢—lqB
+@ìí‚Íl‚¦‚½‚ªAo’£TŠÔ‚ª‚Ü‚¾‘±‚­‚½‚ßŒŸ“¢‚ÌŠÔ‚ª‚È‚¢B
+@o’£‚ª‘±‚­‚Æƒ[ƒ‹‚ª—­‚Ü‚èƒR[ƒh‚Ì®”õ‚ªi‚Ü‚È‚¢B
+@o’£‚ª‚Ğ‚Æ’i—‚µ‚½ŒãA6/8-6/11‚ÌŠÔ‚ª3˜A‹x‚È‚Ì‚Å‚±‚±‚Å‚Ç‚¤‚É‚©‚µ‚½‚¢B
+@
+@[‘Î‰•û–@]
+@ˆÈ‰º\¬‚Æ‚·‚éB‚±‚ê‚Í‚±‚ê‚ÅRX130ARX231ARX65N‚Å–³üLANÀŒ»•û–@‚Æ‚µ‚Ä
+@‘S•”‹¤’Ê\‘¢‚É‚È‚é‚Ì‚Å—Ç‚¢B‚±‚ê‚ğpattern1‚Æ‚·‚éB
+@—LüLAN‚ğg‚¤pattern2ASDIO–³üLAN‚ğg‚¤pattern3‚à‚Ü‚Æ‚ß‚½B
+@ƒ{[ƒh”­”„‚É‡‚í‚¹‚é‚Ì‚Í<first step>‚Æ‘‚¢‚½‚à‚Ì‚Æ‚·‚éB
+@
+@pattern1:
+@osi	protocol	implemented into
+@7	aws		Amazon FreeRTOS
+@7	mqtt		Amazon FreeRTOS
+@6	ssl/tls		wifi module
+@5	socket		wifi module
+@4	tcp		wifi module
+@3	ip		wifi module
+@2	ether		wifi module
+@1	phy		wifi module
+@
+@RX65N Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+@RX231 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+@RX130 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+@RX65N Target Board + Cloud Option Board (with Espressif ESP8266)
+@RX231 Target Board + Cloud Option Board (with Espressif ESP8266)
+@RX130 Target Board + Cloud Option Board (with Espressif ESP8266)
+
+@pattern2:
+@osi	protocol	implemented into
+@7	aws		Amazon FreeRTOS
+@7	mqtt		Amazon FreeRTOS
+@6	ssl/tls		Amazon FreeRTOS
+@5	socket		Amazon FreeRTOS
+@4	tcp		Amazon FreeRTOS
+@3	ip		Amazon FreeRTOS
+@2	ether		Amazon FreeRTOS(RX Ether specific)
+@1	phy		ether-phy
+
+@RX65N RSK <first step>
+@RX65N Envision Kit <first step>
+@
+@pattern3:
+@osi	protocol	implemented into
+@7	aws		Amazon FreeRTOS
+@7	mqtt		Amazon FreeRTOS
+@6	ssl/tls		Amazon FreeRTOS
+@5	socket		Amazon FreeRTOS
+@4	tcp		Amazon FreeRTOS
+@3	ip		Amazon FreeRTOS
+@2	ether		Amazon FreeRTOS(RX SDIO-wifi specific)
+@1	phy		wifi radio
+
+@RX65N RSK + SDIO wifi SDK (with Murata Type 1FX)
+
 2018/05/20
 @‚±‚Ì1TŠÔ‚ÅûW‚µ‚½ƒtƒB[ƒhƒoƒbƒN‚ÍˆÈ‰º3“_B
 @@ƒ‹ƒlƒTƒXƒAƒƒŠƒJF
