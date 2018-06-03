@@ -40,9 +40,20 @@ Getting start steps:
  step7:  Get/Put Device Driver from Renesas Webpage and put it into your project.
          Refer to following text.
          <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
- step8:  Configure your envirionment using Smart Configurator
-         Refer to following text.
-         <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/generate!.txt
+ step8:  Configure your environment using Smart Configurator.
+         Please double click aws_demos.scfg on your Project Explorer on e2 studio.
+         You can start Smart Configurator with already configured value.
+         You can confirm following modules are installed on your Component Tab. (But not generated the code)
+         - r_bsp
+         - r_sci_rx
+         - r_cmt_rx
+         - r_flash_rx
+         - r_ether_rx
+         - r_byteq
+         After confirmation, please click the generate button on Smart Configurator.
+         The device drivers code you confirmed are generated into following directory,
+         and some settings (include path, section, link the library, etc) will be applied.
+         <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/
  step9:  Build
  step10: Execute, confirm console log will show the Echo message from AWS.
          The log will be output from G1CUSB connector as UART/USB.
@@ -59,15 +70,19 @@ I hope this solution will be helpful for embedded system developer in W/W.
 --------------------------------------------------------------------------
 Change Logs
 --------------------------------------------------------------------------
-v0.03:
+v0.0.4:
+[UPDATED] Readme text encode from SJIS to UTF8.
+[UPDATED] Readme text step8 for more details.
+
+v0.0.3:
 [UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.6.
 
-v0.02:
+v0.0.2:
 [UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.5.
 [REMOVED] Getting start step7 from #ifdef 0 to 1.
 [UPDATED] Clarify Getting start root directory path same as download zip "amazon-freertos-master".
 
-v0.01:
+v0.0.1:
 [ADDED] RX65N supports Amazon FreeRTOS Release Version 1.2.3 in tentative.
         Only confirmed Echo demo using Ethernet.
 
@@ -148,748 +163,748 @@ Following text is SheltyDog memo written in Japanese.
 Please ignore this in basically.
 
 ----------------------------------------------
-Amazon FreeRTOS �|�[�e�B���O�L�^
+Amazon FreeRTOS ポーティング記録
 ----------------------------------------------
-���w�i
-���l�T�X�����R�~���j�e�B�u���ӂ����l�v��Amazon FreeRTOS�֘A��
-�b�肪����ANoMaY�����܂Ƃ߂Ă��ꂽ��������RX65N��
-Amazon FreeRTOS�𓮍삳���邱�Ƃ�ڎw���B
+■背景
+ルネサス公式コミュニティ「かふぇルネ」でAmazon FreeRTOS関連の
+話題があり、NoMaY氏がまとめてくれた情報を元にRX65Nで
+Amazon FreeRTOSを動作させることを目指す。
 https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/
 
-�{�L�^�́u���ӂ����l�v�Ŋ�������V�F���e�B���L���B
+本記録は「かふぇルネ」で活動するシェルティが記す。
 
 --------------------------------------------------------------------------
-���i��
+■進捗
 --------------------------------------------------------------------------
-RX65N Envision Kit�ARX65N RSK(2MB��/�Í��킠��i)���^�[�Q�b�g�ɃR�[�h�����e���ێ����܂��B
-���L Amazon FreeRTOS 1.2.x �͓K�X�ŐV�R�[�h�ɍX�V���Ă����܂��B
-2018/04/30���_�ł̓K�p�R�[�h�� 1.2.3 �ł��B
+RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットにコードメンテを維持します。
+下記 Amazon FreeRTOS 1.2.x は適宜最新コードに更新していきます。
+2018/04/30時点での適用コードは 1.2.3 です。
 
-�@���l�T�XTCP/IP���^�[�Q�b�g�œ��삳����iEther�̓���m�F�j
-�ASDIO����LAN�𓮍�m�F����������FreeRTOS 8.2.2���^�[�Q�b�g�œ��삳����
-�B���l�T�X��FreeRTOS�p�b�P�[�W�A9.0.0���^�[�Q�b�g�œ��삳����
-�CAmazon FreeRTOS 1.2.x��FreeRTOS�������^�[�Q�b�g�œ��삳����
-�DAmazon FreeRTOS 1.2.x��FreeRTOS+TCP�������^�[�Q�b�g�œ��삳����
-�EAmazon FreeRTOS 1.2.x��mbed TLS�������^�[�Q�b�g�œ��삳����
-�FAmazon FreeRTOS 1.2.x��MQTT�������^�[�Q�b�g�œ��삳����iAWS�ւ̐ڑ������j
-�GAmazon FreeRTOS 1.2.x��FreeRTOS+TCP�����̃l�b�g���[�N�w�̌����������H�v���āA
-�@(1)Ether�A(2)SPI�ڑ�����LAN���W���[���A(3)SDIO����LAN���W���[����3��ނ�
-�@�؂�ւ�����悤�ɂ���@����U��~�A��ق�(2)�ɍi���čĊJ
-�HAmazon FreeRTOS 1.2.x��mbed TLS�����̈Í������v���~�e�B�u��
-�@�\�t�g�E�F�A�����iAES�Ƃ�RSA�Ƃ��j��RX65N�����Í�����g����
-�@�n�[�h�E�F�A�����ɒu��������@����U��~
-�IEther�w�̃[���R�s�[�ɑΉ�����@����U��~
-�JAmazon FreeRTOS�{�Ɗ��Ƀ}�[�W���AAmazon FreeRTOS�{�ƃR�[�h�ւ̒Ǐ]���ȒP�ɂł���悤�ɂ���@�����܂������V�F���e�B
-�KAmazon FreeRTOS ��Git��fork�ɓo�^����
-�LAmazon FreeRTOS ��Certification���󌱂����i��Git�̖{�Ƃɓo�^����
-�@https://docs.aws.amazon.com/freertos/latest/userguide/freertos-qualification-program.html
-
---------------------------------------------------------------------------
-���ۑ�܂Ƃ߁�
---------------------------------------------------------------------------
-�@2018/05/01
-�@�@2018/05/01�̃|�[�e�B���O�L�^�Q��
-�@
-�@2018/03/17
-�@�@2018/03/17�̃|�[�e�B���O�L�^�Q��
-�@�@
-�@2018/03/03�ȑO
-�@�@NetworkInterface.c 
-�@�@(2)�[���R�s�[�̊T�O�𖳎����邪...��
-�@�@(4)(���M���̃[���R�s�[�̎d�g�݂��s���B������܂���Œ��ׂ遚)
-�@�@(5)LAN�P�[�u���}���̃C�x���g��TCP/IP���ɒʒm����d�g�݂����邪...��
-
-�@�@���̑�
-�@�@�E�V�X�e�����O��SCI����o�͂���悤�ɃR�[�h�ǉ�����΂悢�B(����Ń����e)�ˊ����B
-�@�@�E�R���p�C���O�����̍\����͂ŃG���[�ɂȂ��Ă��銴���B�����c�[���J������ɖ₢���킹�Ă݂�B
-
-�@���̑�
-�@�@NoMaY���̒�Ă̒����B2018/3/11 0:00 �̃|�X�g�Q�ƁB
-�@�@https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/27511#27511
+①ルネサスTCP/IPをターゲットで動作させる（Etherの動作確認）
+②SDIO無線LANを動作確認した時期のFreeRTOS 8.2.2をターゲットで動作させる
+③ルネサスのFreeRTOSパッケージ、9.0.0をターゲットで動作させる
+④Amazon FreeRTOS 1.2.xのFreeRTOS部分をターゲットで動作させる
+⑤Amazon FreeRTOS 1.2.xのFreeRTOS+TCP部分をターゲットで動作させる
+⑥Amazon FreeRTOS 1.2.xのmbed TLS部分をターゲットで動作させる
+⑦Amazon FreeRTOS 1.2.xのMQTT部分をターゲットで動作させる（AWSへの接続実験）
+⑧Amazon FreeRTOS 1.2.xのFreeRTOS+TCP部分のネットワーク層の結合部分を工夫して、
+　(1)Ether、(2)SPI接続無線LANモジュール、(3)SDIO無線LANモジュールの3種類を
+　切り替えられるようにする　★一旦停止、後ほど(2)に絞って再開
+⑨Amazon FreeRTOS 1.2.xのmbed TLS部分の暗号処理プリミティブの
+　ソフトウェア実装（AESとかRSAとか）をRX65N内蔵暗号器を使った
+　ハードウェア実装に置き換える　★一旦停止
+⑩Ether層のゼロコピーに対応する　★一旦停止
+⑪Amazon FreeRTOS本家環境にマージし、Amazon FreeRTOS本家コードへの追従を簡単にできるようにする　★いまここ＠シェルティ
+⑫Amazon FreeRTOS のGitのforkに登録する
+⑬Amazon FreeRTOS のCertificationを受験し合格しGitの本家に登録する
+　https://docs.aws.amazon.com/freertos/latest/userguide/freertos-qualification-program.html
 
 --------------------------------------------------------------------------
-���|�[�e�B���O�L�^	���󂪉������ׂ��ۑ�
+■課題まとめ★
+--------------------------------------------------------------------------
+　2018/05/01
+　　2018/05/01のポーティング記録参照
+　
+　2018/03/17
+　　2018/03/17のポーティング記録参照
+　　
+　2018/03/03以前
+　　NetworkInterface.c 
+　　(2)ゼロコピーの概念を無視するが...★
+　　(4)(送信側のゼロコピーの仕組みが不明。これもまた後で調べる★)
+　　(5)LANケーブル挿抜のイベントをTCP/IP側に通知する仕組みがあるが...★
+
+　　その他
+　　・システムログをSCIから出力するようにコード追加すればよい。(★後でメンテ)⇒完了。
+　　・コンパイル前処理の構文解析でエラーになっている感じ。→★ツール開発部門に問い合わせてみる。
+
+　その他
+　　NoMaY氏の提案の調整。2018/3/11 0:00 のポスト参照。
+　　https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/27511#27511
+
+--------------------------------------------------------------------------
+■ポーティング記録	★印が解決すべき課題
 --------------------------------------------------------------------------
 2018/05/27
-�@���ɐi���͂��Ȃ������B
-�@NoMaY�����R�[�h�̃����e��i�߁A�{��v126�֒Ǐ]���Ă���Ă���B
-�@����m�F����v003�Ƃ��ăR�~�b�g����B
-�@
-�@�J���i���Ƃ��ẮA�ȉ��ۑ肪������A�Ή����@���l�����B
-�@
-�@[�ۑ�]
-�@Silex����TCP/IP�@�\���g�킸�A�}�C�R������TCP/IP���������������ɂ�����������
-�@Silex����TCP/IP�@�\���g��Ȃ��I�v�V�����������l�q�B
-�@���͍l�������A�o���T�Ԃ��܂��������ߌ����̎��Ԃ��Ȃ��B
-�@�o���������ƃ��[�������܂�R�[�h�̐������i�܂Ȃ��B
-�@�o�����Ђƒi��������A6/8-6/11�̊Ԃ�3�A�x�Ȃ̂ł����łǂ��ɂ��������B
-�@
-�@[�Ή����@]
-�@�ȉ��\���Ƃ���B����͂����RX130�ARX231�ARX65N�Ŗ���LAN�������@�Ƃ���
-�@�S�����ʍ\���ɂȂ�̂ŗǂ��B�����pattern1�Ƃ���B
-�@�L��LAN���g��pattern2�ASDIO����LAN���g��pattern3���܂Ƃ߂��B
-�@�{�[�h�����ɍ��킹��̂�<first step>�Ə��������̂Ƃ���B
-�@
-�@pattern1:
-�@osi	protocol	implemented into
-�@7	aws		Amazon FreeRTOS
-�@7	mqtt		Amazon FreeRTOS
-�@6	ssl/tls		wifi module
-�@5	socket		wifi module
-�@4	tcp		wifi module
-�@3	ip		wifi module
-�@2	ether		wifi module
-�@1	phy		wifi module
-�@
-�@RX65N Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
-�@RX231 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
-�@RX130 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
-�@RX65N Target Board + Cloud Option Board (with Espressif ESP8266)
-�@RX231 Target Board + Cloud Option Board (with Espressif ESP8266)
-�@RX130 Target Board + Cloud Option Board (with Espressif ESP8266)
+　特に進捗はしなかった。
+　NoMaY氏がコードのメンテを進め、本家v126へ追従してくれている。
+　動作確認してv003としてコミットする。
+　
+　開発進捗としては、以下課題が挙がり、対応方法を考えた。
+　
+　[課題]
+　Silex側のTCP/IP機能を使わず、マイコン側でTCP/IPを実装した方式にしたかったが
+　Silex側のTCP/IP機能を使わないオプションが無い様子。
+　作戦は考えたが、出張週間がまだ続くため検討の時間がない。
+　出張が続くとメールが溜まりコードの整備が進まない。
+　出張がひと段落した後、6/8-6/11の間が3連休なのでここでどうにかしたい。
+　
+　[対応方法]
+　以下構成とする。これはこれでRX130、RX231、RX65Nで無線LAN実現方法として
+　全部共通構造になるので良い。これをpattern1とする。
+　有線LANを使うpattern2、SDIO無線LANを使うpattern3もまとめた。
+　ボード発売に合わせるのは<first step>と書いたものとする。
+　
+　pattern1:
+　osi	protocol	implemented into
+　7	aws		Amazon FreeRTOS
+　7	mqtt		Amazon FreeRTOS
+　6	ssl/tls		wifi module
+　5	socket		wifi module
+　4	tcp		wifi module
+　3	ip		wifi module
+　2	ether		wifi module
+　1	phy		wifi module
+　
+　RX65N Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+　RX231 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+　RX130 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+　RX65N Target Board + Cloud Option Board (with Espressif ESP8266)
+　RX231 Target Board + Cloud Option Board (with Espressif ESP8266)
+　RX130 Target Board + Cloud Option Board (with Espressif ESP8266)
 
-�@pattern2:
-�@osi	protocol	implemented into
-�@7	aws		Amazon FreeRTOS
-�@7	mqtt		Amazon FreeRTOS
-�@6	ssl/tls		Amazon FreeRTOS
-�@5	socket		Amazon FreeRTOS
-�@4	tcp		Amazon FreeRTOS
-�@3	ip		Amazon FreeRTOS
-�@2	ether		Amazon FreeRTOS(RX Ether specific)
-�@1	phy		ether-phy
+　pattern2:
+　osi	protocol	implemented into
+　7	aws		Amazon FreeRTOS
+　7	mqtt		Amazon FreeRTOS
+　6	ssl/tls		Amazon FreeRTOS
+　5	socket		Amazon FreeRTOS
+　4	tcp		Amazon FreeRTOS
+　3	ip		Amazon FreeRTOS
+　2	ether		Amazon FreeRTOS(RX Ether specific)
+　1	phy		ether-phy
 
-�@RX65N RSK <first step>
-�@RX65N Envision Kit <first step>
-�@
-�@pattern3:
-�@osi	protocol	implemented into
-�@7	aws		Amazon FreeRTOS
-�@7	mqtt		Amazon FreeRTOS
-�@6	ssl/tls		Amazon FreeRTOS
-�@5	socket		Amazon FreeRTOS
-�@4	tcp		Amazon FreeRTOS
-�@3	ip		Amazon FreeRTOS
-�@2	ether		Amazon FreeRTOS(RX SDIO-wifi specific)
-�@1	phy		wifi radio
+　RX65N RSK <first step>
+　RX65N Envision Kit <first step>
+　
+　pattern3:
+　osi	protocol	implemented into
+　7	aws		Amazon FreeRTOS
+　7	mqtt		Amazon FreeRTOS
+　6	ssl/tls		Amazon FreeRTOS
+　5	socket		Amazon FreeRTOS
+　4	tcp		Amazon FreeRTOS
+　3	ip		Amazon FreeRTOS
+　2	ether		Amazon FreeRTOS(RX SDIO-wifi specific)
+　1	phy		wifi radio
 
-�@RX65N RSK + SDIO wifi SDK (with Murata Type 1FX)
+　RX65N RSK + SDIO wifi SDK (with Murata Type 1FX)
 
 2018/05/20
-�@����1�T�ԂŎ��W�����t�B�[�h�o�b�N�͈ȉ�3�_�B
-�@�@���l�T�X�A�����J�F
-�@�@�@�@readme.txt �� step6-7 �Ńv���W�F�N�g���ǂ̂悤�ɃC���|�[�g����̂�
-�@�@�@�@���m�ł͂Ȃ��Bimport->existing project into workspace -> select a root directory
-�@�@�@�@�̂悤�ɏ������ق��������B
-�@�@�@�@ ��(�V�F���e�B): OK
-�@�@�@�Agenerate!.txt ���Ȃ�
-�@�@�@�@ ��(�V�F���e�B): ����Bsmc_gen���̓R�[�h��������Ɗ֌W�Ȃ��t�@�C����������d�l�B
-�@�@�@�@ �@�@�@�@�@�@�@�@GitHub��ɂ͑��݂��邩����Ȃ��B
-�@�@�@�B��x�Ɉ�̊������C���|�[�g�ł��Ȃ��|���������ق�������
-�@�@�@�@(RSK��Envision Kit�̃v���W�F�N�g��������������A
-�@�@�@�@�@�����ɃC���|�[�g���悤�Ƃ���ƃC���|�[�g���ɃG���[���o��j
-�@�@�@�@ ��(�V�F���e�B): OK
-�@�@���l�T�X�V���K�|�[���F
-�@�@�@./realtime_OS_pkg/r_bsp_rtos/mcu/rx65n/mcu_interrupts.c 
-�@�@�@Line851 from #if 0 to #if 1. �ɂ���O���[�v���荞�݂̒�`��
-�@�@�@���[�U�A�v�����Ɉړ��BGetting start�̐����Ƃ��Ă͕s�v�Ƃ��ėǂ��B
-�@�@�@�@ ��(�V�F���e�B): OK�B�������ړ������^�ӂ��m���߂�K�v����B
-�@�@NoMaY���F
-�@�@�@������V1.2.5�ɃA�b�v�f�[�g�B�i2018/05/20 16:00 ���_��V1.2.6�ɂȂ����悤���j
-�@�@�@RX65N�p�̃t�H�[�N��V1.2.5�ɃA�b�v�����B���̑������͈ȉ�URL�Q�ƁB
-�@�@�@http://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/28287#28287
-�@�@�@�@ ��(�V�F���e�B): OK
-�@�@�@
-�@��ƊJ�n�B
-�@�@�܂������l���������[�g�t�F�b�`��NoMaY���̏�Ԃ��擾�B
-�@�@RX65N RSK��e2 studio�̃v���W�F�N�g�œ���m�F�J�n�B
-�@�@�f�o�b�K�̐ݒ�œǂݍ��ރo�C�i�����̂ƃv���W�F�N�g�����������������̂ŏC���B
-�@�@�@rx65n_rsk_aws -> aws_demos
-�@�@���Ƃ��ƃV�F���e�B��������Ƃ��� rx65n_rsk_aws �Ƃ����v���W�F�N�g����������
-�@�@NoMaY���̊��ł�aws_demos �ƂȂ��Ă���B������������v���W�F�N�g���𒲐��������B
-�@�@���̌�A���l�T�X�V���K�|�[���̃t�B�[�h�o�b�N�𔽉f�Bmcu_interrupts.c��
-�@�@�O���[�v���荞�݂̃R�[�h�� freertos_usr_func.c �Ɉړ��B���̑Ώ����@�͂���ς�
-�@�@�����C�ɂȂ�B���̂܂܂ł����̂ł͂Ƃ����C������B�m�F����B��
-�@�@step7 ��ifdef�Ɋւ���w�����폜�����B
-�@�@����m�F�B�G�R�[����OK�B
-�@�@�Ȃ�AWS�ڑ����ɂ����鎞�Ԃ��Z���Ȃ����C������B
+　この1週間で収集したフィードバックは以下3点。
+　　ルネサスアメリカ：
+　　　①readme.txt の step6-7 でプロジェクトをどのようにインポートするのか
+　　　　明確ではない。import->existing project into workspace -> select a root directory
+　　　　のように書いたほうがいい。
+　　　　 ⇒(シェルティ): OK
+　　　②generate!.txt がない
+　　　　 ⇒(シェルティ): ある。smc_gen内はコード生成すると関係ないファイルが消える仕様。
+　　　　 　　　　　　　　GitHub上には存在するから問題なし。
+　　　③一度に一個の環境しかインポートできない旨を書いたほうがいい
+　　　　(RSKとEnvision Kitのプロジェクト名が同じだから、
+　　　　　同時にインポートしようとするとインポート時にエラーが出る）
+　　　　 ⇒(シェルティ): OK
+　　ルネサスシンガポール：
+　　　./realtime_OS_pkg/r_bsp_rtos/mcu/rx65n/mcu_interrupts.c 
+　　　Line851 from #if 0 to #if 1. にあるグループ割り込みの定義は
+　　　ユーザアプリ側に移動。Getting startの説明としては不要として良い。
+　　　　 ⇒(シェルティ): OK。ただし移動した真意を確かめる必要あり。
+　　NoMaY氏：
+　　　公式がV1.2.5にアップデート。（2018/05/20 16:00 時点でV1.2.6になったようだ）
+　　　RX65N用のフォークをV1.2.5にアップした。その他調整は以下URL参照。
+　　　http://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/28287#28287
+　　　　 ⇒(シェルティ): OK
+　　　
+　作業開始。
+　　まず何も考えずリモートフェッチでNoMaY氏の状態を取得。
+　　RX65N RSKのe2 studioのプロジェクトで動作確認開始。
+　　デバッガの設定で読み込むバイナリ名称とプロジェクト名がおかしかったので修正。
+　　　rx65n_rsk_aws -> aws_demos
+　　もともとシェルティが作ったときは rx65n_rsk_aws というプロジェクト名だったが
+　　NoMaY氏の環境ではaws_demos となっている。落ち着いたらプロジェクト名を調整したい。
+　　その後、ルネサスシンガポールのフィードバックを反映。mcu_interrupts.cの
+　　グループ割り込みのコードは freertos_usr_func.c に移動。この対処方法はやっぱり
+　　何か気になる。元のままでいいのではという気がする。確認する。★
+　　step7 のifdefに関する指示を削除した。
+　　動作確認。エコー動作OK。
+　　なんかAWS接続時にかかる時間が短くなった気がする。
 
-�@�@RX65N RSK��CS+�̃v���W�F�N�g�œ���m�F�J�n�B
-�@�@����������ɖ��Ȃ��B
-�@�@RX65N Envision Kit��e2 studio�̃v���W�F�N�g�œ���m�F�J�n�B
-�@�@����������ɖ��Ȃ��B
-�@�@RX65N Envision Kit��CS+�̃v���W�F�N�g�œ���m�F�J�n�B
-�@�@����������ɖ��Ȃ��B
+　　RX65N RSKのCS+のプロジェクトで動作確認開始。
+　　こちらも特に問題なし。
+　　RX65N Envision Kitのe2 studioのプロジェクトで動作確認開始。
+　　こちらも特に問題なし。
+　　RX65N Envision KitのCS+のプロジェクトで動作確認開始。
+　　こちらも特に問題なし。
 
-�@�ЂƂ܂������܂łŃR�~�b�g�Bv0.02�Ƃ���B
-�@
+　ひとまずここまででコミット。v0.02とする。
+　
 2018/05/12
-�@NoMaY���ɃA�h�o�C�X�����������A5/1�ۑ�ɑ΂��Ĉȉ����j�Ƃ����B
-�@�E�ȉ��{�[�h�ˑ��������R�[�h(�S�������ɂȂ���)�Ȃ̂�1�K�wUP���ă}�[�W����B
-�@�@�ˌ���ێ��B
-�@�@�@NoMaY���F�t���b�V���̃u���b�N�T�C�Y���@�했�ɈقȂ邽�ߕ����Ă������ق�����X�y�B
-�@�@�@�@�˃V�F���e�B�FYES�B�����A�u���b�N�T�C�Y�̓t���b�V�����W���[���̋��ʃ}�N�����Ŕ��ʂł���̂�
-�@�@�@�@�@�����I�ɂ͂�͂�}�[�W�ł���\�������肻���B
-�@�EBSP��h���C�o�́A�ȉ��t�H���_�ɓ����̂�����@�̂悤���B���̂��������z������B
-�@�@�ˌ���ێ��B
-�@�@�@NoMaY���F�X�}�[�g�R���t�B�O���[�^�̎d�l�ƍ��킹���Ȃ��B
-�@�@�@�@�˃V�F���e�B�F�c���B����ێ��Ƃ������B
-�@�@�@�@�@���x���_�Ǝ����\���ɂ��ׂ��A�p���c�_�͕K�v�B
-�@�@�@�@�@�i�X�}�[�g�R���t�B�O���[�^�őΉ��ł�����@���l����Ȃǁj
-�@
-�@�{���̊����́AGitHub�ւ̃R�[�h�o�^�BNoMaY���Ƒ��k���ЂƂ܂���v1.2.3�̌���œo�^����̂�
-�@�ǂ��ł��낤�Ƃ̂��ƁB����������A�ȉ�3�_��Ώ�����Ό���̂��̂��A�b�v���[�h�ł���B
-�@�@(1)AWS�ڑ��p�A�J�E���g���(�f�o�C�X�ؖ����A�閧��)�̃f�[�^���폜
-�@�@(2)AWS�ڑ��p�A�J�E���g���̐ݒ���@�A�f�o�C�X�h���C�o�̃C���X�g�[�����@�A
-�@�@�@ �f���̓���m�F���@�A���������ȂǃX�^�[�g�A�b�v�K�C�h��{���̐擪�ɋL���B
-�@�@�@ �X�^�[�g�A�b�v�K�C�h�͉p��A���{�ꕹ�L�Ƃ�
-�@�@�@ �|�[�e�B���O�L�^���͓̂��{��ŗǂ��ł��낤�B
-�@�@(3)���l�T�X�̃f�o�C�X�h���C�o�̃R�[�h���폜���Ă����B(NoMaY���̐��ʂ��g�킹�Ă�������)
-�@�@
+　NoMaY氏にアドバイスをいただき、5/1課題に対して以下方針とした。
+　・以下ボード依存が無いコード(全く同じになった)なので1階層UPしてマージする。
+　　⇒現状維持。
+　　　NoMaY氏：フラッシュのブロックサイズが機種毎に異なるため分けておいたほうが後々楽。
+　　　　⇒シェルティ：YES。ただ、ブロックサイズはフラッシュモジュールの共通マクロ名で判別できるので
+　　　　　将来的にはやはりマージできる可能性もありそう。
+　・BSPやドライバは、以下フォルダに入れるのがお作法のようだ。そのうち引っ越しする。
+　　⇒現状維持。
+　　　NoMaY氏：スマートコンフィグレータの仕様と合わせられない。
+　　　　⇒シェルティ：把握。現状維持としたい。
+　　　　　他ベンダと似た構成にすべく、継続議論は必要。
+　　　　　（スマートコンフィグレータで対応できる方法を考えるなど）
+　
+　本日の活動は、GitHubへのコード登録。NoMaY氏と相談しひとまずはv1.2.3の現状で登録するのが
+　良いであろうとのこと。さしあたり、以下3点を対処すれば現状のものをアップロードできる。
+　　(1)AWS接続用アカウント情報(デバイス証明書、秘密鍵)のデータを削除
+　　(2)AWS接続用アカウント情報の設定方法、デバイスドライバのインストール方法、
+　　　 デモの動作確認方法、改訂履歴などスタートアップガイドを本書の先頭に記す。
+　　　 スタートアップガイドは英語、日本語併記とし
+　　　 ポーティング記録自体は日本語で良いであろう。
+　　(3)ルネサスのデバイスドライバのコードを削除しておく。(NoMaY氏の成果を使わせていただく)
+　　
 2018/05/01
-�@��X�������o�Ĉȉ�4��ނ̃v���W�F�N�g�̓���m�F�������B
-�@Amazon FreeRTOS 1.2.3 �Ɠ����\���ɏo�����B
-�@(1)RX65N RSK/CS+
-�@(2)RX65N RSK/e2 studio
-�@(3)RX65N Envision Kit/CS+
-�@(4)RX65N Envision Kit/e2 studio
-�@
-�@�ȉ����ۑ�B��
-�@�EAWS IoT�̃A�J�E���g�ɕR�Â���"���m"�̃f�o�C�X�ؖ����A�閧������
-�@�@RX65N���Ɏ������Ă����K�v������B
-�@�@���݂́A�ȉ��\�[�X�R�[�h�ɖ��ߍ���ł���B
-�@�@�@\demos\common\include\aws_clientcredential.h
-�@�@�@�@�EclientcredentialMQTT_BROKER_ENDPOINT[]
-�@�@�@�@�EclientcredentialIOT_THING_NAME
-�@�@�@\demos\common\include\aws_clientcredential_keys.h
-�@�@�@�@�EclientcredentialCLIENT_CERTIFICATE_PEM
-�@�@�@�@�EclientcredentialCLIENT_PRIVATE_KEY_PEM
-�@�@�@�@
-�@�@�@���O�C������Ƃ��ɕK�v�ȃf�[�^�ł��邪�A���ۂ͂��̒l�̓��[�U���ɈقȂ�B
-�@�@�@STM32�̊��ł́A�V�X�e������N�����ɏ�L�f�[�^���R���\�[��������͂���
-�@�@�@�����ɂȂ��Ă���悤���B���������[�X�܂łɂ́A�^�����ăV�X�e�������K�v������B
-�@�@�@�i���܂̃R�[�h�̓V�F���e�B�̃A�J�E���g�Ɍq����̂ł������炵�Ȃ��ł��������ˁj
-�@�ENIST FIPS140-2�ł͔閧���̂悤�ɃV�X�e���Z�L�����e�B�̗v�ɂȂ�f�[�^��
-�@�@Critical Security Parameter(CSP)�ƌď̂��A�K�؂ɒ�߂��Í����E�̒��ł݈̂����悤��
-�@�@��߂Ă���B�ʏ�̃}�C�R�����ƈÍ����E���������߂��̗v���𖞂����Ȃ����A
-�@�@RX65N���ڂ�Trusted Secure IP�ł͂��̔閧���͂��Ƃ��ASSL/TLS�̃Z�b�V�������Ɏ���܂�
-�@�@���ׂĂ�CSP��Trusted Secure IP�̒�(�Í����E�̒�)�ň�����悤�ɐ݌v���Ă���B
-�@�@�����mbed TLS�̃R�[�h�̂܂܂��ƁA�Z�b�V��������閧�����f�o�b�K��R�[�h��ی����ł��邪�A
-�@�@���������Trusted Secure IP�ɔ铽�����܂܈Í��ʐM���s����悤���ǂ��Ă����\��B
-�@�E�܂��f���u\demos\common�v�̂����A�G�R�[�̃f�����������ĂȂ�
-�@�@���̑��̃f��������m�F���Ă����B����OTA�̃f���ɒ��ځB
-�@�Ee2 studio�̊��̃t�H���_�\���������Ƃ܂������ĂȂ��B�C������B(CS+�͂ł���)
-�@�E�ȉ��̓{�[�h�ˑ��������R�[�h(�S�������ɂȂ���)�Ȃ̂�1�K�wUP���ă}�[�W����B
-�@�@�@\lib\ota\portable\renesas\rx65n-envision-kit\aws_ota_pal.c
-�@�@�@\lib\ota\portable\renesas\rx65n-rsk\aws_ota_pal.c
-�@�@�@\lib\pkcs11\portable\renesas\rx65n-envision-kit\pkcs11.c
-�@�@�@\lib\pkcs11\portable\renesas\rx65n-rsk\pkcs11.c
-�@�@�@\lib\secure_sockets\portable\renesas\rx65n-envision-kit\aws_secure_sockets.c
-�@�@�@\lib\secure_sockets\portable\renesas\rx65n-rsk\aws_secure_sockets.c
-�@�EBSP��h���C�o�́A�ȉ��t�H���_�ɓ����̂�����@�̂悤���B���̂��������z������B
-�@�@�@\lib\third_party\mcu_vendor\renesas\
-�@�@�@�@��DriverLibName�Ƃ���̂ŁA�x���_���D���Ȗ��O��t������悤���B
-�@�@�@�@�@���ɂ��悤���ȁH
-�@�@�@�@�@�ˑf���ɁA�urx_driver_package�v�ɂ��悤�B
+　種々調整を経て以下4種類のプロジェクトの動作確認が完了。
+　Amazon FreeRTOS 1.2.3 と同じ構造に出来た。
+　(1)RX65N RSK/CS+
+　(2)RX65N RSK/e2 studio
+　(3)RX65N Envision Kit/CS+
+　(4)RX65N Envision Kit/e2 studio
+　
+　以下が課題。★
+　・AWS IoTのアカウントに紐づいた"モノ"のデバイス証明書、秘密鍵情報を
+　　RX65N側に持たせておく必要がある。
+　　現在は、以下ソースコードに埋め込んである。
+　　　\demos\common\include\aws_clientcredential.h
+　　　　・clientcredentialMQTT_BROKER_ENDPOINT[]
+　　　　・clientcredentialIOT_THING_NAME
+　　　\demos\common\include\aws_clientcredential_keys.h
+　　　　・clientcredentialCLIENT_CERTIFICATE_PEM
+　　　　・clientcredentialCLIENT_PRIVATE_KEY_PEM
+　　　　
+　　　ログインするときに必要なデータであるが、実際はこの値はユーザ毎に異なる。
+　　　STM32の環境では、システム初回起動時に上記データをコンソールから入力する
+　　　方式になっているようだ。正式リリースまでには、真似してシステムを作る必要がある。
+　　　（いまのコードはシェルティのアカウントに繋がるのでいたずらしないでくださいね）
+　・NIST FIPS140-2では秘密鍵のようにシステムセキュリティの要になるデータを
+　　Critical Security Parameter(CSP)と呼称し、適切に定めた暗号境界の中でのみ扱うように
+　　定めている。通常のマイコンだと暗号境界が無いためこの要件を満たせないが、
+　　RX65N搭載のTrusted Secure IPではこの秘密鍵はもとより、SSL/TLSのセッション鍵に至るまで
+　　すべてのCSPをTrusted Secure IPの中(暗号境界の中)で扱えるように設計してある。
+　　現状のmbed TLSのコードのままだと、セッション鍵や秘密鍵がデバッガやコード上丸見えであるが、
+　　将来これをTrusted Secure IPに秘匿したまま暗号通信が行えるよう改良していく予定。
+　・まだデモ「\demos\common」のうち、エコーのデモしか動いてない
+　　その他のデモも動作確認していく。特にOTAのデモに着目。
+　・e2 studioの環境のフォルダ構成が実物とまだ合ってない。修正する。(CS+はできた)
+　・以下はボード依存が無いコード(全く同じになった)なので1階層UPしてマージする。
+　　　\lib\ota\portable\renesas\rx65n-envision-kit\aws_ota_pal.c
+　　　\lib\ota\portable\renesas\rx65n-rsk\aws_ota_pal.c
+　　　\lib\pkcs11\portable\renesas\rx65n-envision-kit\pkcs11.c
+　　　\lib\pkcs11\portable\renesas\rx65n-rsk\pkcs11.c
+　　　\lib\secure_sockets\portable\renesas\rx65n-envision-kit\aws_secure_sockets.c
+　　　\lib\secure_sockets\portable\renesas\rx65n-rsk\aws_secure_sockets.c
+　・BSPやドライバは、以下フォルダに入れるのがお作法のようだ。そのうち引っ越しする。
+　　　\lib\third_party\mcu_vendor\renesas\
+　　　　⇒DriverLibNameとあるので、ベンダが好きな名前を付けられるようだ。
+　　　　　何にしようかな？
+　　　　　⇒素直に、「rx_driver_package」にしよう。
 
 2018/04/30
-�@����1�����͎Г������ɖz���B�R�[�h�̒����̓A�����J�̊J�������ɔC�����B
-�@�A�����J�̊J�������̒����ɂ��Amazon FreeRTOS Qualification Program�̍��i�ɖړr���������B
-�@�܂��A���͉�ЂƂ̌_���4���͐؂�Ă���i�������B
-�@5���ȍ~�Č_�������FreeRTOS+TCP�ւ�IGMP�@�\�ǉ���GCC�Ή���i�߂Ă��炤�悤���������B
-�@�V�F���e�B�́ARX65N Amazon FreeRTOS�p�̃{�[�h�d�l��W/W�����o�[�ԂŌ����B
-�@�����ł͏ڍׂ͕����邪�S�[���������Ă����󋵁B
-�@�f�o�C�X�h���C�o�̍Ĕz�z�ɂ��ă��[�K���`�[���Ƌ��c���A
-�@����LAN���W���[��(Silex SX-ULPGN)�̓��{�����Z�K�擾���傫�ȉۑ�B
-�@
-�@�܂��A�Z�L�����e�BIP�A�g��SDIO�A�g����U��~���A
-�@�{�[�h�̔���D�悳����悤�S�̕��j���X�V�B�ȉ��i���\���X�V����B
+　ここ1か月は社内調整に奔走。コードの調整はアメリカの開発部隊に任せた。
+　アメリカの開発部隊の調整によりAmazon FreeRTOS Qualification Programの合格に目途が立った。
+　また、協力会社との契約は4月は切れており進捗無し。
+　5月以降再契約を結びFreeRTOS+TCPへのIGMP機能追加とGCC対応を進めてもらうよう調整した。
+　シェルティは、RX65N Amazon FreeRTOS用のボード仕様をW/Wメンバー間で検討。
+　ここでは詳細は伏せるがゴールが見えてきた状況。
+　デバイスドライバの再配布についてリーガルチームと協議中、
+　無線LANモジュール(Silex SX-ULPGN)の日本国内技適取得が大きな課題。
+　
+　また、セキュリティIP連携やSDIO連携を一旦停止し、
+　ボード販売を優先させるよう全体方針を更新。以下進捗表も更新する。
 
     ------------------------------------
-    RX65N Envision Kit�ARX65N RSK(2MB��/�Í��킠��i)���^�[�Q�b�g�ɃR�[�h�����e���ێ����܂��B
-    ���L Amazon FreeRTOS 1.2.x �͓K�X�ŐV�R�[�h�ɍX�V���Ă����܂��B
-    2018/04/30���_�ł̓K�p�R�[�h�� 1.2.3 �ł��B
+    RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットにコードメンテを維持します。
+    下記 Amazon FreeRTOS 1.2.x は適宜最新コードに更新していきます。
+    2018/04/30時点での適用コードは 1.2.3 です。
 
-    �@���l�T�XTCP/IP���^�[�Q�b�g�œ��삳����iEther�̓���m�F�j
-    �ASDIO����LAN�𓮍�m�F����������FreeRTOS 8.2.2���^�[�Q�b�g�œ��삳����
-    �B���l�T�X��FreeRTOS�p�b�P�[�W�A9.0.0���^�[�Q�b�g�œ��삳����
-    �CAmazon FreeRTOS 1.2.x��FreeRTOS�������^�[�Q�b�g�œ��삳����
-    �DAmazon FreeRTOS 1.2.x��FreeRTOS+TCP�������^�[�Q�b�g�œ��삳����
-    �EAmazon FreeRTOS 1.2.x��mbed TLS�������^�[�Q�b�g�œ��삳����
-    �FAmazon FreeRTOS 1.2.x��MQTT�������^�[�Q�b�g�œ��삳����iAWS�ւ̐ڑ������j
-    �GAmazon FreeRTOS 1.2.x��FreeRTOS+TCP�����̃l�b�g���[�N�w�̌����������H�v���āA
-    �@(1)Ether�A(2)SPI�ڑ�����LAN���W���[���A(3)SDIO����LAN���W���[����3��ނ�
-    �@�؂�ւ�����悤�ɂ���@����U��~�A��ق�(2)�ɍi���čĊJ
-    �HAmazon FreeRTOS 1.2.x��mbed TLS�����̈Í������v���~�e�B�u��
-    �@�\�t�g�E�F�A�����iAES�Ƃ�RSA�Ƃ��j��RX65N�����Í�����g����
-    �@�n�[�h�E�F�A�����ɒu��������@����U��~
-    �IEther�w�̃[���R�s�[�ɑΉ�����@����U��~
-    �JAmazon FreeRTOS�{�Ɗ��Ƀ}�[�W���AAmazon FreeRTOS�{�ƃR�[�h�ւ̒Ǐ]���ȒP�ɂł���悤�ɂ���@�����܂������V�F���e�B
-    �KAmazon FreeRTOS ��Git��fork�ɓo�^����
-    �LAmazon FreeRTOS ��Certification���󌱂����i��Git�̖{�Ƃɓo�^����
-    �@https://docs.aws.amazon.com/freertos/latest/userguide/freertos-qualification-program.html
+    ①ルネサスTCP/IPをターゲットで動作させる（Etherの動作確認）
+    ②SDIO無線LANを動作確認した時期のFreeRTOS 8.2.2をターゲットで動作させる
+    ③ルネサスのFreeRTOSパッケージ、9.0.0をターゲットで動作させる
+    ④Amazon FreeRTOS 1.2.xのFreeRTOS部分をターゲットで動作させる
+    ⑤Amazon FreeRTOS 1.2.xのFreeRTOS+TCP部分をターゲットで動作させる
+    ⑥Amazon FreeRTOS 1.2.xのmbed TLS部分をターゲットで動作させる
+    ⑦Amazon FreeRTOS 1.2.xのMQTT部分をターゲットで動作させる（AWSへの接続実験）
+    ⑧Amazon FreeRTOS 1.2.xのFreeRTOS+TCP部分のネットワーク層の結合部分を工夫して、
+    　(1)Ether、(2)SPI接続無線LANモジュール、(3)SDIO無線LANモジュールの3種類を
+    　切り替えられるようにする　★一旦停止、後ほど(2)に絞って再開
+    ⑨Amazon FreeRTOS 1.2.xのmbed TLS部分の暗号処理プリミティブの
+    　ソフトウェア実装（AESとかRSAとか）をRX65N内蔵暗号器を使った
+    　ハードウェア実装に置き換える　★一旦停止
+    ⑩Ether層のゼロコピーに対応する　★一旦停止
+    ⑪Amazon FreeRTOS本家環境にマージし、Amazon FreeRTOS本家コードへの追従を簡単にできるようにする　★いまここ＠シェルティ
+    ⑫Amazon FreeRTOS のGitのforkに登録する
+    ⑬Amazon FreeRTOS のCertificationを受験し合格しGitの本家に登録する
+    　https://docs.aws.amazon.com/freertos/latest/userguide/freertos-qualification-program.html
     ------------------------------------
 
-�@GW���Ԓ��́A�ȉ��������s���B
-�@(1)RX65N Amazon FreeRTOS�R�[�h�̃}�[�W(NoMaY���ŁA���l�T�X�A�����J�ŁA�V�F���e�B��)�ˇJ�`�K
-�@(2)Amazon Web Service�̕׋�
-�@(3)Silex SX-ULPGN�̃h���C�o���ˇG��(2)�Ή� <���ۂ͒n�Ȃ炵��������5�����畾�ۂɗ��錤�C���ɍ���Ă��炤>
+　GW期間中は、以下調整を行う。
+　(1)RX65N Amazon FreeRTOSコードのマージ(NoMaY氏版、ルネサスアメリカ版、シェルティ版)⇒⑪～⑫
+　(2)Amazon Web Serviceの勉強
+　(3)Silex SX-ULPGNのドライバ作り⇒⑧の(2)対応 <実際は地ならしだけして5月から弊課に来る研修生に作ってもらう>
 
-�@����ł͍�ƊJ�n�B�܂���(1)����B
-�@(1)RX65N Amazon FreeRTOS�R�[�h�̃}�[�W(NoMaY���ŁA���l�T�X�A�����J�ŁA�V�F���e�B��)�ˇJ�`�K
+　それでは作業開始。まずは(1)から。
+　(1)RX65N Amazon FreeRTOSコードのマージ(NoMaY氏版、ルネサスアメリカ版、シェルティ版)⇒⑪～⑫
 
-�@�����l����B�܂��͓���m�F�󋵂��}�g���N�X���B
-�@			NoMaY����	�A�����J��	�V�F���e�B��
-�@�r���h		�Z		�Z		�Z
-�@���퓮��		�~		�Z		�Z
-�@�t�H���_�ʒu��ˑ�	�Z		�~		�Z
-�@GitHub�x�[�X		�Z		�~		�~
-�@���荇�i		�~		�Z		�~
-�@�x�[�X�o�[�W����	1.2.3		1.2.0?		1.2.3
-�@
-�@�\�����Ă݂�ƁANoMaY���ł̃v���W�F�N�g�ɃA�����J�ł̃R�[�h�ŏ㏑������Ηǂ��������B
-�@���퓮�삵������߂Ė{�Ƃ�1.2.3�ƃ}�[�W����΂悢�B
-�@�}�[�W�c�[���łЂ�����A�����J�Ł�NoMaY���ł̃R�[�h�ɏ㏑�����Ă����B
-�@NoMaY���̃R�[�h�́AGitHub����4/29 (Amazon FreeRTOS 1.2.3)��Clone�������́B
-�@�A�����J�ł̃R�[�h�́AAmazonFreeRTOS_04052018.zip��p�����B
-�@
+　作戦を考える。まずは動作確認状況をマトリクス化。
+　			NoMaY氏版	アメリカ版	シェルティ版
+　ビルド		〇		〇		〇
+　正常動作		×		〇		〇
+　フォルダ位置非依存	〇		×		〇
+　GitHubベース		〇		×		×
+　検定合格		×		〇		×
+　ベースバージョン	1.2.3		1.2.0?		1.2.3
+　
+　表を見てみると、NoMaY氏版のプロジェクトにアメリカ版のコードで上書きすれば良さそうだ。
+　正常動作したら改めて本家の1.2.3とマージすればよい。
+　マージツールでひたすらアメリカ版⇒NoMaY氏版のコードに上書きしていく。
+　NoMaY氏のコードは、GitHubから4/29 (Amazon FreeRTOS 1.2.3)にCloneしたもの。
+　アメリカ版のコードは、AmazonFreeRTOS_04052018.zipを用いた。
+　
 2018/03/17
-�@���͉�ЂɈ˗������i���E�F���߂��Ă����B
-�@3/3���̐��ʂɑ΂��AAWS�ڑ�(MQTT������SSL/TLS����)���o�����悤���B
-�@����Ői���E�F��OK�ƂȂ����B���@�m�F���A�m����MQTT��AWS�Ɍq������
-�@HELLO WORLD�������Ă��邱�Ƃ��m�F�B���͉�Ђ͌��ݐi���H�̒�����i�߂Ă���B
-�@
-�@�V�F���e�B�͂��낻��G�������e����K�v�����肻���B
-�@�ȉ��ɒ��߂Ō������s�����{���̖���LAN�Ή����j���L���B
-�@
-�@SPI�ڑ��̖���LAN���W���[���͎�v���Ŏg�p/�T�|�[�g�\�Ȃ��̂Ƃ���Silex��SX-ULPGN�A
-�@�V����������Realtek��RTL8710��I��B�z�r�[���[�X������Espressif��ESP8266�B
-�@Realtek�Ƃ����ƃV�F���e�B��g�ݍ��݃l�b�g���[�N�̐��E�ɗU������
-�@���̃J�j�}�[�N�̃`�b�v�ARTL8019AS���v���o���B
-�@�@https://www.google.co.jp/search?q=rtl8019as&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjDvoyzsvLZAhVDGpQKHVjECycQ_AUICygC&biw=2021&bih=1014
-�@
-�@
-�@SDIO�ڑ��̖���LAN���W���[���͌v��ʂ葺�c���쏊��Type 1FX�B
-�@���ꂼ��SDK����肵�Ď����ł���悤��z��i�߂Ă����B
-�@�C���^�t�F�[�X��PMOD�ɂȂ��Ă���΂ǂ̃��l�T�X�{�[�h�ɂ�
-�@�������Őڑ��\�BPMOD�^�C�v������Ώ��ǂ��B
-�@PMOD�^�C�v��SPI�ڑ��ŗD��B�iUART���ƒx������j
-�@SDK�������SPI�ł�USB�ł�UART�ł��Ȃ�ł��ł���W�F�l���b�N�Ȋ������ǂ��B
-�@
-�@<<SPI�ڑ�����LAN���W���[��>>
-�@Silex��SX-ULPGN
-�@(SDK)�F������
-�@�@http://www.silexamerica.com/products/connectivity-solutions/embedded-wireless/IoT-Modules/sx-ulpgn-evk/
-�@(���W���[��)�F������
-�@�@http://www.silexamerica.com/products/connectivity-solutions/embedded-wireless/IoT-Modules/sx-ulpgn-iot-qca4010-radio-module/
-�@�@��PMOD�R���o�[�^����邩�H
-�@�@
-�@Realtek��RTL8710
-�@(SDK)�F������
-�@�@�ǂ��̂������B
-�@(���W���[��)�F������
-�@�@https://www.seeedstudio.com/RTL8710-WiFi-Module-p-2793.html
-�@�@��PMOD�R���o�[�^����邩�H
-�@
-�@Espressif��ESP8266
-�@(SDK)�F������
-�@�@https://www.mouser.jp/ProductDetail/Olimex-Ltd/MOD-WIFI-ESP8266?qs=QGk6feVlqMKKopUWzCH4tA%3D%3D
-�@(���W���[��)�F
-�@�@��SDK�ŏ\���������H
+　協力会社に依頼した進捗⑥⑦が戻ってきた。
+　3/3分の成果に対し、AWS接続(MQTT実装とSSL/TLS実装)が出来たようだ。
+　これで進捗⑥⑦がOKとなった。実機確認し、確かにMQTTでAWSに繋がって
+　HELLO WORLDが動いていることを確認。協力会社は現在進捗⑨の調査を進めている。
+　
+　シェルティはそろそろ⑧をメンテする必要がありそう。
+　以下に直近で検討を行った本件の無線LAN対応方針を記す。
+　
+　SPI接続の無線LANモジュールは主要国で使用/サポート可能なものとしてSilexのSX-ULPGN、
+　新興国向けにRealtekのRTL8710を選定。ホビーユース向けにEspressifのESP8266。
+　Realtekというとシェルティを組み込みネットワークの世界に誘い込んだ
+　あのカニマークのチップ、RTL8019ASを思い出す。
+　　https://www.google.co.jp/search?q=rtl8019as&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjDvoyzsvLZAhVDGpQKHVjECycQ_AUICygC&biw=2021&bih=1014
+　
+　
+　SDIO接続の無線LANモジュールは計画通り村田製作所のType 1FX。
+　それぞれSDKを入手して実験できるよう手配を進めておく。
+　インタフェースはPMODになっていればどのルネサスボードにも
+　無改造で接続可能。PMODタイプがあれば尚良し。
+　PMODタイプはSPI接続最優先。（UARTだと遅いから）
+　SDKがあればSPIでもUSBでもUARTでもなんでもできるジェネリックな感じが良い。
+　
+　<<SPI接続無線LANモジュール>>
+　SilexのSX-ULPGN
+　(SDK)：未入手
+　　http://www.silexamerica.com/products/connectivity-solutions/embedded-wireless/IoT-Modules/sx-ulpgn-evk/
+　(モジュール)：未入手
+　　http://www.silexamerica.com/products/connectivity-solutions/embedded-wireless/IoT-Modules/sx-ulpgn-iot-qca4010-radio-module/
+　　⇒PMODコンバータを作るか？
+　　
+　RealtekのRTL8710
+　(SDK)：未入手
+　　良いのが無い。
+　(モジュール)：未入手
+　　https://www.seeedstudio.com/RTL8710-WiFi-Module-p-2793.html
+　　⇒PMODコンバータを作るか？
+　
+　EspressifのESP8266
+　(SDK)：未入手
+　　https://www.mouser.jp/ProductDetail/Olimex-Ltd/MOD-WIFI-ESP8266?qs=QGk6feVlqMKKopUWzCH4tA%3D%3D
+　(モジュール)：
+　　⇒SDKで十分安いか？
 
-�@<<SDIO�ڑ�����LAN���W���[��>>
-�@���c���쏊��Type 1FX
-�@(SDK)�F����ς݁i������1��̂݁B���͉�Зp�ɂ���1��ǉ��K�v�j
-�@�@https://www.digikey.jp/product-detail/ja/murata-electronics-north-america/LBWA1KL1FX-TEMP-DS-SD/490-14857-ND/6612483
-�@(���W���[���j�F������
-�@�@https://wireless.murata.com/eng/products/rf-modules-1/embedded-wi-fi-1/type-1fx.html
-�@�@
-�@<<����LAN�h���C�o�J���̍��>>
-�@SPI�ڑ��̖���LAN���W���[���̃h���C�o���͎��̋���f�ނɗǂ������B
-�@���܂��Փx�͍����Ȃ��̂ŁA�f�[�^�V�[�g���Ȃ���Ƃɂ�������OK�B
+　<<SDIO接続無線LANモジュール>>
+　村田製作所のType 1FX
+　(SDK)：入手済み（ただし1台のみ。協力会社用にもう1台追加必要）
+　　https://www.digikey.jp/product-detail/ja/murata-electronics-north-america/LBWA1KL1FX-TEMP-DS-SD/490-14857-ND/6612483
+　(モジュール）：未入手
+　　https://wireless.murata.com/eng/products/rf-modules-1/embedded-wi-fi-1/type-1fx.html
+　　
+　<<無線LANドライバ開発の作戦>>
+　SPI接続の無線LANモジュールのドライバ作りは若手の教育素材に良さそう。
+　あまり難易度は高くないので、データシート見ながらとにかく作ればOK。
 
-�@SDIO�ڑ��̖���LAN���W���[���̃h���C�o���͋��͉�ЂɈ˗�����\��B
-�@Type 1FX��Broadcom�̃`�b�v�Z�b�g�����ڂ���Ă���BBroadcom�̖������Ƃ�Cypress��
-�@���p����Ă���A���ݖ���LAN�h���C�o(WICED)��Cypress����I�[�v���\�[�X�񋟂���Ă���B
-�@Type 1FX�̑O�g�ł���Type ZX�p��WICED�͉ߋ�FreeRTOS��ł̓���m�F���ł����̂ŁA
-�@�܂�Type ZX�p��WICED�\�t�g��p����Type ZX�œ���m�F��i�߂Ă݂�BType ZX��SDK�͓���ς݁B
-�@Type 1FX�Ή���WICED�̃I�[�v���\�[�X���撣���Ď��͈ڐA���邩
-�@���c���쏊�ɃT�|�[�g�˗����邩�����B
-�@
-�@�|���Ď茳�ł̐i���E�F�̃}�[�W���s���B
-�@���̌�Amazon FreeRTOS�{�ƂƂ̃Y������m�F����B
+　SDIO接続の無線LANモジュールのドライバ作りは協力会社に依頼する予定。
+　Type 1FXはBroadcomのチップセットが搭載されている。Broadcomの無線事業はCypressに
+　売却されており、現在無線LANドライバ(WICED)はCypressからオープンソース提供されている。
+　Type 1FXの前身であるType ZX用のWICEDは過去FreeRTOS上での動作確認ができたので、
+　まずType ZX用のWICEDソフトを用いてType ZXで動作確認を進めてみる。Type ZXのSDKは入手済み。
+　Type 1FX対応はWICEDのオープンソースを頑張って自力移植するか
+　村田製作所にサポート依頼するか検討。
+　
+　翻って手元での進捗⑥⑦のマージを行う。
+　その後Amazon FreeRTOS本家とのズレ具合を確認する。
 
-�@rx65n_rsk_aws�Ŏ����J�n�B
+　rx65n_rsk_awsで実験開始。
 
-�@<<�i���E�F�̃}�[�W>>
-�@�܂��ω��_�𕪉����č\����c�����Ă����A���|�W�g���o�^���Ă����B
-�@�܂��͒�Ԃ�grep�����B
-�@�ȍ~�A�V�F���e�B�ł�{���A���͉�Дł��x���ƕ\������B
-�@
-�@rx65n_rsk_aws.c
-�@�@���C���^�X�N�����B�x���ɂ�AWS�ڑ����s���^�X�N�N�����̏������ǉ�����Ă���B
-�@�@�{���Ƀ}�[�W�B
-�@�@�ȉ�2�֐����ǉ�����Ă���B���Ƃŗ�������B��
-�@�@�@vApplicationGetIdleTaskMemory()
-�@�@�@vApplicationGetTimerTaskMemory()
-�@�@�ȉ��֐��Ăяo���������Ă���B���Ƃŗ�������B��
-�@�@�@SYSTEM_Init()
-�@�@�@
-�@\rx65n_rsk_aws_\src\amazon-freertos-master
-�@ \demos\common
-�@�@�ȉ��t�@�C��/�t�H���_�������Ă���B�f���p�R�[�h�̗l�q�B�{���Ƀ}�[�W�B
-�@�@���Ƃŗ�������B��
-�@�@�@demo_runner
-�@�@�@include�@�@�@���C���N���[�h�p�X��ǉ����Ă���
-�@�@�@mqtt
-�@�@�@tcp
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master
-�@ \demos\renesas\rx65n_envision_kit\common\application_code\renesas_code
-�@  \entropy_hardware_poll.c
-�@  Amazon FreeRTOS���v������G���g���s�[�\�[�X(������)�̎����B
-�@  ���݂͌Œ�l���Ԃ�悤�Ɏ�������Ă��邪�A
-�@  NetworkInterface.c��get_random_number()�֐�������̂ł��Ƃł����Ɍq���悤�ύX�B
-�@  �ŏI�I��get_random_number()�͈Í�IP������`�b�v�̂Ƃ��͈Í�IP�̗����킩��
-�@  �������擾����悤�ɕύX����B�Í�IP���Ȃ��`�b�v�̂Ƃ��͋^�������ɂ���B��
-�@  
-�@  ���łɁANetworkInterface.c�� uRand()�̎������o�O���Ă����̂ŏC���B
-�@  uint32_t ulRand(void)
+　<<進捗⑥⑦のマージ>>
+　まず変化点を分解して構造を把握していき、リポジトリ登録していく。
+　まずは定番のgrep調査。
+　以降、シェルティ版を本流、協力会社版を支流と表現する。
+　
+　rx65n_rsk_aws.c
+　　メインタスク部分。支流にはAWS接続を行うタスク起動等の処理が追加されている。
+　　本流にマージ。
+　　以下2関数が追加されている。あとで理解する。★
+　　　vApplicationGetIdleTaskMemory()
+　　　vApplicationGetTimerTaskMemory()
+　　以下関数呼び出しが増えている。あとで理解する。★
+　　　SYSTEM_Init()
+　　　
+　\rx65n_rsk_aws_\src\amazon-freertos-master
+　 \demos\common
+　　以下ファイル/フォルダが増えている。デモ用コードの様子。本流にマージ。
+　　あとで理解する。★
+　　　demo_runner
+　　　include　　　←インクルードパスを追加しておく
+　　　mqtt
+　　　tcp
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　 \demos\renesas\rx65n_envision_kit\common\application_code\renesas_code
+　  \entropy_hardware_poll.c
+　  Amazon FreeRTOSが要求するエントロピーソース(乱数性)の実装。
+　  現在は固定値が返るように実装されているが、
+　  NetworkInterface.cにget_random_number()関数があるのであとでそこに繋ぐよう変更。
+　  最終的にget_random_number()は暗号IPがあるチップのときは暗号IPの乱数器から
+　  乱数を取得するように変更する。暗号IPがないチップのときは疑似乱数にする。★
+　  
+　  ついでに、NetworkInterface.cの uRand()の実装がバグっていたので修正。
+　  uint32_t ulRand(void)
     {
-	/* ��Ńn�[�h�E�F�A����(�Í���g�p)�ɕύX���܂� (�V�F���e�B) */
+	/* 後でハードウェア実装(暗号器使用)に変更します (シェルティ) */
 	uint32_t tmp;
 	get_random_number(tmp, 4);
 	return tmp;
     }
-    ��
-�@  uint32_t ulRand(void)
+    ↓
+　  uint32_t ulRand(void)
     {
-	/* ��Ńn�[�h�E�F�A����(�Í���g�p)�ɕύX���܂� (�V�F���e�B) */
+	/* 後でハードウェア実装(暗号器使用)に変更します (シェルティ) */
 	uint32_t tmp;
 	get_random_number(&tmp, 4);
 	return tmp;
     }
 
-�@\rx65n_rsk_aws\src\amazon-freertos-master
-�@ \demos\renesas\rx65n_envision_kit\common\config_files
-�@ �@�ȉ��R���t�B�O�t�@�C���������Ă���B�{���Ƀ}�[�W�B
-�@ �@aws_bufferpool_config.h
-�@ �@aws_demo_config.h
-�@ �@aws_mqtt_agent_config.h
-�@ �@aws_mqtt_config.h
-�@ �@aws_secure_sockets_config.h
-�@ �@
-�@ �@�ȉ��R���t�B�O�t�@�C�����ύX����Ă���B�{���Ƀ}�[�W�B���Ƃŗ�������B��
-�@ �@FreeRTOSConfig.h
-�@ �@
-�@�@ �@�ǉ��F
-�@�@ �@#define configSUPPORT_STATIC_ALLOCATION              1
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　 \demos\renesas\rx65n_envision_kit\common\config_files
+　 　以下コンフィグファイルが増えている。本流にマージ。
+　 　aws_bufferpool_config.h
+　 　aws_demo_config.h
+　 　aws_mqtt_agent_config.h
+　 　aws_mqtt_config.h
+　 　aws_secure_sockets_config.h
+　 　
+　 　以下コンフィグファイルが変更されている。本流にマージ。あとで理解する。★
+　 　FreeRTOSConfig.h
+　 　
+　　 　追加：
+　　 　#define configSUPPORT_STATIC_ALLOCATION              1
 
-�@�@�@/*********************************************
-�@�@�@ * FreeRTOS specific demos
-�@�@�@ ********************************************/
+　　　/*********************************************
+　　　 * FreeRTOS specific demos
+　　　 ********************************************/
 
-�@�@�@/* The address of an echo server that will be used by the two demo echo client
-�@�@�@ * tasks.
-�@�@�@ * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
-�@�@�@ * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
-�@�@�@#define configECHO_SERVER_ADDR0       192
-�@�@�@#define configECHO_SERVER_ADDR1       168
-�@�@�@#define configECHO_SERVER_ADDR2       0
-�@�@�@#define configECHO_SERVER_ADDR3       1
-�@�@�@#define configTCP_ECHO_CLIENT_PORT    8888
+　　　/* The address of an echo server that will be used by the two demo echo client
+　　　 * tasks.
+　　　 * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
+　　　 * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
+　　　#define configECHO_SERVER_ADDR0       192
+　　　#define configECHO_SERVER_ADDR1       168
+　　　#define configECHO_SERVER_ADDR2       0
+　　　#define configECHO_SERVER_ADDR3       1
+　　　#define configTCP_ECHO_CLIENT_PORT    8888
 
-�@\rx65n_rsk_aws_\src\amazon-freertos-master
-�@ \lib
-�@ �@�ȉ��t�H���_�������Ă���B�{���Ƀ}�[�W�B
-�@ �@�@bufferpool
-�@ �@�@crypto
-�@ �@�@mqtt
-�@ �@�@pkcs11
-�@ �@�@secure_sockets
-�@ �@�@third_party
-�@ �@�@�@\mbedtls\include�@���C���N���[�h�p�X��ǉ����Ă���
-�@ �@�@�@ \mbedtls
-�@ �@�@�@\pkcs11�@���C���N���[�h�p�X��ǉ����Ă���
-�@ �@�@tls
-�@ �@�@utils
-�@
-�@\rx65n_rsk_aws_\src\smc_gen
-�@�@�ȉ��t�H���_�������Ă���B����̓��l�T�X�̃t���b�V��API��FIT���W���[�����B
-�@�@�X�}�[�g�R���t�B�O���[�^�̋@�\�Ńt���b�V��API�̃��W���[����ǉ�����B
-�@�@r_flash_rx
-�@ 
-�@�����܂łŎx����{���Ƀ}�[�W�����A�V�F���e�B�̊J���T�[�o�ɃR�~�b�g����B(r5128)
-�@
-�@<<Amazon FreeRTOS�{�ƂƂ̃Y������m�F>>
-�@�ŐV��v1.2.2���_�E�����[�h����B�{�Ƃƌď̂���B
-�@�@https://github.com/aws/amazon-freertos
+　\rx65n_rsk_aws_\src\amazon-freertos-master
+　 \lib
+　 　以下フォルダが増えている。本流にマージ。
+　 　　bufferpool
+　 　　crypto
+　 　　mqtt
+　 　　pkcs11
+　 　　secure_sockets
+　 　　third_party
+　 　　　\mbedtls\include　←インクルードパスを追加しておく
+　 　　　 \mbedtls
+　 　　　\pkcs11　←インクルードパスを追加しておく
+　 　　tls
+　 　　utils
+　
+　\rx65n_rsk_aws_\src\smc_gen
+　　以下フォルダが増えている。これはルネサスのフラッシュAPIのFITモジュールだ。
+　　スマートコンフィグレータの機能でフラッシュAPIのモジュールを追加する。
+　　r_flash_rx
+　 
+　ここまでで支流を本流にマージ完了、シェルティの開発サーバにコミットする。(r5128)
+　
+　<<Amazon FreeRTOS本家とのズレ具合を確認>>
+　最新版v1.2.2をダウンロードする。本家と呼称する。
+　　https://github.com/aws/amazon-freertos
 
-�@amazon-freertos-master�t�H���_�S�̂�grep���Ė{�ƂƖ{���̍����m�F����B
-�@\rx65n_rsk_aws\src\amazon-freertos-master\demos
-�@ \common
-�@  �{���ɂ͈ȉ��t�H���_������Ă��Ȃ��B�ŏI�I�ɂ͂ǂ����邩�����B��
-�@  �@devmode_key_provisioning
-�@  �@greengrass_connectivity
-�@  �@logging
-�@  �@ota
-�@  �@shadow
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\demos
-�@ \renesas\rx65n_envision_kit\common\application_code\renesas_code
-�@  �{�Ƃ͊e�}�C�R���p��BSP��W���f�o�C�X�h���C�o�Amain�֐��A
-�@  �v���W�F�N�g�t�@�C�����͂����ɓo�^����Ă���B�ŏI�I�ɂ̓��l�T�X�������z���B��
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master
-�@�@���C�Z���X�֌W�̈ȉ��t�@�C���������Ă���B�o�^�����B
-�@�@�@change_log.txt
-�@�@�@directories.txt
-�@�@�@LICENSE
-�@�@�@README.md
-�@�@�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\demos
-�@ \common\include
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@ �@(RX�}�C�R���p�e�X�g�A�J�E���g�f�[�^�͎c��)
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master
-�@ \demos\common\demo_runner
-�@  aws_demo_runner.c
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@ �@���}�[�N�̂Ƃ���i���͉�Ђɂ�钲���R�[�h�j�͎c���B��
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\lib
-�@ \FreeRTOS\portable\Renesas\RX600v2
-�@  port.c
-�@   �C���N���[�h�t�@�C�����Aiodefine.h(�{��)��platform.h(�{��)�ƂňႤ�B
-�@   �������Amazon�{�Ƃɂ��������A�{�ƃR�[�h�C�����K�v�B��
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\lib
-�@ \FreeRTOS-Plus-TCP\include
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\lib
-�@ \FreeRTOS-Plus-TCP\source
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\lib
-�@ \FreeRTOS-Plus-TCP\source\portable\BufferManagement
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@ �@�@BufferAllocation_2.c ���啝�ɕς���Ă���B�v���ӁB���ƂŒ��ׂ�B��
-�@ �@�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\lib
-�@ \FreeRTOS-Plus-TCP\source\portable\Compiler\Renesas
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@ �@�\���� pack �̒����R�[�h�B
-�@   �������Amazon�{�Ƃɂ��������A�{�ƃR�[�h�C�����K�v�B��
-�@
-�@\rx65n_rsk_aws\src\amazon-freertos-master\lib
-�@ \FreeRTOS-Plus-TCP\source\protocols
-�@ �@Amazon FreeRTOS v1.2.2�̍ŐV�R�[�h�ɒu�������B
-�@
-�@�����܂łŖ{�� v1.2.2��{���Ƀ}�[�W�����B
-�@�V�F���e�B�̊J���T�[�o�ɃR�~�b�g����B(r5129)
-�@
-�@RX65N Envision Kit�̊��������e����B
-�@�@RX65N Envision Kit�̂ق���DHCP�̍ŏ���1��ڂ̃p�P�b�g�����ς�炸�R�P�Ă���B
-�@�@DHCP�̍đ���҂���DHCP�������Ă���łȂ��ƃf���A�v����MQTT�ʐM��
-�@�@���s����̂ŁArx65n_envision_kit_aws.c �ɂ�����DEMO_RUNNER_RunDemos()��
-�@�@�Ăяo���܂ł̃E�F�C�g��2�b����10�b�ɕύX�B
-�@�V�F���e�B�̊J���T�[�o�ɃR�~�b�g����B(r5130)
-�@
+　amazon-freertos-masterフォルダ全体をgrepして本家と本流の差分確認する。
+　\rx65n_rsk_aws\src\amazon-freertos-master\demos
+　 \common
+　  本流には以下フォルダが足りていない。最終的にはどうするか検討。★
+　  　devmode_key_provisioning
+　  　greengrass_connectivity
+　  　logging
+　  　ota
+　  　shadow
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\demos
+　 \renesas\rx65n_envision_kit\common\application_code\renesas_code
+　  本家は各マイコン用のBSPや標準デバイスドライバ、main関数、
+　  プロジェクトファイル等はここに登録されている。最終的にはルネサスも引っ越す。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　　ライセンス関係の以下ファイルが抜けている。登録した。
+　　　change_log.txt
+　　　directories.txt
+　　　LICENSE
+　　　README.md
+　　　
+　\rx65n_rsk_aws\src\amazon-freertos-master\demos
+　 \common\include
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　(RXマイコン用テストアカウントデータは残す)
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　 \demos\common\demo_runner
+　  aws_demo_runner.c
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　★マークのところ（協力会社による調整コード）は残す。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS\portable\Renesas\RX600v2
+　  port.c
+　   インクルードファイルが、iodefine.h(本家)とplatform.h(本流)とで違う。
+　   いずれはAmazon本家にかけあい、本家コード修正が必要。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\include
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source\portable\BufferManagement
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　　BufferAllocation_2.c が大幅に変わっている。要注意。あとで調べる。★
+　 　　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source\portable\Compiler\Renesas
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　構造体 pack の調整コード。
+　   いずれはAmazon本家にかけあい、本家コード修正が必要。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source\protocols
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　
+　ここまでで本家 v1.2.2を本流にマージ完了。
+　シェルティの開発サーバにコミットする。(r5129)
+　
+　RX65N Envision Kitの環境もメンテする。
+　　RX65N Envision KitのほうはDHCPの最初の1回目のパケットが相変わらずコケている。
+　　DHCPの再送を待ってDHCP完了してからでないとデモアプリのMQTT通信に
+　　失敗するので、rx65n_envision_kit_aws.c においてDEMO_RUNNER_RunDemos()を
+　　呼び出すまでのウェイトを2秒から10秒に変更。
+　シェルティの開発サーバにコミットする。(r5130)
+　
 
 --------------------------------------------------------------------------
 2018/03/03
-�@rx65n_rsk_aws�Ŏ����J�n�B
-�@�J�����̃R���p�C���o�[�W�����̕\�L���Ԉ���Ă����B�C���BV2.07��V2.08�B
-�@
-�@���l�T�XTCP/IP(T4)�̊֐��Q���g�p���Ă���ӏ��𐮔����āA
-�@FreeRTOS+TCP����Ether�h���C�o�𒼐ڌĂяo���悤�ɉ��ǂ���B
+　rx65n_rsk_awsで実験開始。
+　開発環境のコンパイラバージョンの表記が間違っていた。修正。V2.07→V2.08。
+　
+　ルネサスTCP/IP(T4)の関数群を使用している箇所を整備して、
+　FreeRTOS+TCPからEtherドライバを直接呼び出すように改良する。
 
-�@�X�}�[�g�R���t�B�O���[�^�̐ݒ肩��Ar_sys_time_rx�Ar_t4_driver_rx�A
-�@r_t4_rx���폜���A���̏�ԂŃR�[�h�������s���B
+　スマートコンフィグレータの設定から、r_sys_time_rx、r_t4_driver_rx、
+　r_t4_rxを削除し、その状態でコード生成を行う。
 
-�@�r���h����B���l�T�XTCP/IP(T4)�Ɋ֘A����֐��Ăяo���ŃG���[�ɂȂ�͂��B
+　ビルドする。ルネサスTCP/IP(T4)に関連する関数呼び出しでエラーになるはず。
 
-�@(�R���p�C���G���[1)
-�@../src/rx65n_rsk_aws.c(15):E0520005:Could not open source file "r_sys_time_rx_if.h"
-�@../src/rx65n_rsk_aws.c(17):E0520005:Could not open source file "r_t4_itcpip.h"
+　(コンパイルエラー1)
+　../src/rx65n_rsk_aws.c(15):E0520005:Could not open source file "r_sys_time_rx_if.h"
+　../src/rx65n_rsk_aws.c(17):E0520005:Could not open source file "r_t4_itcpip.h"
 
-�@main()�t�߂ŌĂяo���Ă���T4�֘A�̃w�b�_�A�֐��Ăяo���A�ϐ������폜���Ă����B
+　main()付近で呼び出しているT4関連のヘッダ、関数呼び出し、変数等を削除していく。
 
-�@<<�����܂łŃR���p�C���ʂ���>>
+　<<ここまででコンパイル通った>>
 
-�@(�����N�G���[1)
-�@E0562310:Undefined external symbol "_get_random_number" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
-�@E0562310:Undefined external symbol "_lan_read" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
-�@E0562310:Undefined external symbol "_rcv_buff_release" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
-�@E0562310:Undefined external symbol "_lan_open" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
-�@E0562310:Undefined external symbol "_lan_write" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
+　(リンクエラー1)
+　E0562310:Undefined external symbol "_get_random_number" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
+　E0562310:Undefined external symbol "_lan_read" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
+　E0562310:Undefined external symbol "_rcv_buff_release" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
+　E0562310:Undefined external symbol "_lan_open" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
+　E0562310:Undefined external symbol "_lan_write" referenced in ".\src\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.obj"
 
-�@�����܂łŁANetworkInterface.c�̎����݂̂ɍi��ꂽ�B
-�@�_���ʂ�T4�֘A��API�Ăяo�������ɂȂ��Ă���B
-�@��t4_driver.c ����֐��̒��g�������Ă���B
-�@�@UB�Ƃ�UH�Ƃ���ITRON�̃f�[�^�^��`�́Auint8_t�Ƃ�uint16_t�Ƃ��̕W���^�ɒu��������B
-�@�@
-�@FreeRTOS_IPInit()�Őݒ肳���MAC�A�h���X�́ATCP/IP����RAM�ɕێ�����镪��
-�@Ether�h���C�o�o�R(R_ETHER_Open_ZC2())��MAC�̃��W�X�^�ɕێ�����镪�Ɠ����l��
-�@����K�v������BFreeRTOS_IPInit()�Őݒ肵�����Ƃ́A�ǂ����̕ϐ��ɕێ�����Ă��邩��
-�@�����NetworkInterface.c�Ɉ����n���K�v�����邪�AxNetworkInterfaceInitialise()�ɂ�
-�@�����n����Ă��Ȃ��B
-�@ST�̃T���v��������ƁAucMACAddress[]�Ƃ����O���[�o���ϐ��Ŏ󂯓n�������Ă���B���܂����B
-�@���߂āAFreeRTOSConfig.h�ɂ���R���t�B�O�l��匳�Ƃ��AFreeRTOS_IPInit()��
-�@MAC�w�ɕ��z���Ă�����ׂ��ł��낤�B(FreeRTOSIPConfig.h�ł͂Ȃ��̂��H��������܂����j
-�@
-�@�����܂ł̉����ŁAr_sys_time_rx�Ar_t4_driver_rx�Ar_t4_rx���폜���A����m�F��OK�B
-�@rx65n_envision_kit_aws�������������{������m�FOK�B
+　ここまでで、NetworkInterface.cの実装のみに絞られた。
+　狙い通りT4関連のAPI呼び出しだけになっている。
+　→t4_driver.c から関数の中身を持ってくる。
+　　UBとかUHとかのITRONのデータ型定義は、uint8_tとかuint16_tとかの標準型に置き換える。
+　　
+　FreeRTOS_IPInit()で設定されるMACアドレスは、TCP/IP内部RAMに保持される分と
+　Etherドライバ経由(R_ETHER_Open_ZC2())でMACのレジスタに保持される分と同じ値に
+　する必要がある。FreeRTOS_IPInit()で設定したあとは、どこかの変数に保持されているから
+　それをNetworkInterface.cに引き渡す必要があるが、xNetworkInterfaceInitialise()には
+　引き渡されてこない。
+　STのサンプルを見ると、ucMACAddress[]というグローバル変数で受け渡しをしている。いまいち。
+　せめて、FreeRTOSConfig.hにあるコンフィグ値を大元とし、FreeRTOS_IPInit()と
+　MAC層に分配してあげるべきであろう。(FreeRTOSIPConfig.hではないのか？これもいまいち）
+　
+　ここまでの改造で、r_sys_time_rx、r_t4_driver_rx、r_t4_rxを削除し、動作確認もOK。
+　rx65n_envision_kit_awsも同じ改造を施し動作確認OK。
 
-�@�����܂łŃR�~�b�g�B(r5091)
-�@
-�@NetworkInterface.c �ɍēx���ځB�ۑ�̐����B�ߋ��̉ۑ聚�̂���NetworkInterface.c�̂��̂��T���x�[�W�B
-�@(1)�Ȃ��� lan_write()��-5��Ԃ��B���ƂŊm�F����B��
-�@(2)�[���R�s�[�̊T�O�𖳎����邪...��
-�@(3)�����Ether���荞�݋쓮�ɕK�������B
-�@(4)(���M���̃[���R�s�[�̎d�g�݂��s���B������܂���Œ��ׂ遚)
-�@(5)LAN�P�[�u���}���̃C�x���g��TCP/IP���ɒʒm����d�g�݂����邪...��
+　ここまででコミット。(r5091)
+　
+　NetworkInterface.c に再度着目。課題の整理。過去の課題★のうちNetworkInterface.cのものをサルベージ。
+　(1)なぜか lan_write()が-5を返す。あとで確認する。★
+　(2)ゼロコピーの概念を無視するが...★
+　(3)★後でEther割り込み駆動に必ず直す。
+　(4)(送信側のゼロコピーの仕組みが不明。これもまた後で調べる★)
+　(5)LANケーブル挿抜のイベントをTCP/IP側に通知する仕組みがあるが...★
 
-�@(1)�Ȃ��� lan_write()��-5��Ԃ��B���ƂŊm�F����B��
-�@�@Ether�h���C�o�̃����N��Ԃ�\���ϐ��utransfer_enable_flag�v��ON�ɂȂ��Ă��炸
-�@�@�ŏ���1�񂾂�lan_write()��-5��Ԃ��Ă���悤���B
-�@�@��xNetworkInterfaceInitialise()����������Ether�̃����N�A�b�v���������Ă���Ƃ�����Ȃ��̂ŁA
-�@�@�@���炩FreeRTOS+TCP�Ƀ����N�A�b�v/�_�E����ʒm����d�|��������Ǝv�����A�������炸�B
-�@�@�@xNetworkInterfaceInitialise()�����������烊���N�A�b�v�͊������Ă���O��Ƃ���B
-�@�@�@
-�@�@�@R_ETHER_CheckLink_ZC()�Ń����N�`�F�b�N������͎̂�������PHY�̏�Ԃł���A
-�@�@�@MAC(Ether�h���C�o)�������������Ă���Ƃ͌���Ȃ��B
-�@�@�@�Ȃ̂�Ether�h���C�o����̏��������̃R�[���o�b�N(callback_link_on())�����Ă���
-�@�@�@xNetworkInterfaceInitialise()���ɐi�߂�悤�ɂ���B
-�@�@�@callback_link_on()������ƁAlink_detect��ETHER_FLAG_ON_LINK_ON�ɂȂ�̂ł���ő҂B
-�@�@�@
-�@�@�@�ȏォ��AxNetworkInterfaceInitialise()�̗���𐮗�����B
-�@�@�@
-�@�@�@�����O�F
-�@�@�@�@(1)lan_open() (MAC/PHY�̏������A�I�[�g�l�S�V�G�[�V�����J�n)
-�@�@�@�@(2)R_ETHER_CheckLink_ZC()�@PHY�����N�A�b�v�����҂�
-�@�@�@�@(3)�\�t�g�E�F�A���[�v�@���K����
-�@�@�@�@(4)��M�^�X�N�J�n
-�@�@�@�@(5)MAC�w�����N�`�F�b�N�J�n
-�@�@�@�@(6)xNetworkInterfaceInitialise()�I����DHCP���M��xNetworkInterfaceOutput()���s�i�܂�MAC�w�����������ĂȂ��j
-�@�@�@�@�@�@��DHCP�^�C���A�E�g��DHCP�đ���xNetworkInterfaceOutput()����
+　(1)なぜか lan_write()が-5を返す。あとで確認する。★
+　　Etherドライバのリンク状態を表す変数「transfer_enable_flag」がONになっておらず
+　　最初の1回だけlan_write()が-5を返しているようだ。
+　　→xNetworkInterfaceInitialise()が完了時にEtherのリンクアップが完了しているとも限らないので、
+　　　何らかFreeRTOS+TCPにリンクアップ/ダウンを通知する仕掛けがあると思うが、見当たらず。
+　　　xNetworkInterfaceInitialise()が完了したらリンクアップは完了している前提とする。
+　　　
+　　　R_ETHER_CheckLink_ZC()でリンクチェックをするのは自分側のPHYの状態であり、
+　　　MAC(Etherドライバ)が準備完了しているとは限らない。
+　　　なのでEtherドライバからの準備完了のコールバック(callback_link_on())が来てから
+　　　xNetworkInterfaceInitialise()を先に進めるようにする。
+　　　callback_link_on()がくると、link_detectがETHER_FLAG_ON_LINK_ONになるのでこれで待つ。
+　　　
+　　　以上から、xNetworkInterfaceInitialise()の流れを整理する。
+　　　
+　　　整理前：
+　　　　(1)lan_open() (MAC/PHYの初期化、オートネゴシエーション開始)
+　　　　(2)R_ETHER_CheckLink_ZC()　PHYリンクアップ完了待ち
+　　　　(3)ソフトウェアループ　＜適当＞
+　　　　(4)受信タスク開始
+　　　　(5)MAC層リンクチェック開始
+　　　　(6)xNetworkInterfaceInitialise()終了→DHCP送信→xNetworkInterfaceOutput()失敗（まだMAC層準備完了してない）
+　　　　　　→DHCPタイムアウト→DHCP再送→xNetworkInterfaceOutput()成功
 
-�@�@�@������F
-�@�@�@�@(1)lan_open() (MAC/PHY�̏������A�I�[�g�l�S�V�G�[�V�����J�n)
-�@�@�@�@(2)MAC�w�����N�`�F�b�N�J�n
-�@�@�@�@(3)MAC�w�����N�����҂�
-�@�@�@�@(4)��M�^�X�N�J�n
-�@�@�@�@(5)xNetworkInterfaceInitialise()�I����DHCP���M��xNetworkInterfaceOutput()����
-�@�@�@�@�@�@�܂����؂��ł͂Ȃ��āA���쒆��LAN�P�[�u����
-�@�@�@�@�@�@�������肳�������肷�铮��ɑΉ��ł��ĂȂ��B(�����}���j
-�@�@�@�@�@�@�����_�ŁALAN�P�[�u���̑}���ɉ�����Ether�h���C�o�̓R�[���o�b�N�ł��邪�A
-�@�@�@�@�@�@�����FreeRTOS+TCP�ɒʒm�����i���Ȃ��B
-�@�@�@�@�@�@xSendEventStructToIPTask()�Œʒm�ł���悤�ȋC������̂Ō�Œ��ׂ�B
-�@�@�@�@�@�@(5)�ɂ��Ƃ͔C���āA(1)�Ƃ��Ă͊����B
-�@�@�@�@�@�@
-�@(2)�[���R�s�[�̊T�O�𖳎����邪...��
-�@�@����񂵁B
-�@(3)�����Ether���荞�݋쓮�ɕK�������B
-�@�@receive_check()�^�X�N��vTaskDelay()�ŉ������Ă���Ƃ�����T���v�����l�ɁAulTaskNotifyTake();���g�p����B
-�@�@Ether���荞�݂�lan_inthdr()�ɓ�������̂ŁA������vTaskNotifyGiveFromISR()���g����
-�@�@receive_check()�^�X�N�ɃC�x���g�ʒm����B
-�@�@�������Ŏ��s���Ă݂邪�Atask.c��vTaskNotifyGiveFromISR()�̎��s����Assert�����s����ăt���[�Y���Ă��܂��B
-�@�@�@���荞�݂���^�X�N�ɒʒm����̂͂�͂�Z���V�e�B�u�Ȃ悤���BOS�̋@�\�ɂ��Ē��ׂ�K�v������B
-�@�@�@��task.c��vTaskNotifyGiveFromISR()��4799�s�ڂ�Assert�Ɏ~�܂��Ă���B
-�@�@�@�@��ether_receive_check_task_handle�������������O�ɁAvTaskNotifyGiveFromISR()���Ă�ł��܂��Ă����B
-�@�@�@�@�@��ether_receive_check_task_handle�ɒl�������Ă�����vTaskNotifyGiveFromISR���Ă�if����ǉ��B
-�@�@�@�@�@�@��task.c��vTaskNotifyGiveFromISR()��4817�s�ڂ�portASSERT_IF_INTERRUPT_PRIORITY_INVALID()�Ńt���[�Y���Ă��܂��B
-�@�@�@�@�@�@�@��portASSERT_IF_INTERRUPT_PRIORITY_INVALID()�𒲂ׂĂ݂�ƈȉ��̒ʂ�B
-�@�@�@�@�@�@�@�@���݂�IPL��configMAX_SYSCALL_INTERRUPT_PRIORITY��菬������ASSERT�ƂȂ�悤���B
-�@�@�@�@�@�@�@	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() configASSERT( ( get_ipl() <= configMAX_SYSCALL_INTERRUPT_PRIORITY ) )
-�@�@�@�@�@�@�@	��lan_inthdr()���s����get_ipl()���Ăяo����IPL�l������ƁA7�ƂȂ��Ă���B
-�@�@�@�@�@�@�@	�@configMAX_SYSCALL_INTERRUPT_PRIORITY�̒l��6�������BconfigMAX_SYSCALL_INTERRUPT_PRIORITY��7�ɕύX�B
-�@�@�@�@�@�@�@	�@�������܂ł̐ݒ�ŁA����OK�ƂȂ����Bping����������܂ōő�10ms�̃W�b�^�[�����������A
-�@�@�@�@�@�@�@	�@�@Ether���荞�݂�FreeRTOS+TCP���q�����������ŁA���1ms�ȓ��ɉ�������悤�ɂȂ����B�����B
-�@(4)(���M���̃[���R�s�[�̎d�g�݂��s���B������܂���Œ��ׂ遚)
-�@�@����񂵁B
-�@(5)LAN�P�[�u���}���̃C�x���g��TCP/IP���ɒʒm����d�g�݂����邪...��
-�@�@���ۑ�Ƃ��Ă�(1)�Ɠ����B
+　　　整理後：
+　　　　(1)lan_open() (MAC/PHYの初期化、オートネゴシエーション開始)
+　　　　(2)MAC層リンクチェック開始
+　　　　(3)MAC層リンク完了待ち
+　　　　(4)受信タスク開始
+　　　　(5)xNetworkInterfaceInitialise()終了→DHCP送信→xNetworkInterfaceOutput()成功
+　　　　　　まだ完ぺきではなくて、動作中にLANケーブルが
+　　　　　　抜けたりささったりする動作に対応できてない。(活線挿抜）
+　　　　　　現時点で、LANケーブルの挿抜に応じてEtherドライバはコールバックできるが、
+　　　　　　これをFreeRTOS+TCPに通知する手段がない。
+　　　　　　xSendEventStructToIPTask()で通知できるような気がするので後で調べる。
+　　　　　　(5)にあとは任せて、(1)としては完了。
+　　　　　　
+　(2)ゼロコピーの概念を無視するが...★
+　　→後回し。
+　(3)★後でEther割り込み駆動に必ず直す。
+　　receive_check()タスクでvTaskDelay()で横着しているところをサンプル同様に、ulTaskNotifyTake();を使用する。
+　　Ether割り込みはlan_inthdr()に到着するので、ここでvTaskNotifyGiveFromISR()を使って
+　　receive_check()タスクにイベント通知する。
+　　→ここで実行してみるが、task.cのvTaskNotifyGiveFromISR()の実行時にAssertが発行されてフリーズしてしまう。
+　　　割り込みからタスクに通知するのはやはりセンシティブなようだ。OSの機能について調べる必要がある。
+　　　→task.cのvTaskNotifyGiveFromISR()の4799行目のAssertに止まっている。
+　　　　→ether_receive_check_task_handleが初期化される前に、vTaskNotifyGiveFromISR()を呼んでしまっていた。
+　　　　　→ether_receive_check_task_handleに値が入っていたらvTaskNotifyGiveFromISRを呼ぶif文を追加。
+　　　　　　→task.cのvTaskNotifyGiveFromISR()の4817行目のportASSERT_IF_INTERRUPT_PRIORITY_INVALID()でフリーズしてしまう。
+　　　　　　　→portASSERT_IF_INTERRUPT_PRIORITY_INVALID()を調べてみると以下の通り。
+　　　　　　　　現在のIPLがconfigMAX_SYSCALL_INTERRUPT_PRIORITYより小さいとASSERTとなるようだ。
+　　　　　　　	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() configASSERT( ( get_ipl() <= configMAX_SYSCALL_INTERRUPT_PRIORITY ) )
+　　　　　　　	→lan_inthdr()実行中にget_ipl()を呼び出してIPL値を見ると、7となっている。
+　　　　　　　	　configMAX_SYSCALL_INTERRUPT_PRIORITYの値は6だった。configMAX_SYSCALL_INTERRUPT_PRIORITYを7に変更。
+　　　　　　　	　→ここまでの設定で、動作OKとなった。ping応答もこれまで最大10msのジッターがあったが、
+　　　　　　　	　　Ether割り込みとFreeRTOS+TCPを繋いだおかげで、常に1ms以内に応答するようになった。完了。
+　(4)(送信側のゼロコピーの仕組みが不明。これもまた後で調べる★)
+　　→後回し。
+　(5)LANケーブル挿抜のイベントをTCP/IP側に通知する仕組みがあるが...★
+　　→課題としては(1)と同じ。
 
-�@�c�����ۑ�͈ȉ��B�[���R�s�[�Ɗ����}���ł���B
-�@�@(2)�[���R�s�[�̊T�O�𖳎����邪...��
-�@�@(4)(���M���̃[���R�s�[�̎d�g�݂��s���B������܂���Œ��ׂ遚)
-�@�@(5)LAN�P�[�u���}���̃C�x���g��TCP/IP���ɒʒm����d�g�݂����邪...��
+　残った課題は以下。ゼロコピーと活線挿抜である。
+　　(2)ゼロコピーの概念を無視するが...★
+　　(4)(送信側のゼロコピーの仕組みが不明。これもまた後で調べる★)
+　　(5)LANケーブル挿抜のイベントをTCP/IP側に通知する仕組みがあるが...★
 
-�@�����܂ł�Envision Kit��RSK�̃R�[�h�𓯊���������m�F���A��U�R�~�b�g����B(r5092)
+　ここまででEnvision KitとRSKのコードを同期させ動作確認し、一旦コミットする。(r5092)
 
-�@�����āA�[���R�s�[�Ƀg���C���Ă݂�B
-�@�@BufferAllocation_2.c���r���h���珜�O���ABufferAllocation_1.c ��L���ɂ���B
-�@�@BufferAllocation_1.c���g�p����Ƃ��� vNetworkInterfaceAllocateRAMToBuffers() �͉��ƂȂ��������Ă���̂�
-�@�@�r���h�͒ʂ�B���A�\�z�ʂ�A�G���[���b�Z�[�W��"INVALID BUFFER"�Ƃł�B
-�@�@���̂Ƃ���vNetworkInterfaceAllocateRAMToBuffers()�̌��H���Ă����Ă݂�B
+　続いて、ゼロコピーにトライしてみる。
+　　BufferAllocation_2.cをビルドから除外し、BufferAllocation_1.c を有効にする。
+　　BufferAllocation_1.cを使用するときの vNetworkInterfaceAllocateRAMToBuffers() は何となく実装してあるので
+　　ビルドは通る。が、予想通り、エラーメッセージで"INVALID BUFFER"とでる。
+　　このときのvNetworkInterfaceAllocateRAMToBuffers()の後を辿っていってみる。
 
-�@�@2/18�ɒ����������ɂ��ǂ蒅�����AFreeRTOS_IP.c��917�s�ڂ̕��򂪔Ɛl�B
-�@�@�A���C�����g�����ĂȂ��B
-�@�@
-�@�@�������N���A���邽�߂ɂ́A
-�@�@�[���R�s�[�Ή����邽�߂�second sample�Ƃ����̂��n�ǂ���K�v������B
-�@�@https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Porting.html#creating_a_zero_copy_network_port_layer
+　　2/18に調査した時にたどり着いた、FreeRTOS_IP.cの917行目の分岐が犯人。
+　　アライメントが取れてない。
+　　
+　　ここをクリアするためには、
+　　ゼロコピー対応するためのsecond sampleというのを熟読する必要がある。
+　　https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Porting.html#creating_a_zero_copy_network_port_layer
 
-�@�@���ƂȂ������������A�������Ԃ������肻�����B���T�Ɏ������݁B
-�@�@
+　　何となく分かったが、少し時間がかかりそうだ。次週に持ち込み。
+　　
 --------------------------------------------------------------------------
 2018/02/24
-�@rx65n_rsk_aws�Ŏ����J�n�B
-�@�|�[�e�B���O�K�C�h�����Ă�����x�����m�F�B
-�@BufferAllocation_2.c�ŊȈՓI�Ɏ������邱�Ƃɂ����̂ŁA
-�@first example�Ƃ����̂��������Ă݂�B
-�@https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Porting.html#creating_a_simple_network_interface_port_layer
+　rx65n_rsk_awsで実験開始。
+　ポーティングガイドを見てもう一度方向確認。
+　BufferAllocation_2.cで簡易的に実装することにしたので、
+　first exampleというのを実装してみる。
+　https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Porting.html#creating_a_simple_network_interface_port_layer
 
-�@xNetworkInterfaceInitialise()�̍\���͓��ɖ��Ȃ������B
-�@xNetworkInterfaceOutput()�̎����́A���M�f�B�X�N���v�^�̊J���������Ă����B
-�@�@�����M������ɁAvReleaseNetworkBufferAndDescriptor( pxDescriptor );��ǉ�
-�@
-�@���̎�M���ł��邪�ANOTE1��BufferAllocation_2.c���g�p����ꍇ��
-�@���荞�݂̍Œ���discriptor��Ethernet buffers�̊��蓖�Ă��s���Ȃ��A
-�@�Ə����Ă������B���̂��߁A�^�X�N��1�����グ�Ă����Ŏ�M���荞�݂���
-�@�ʒm���󂯂���o�b�t�@���蓖�Ă��s���AIP�^�X�N�ɒʒm���s���Ƃ̂��ƁB
-�@�����Deferrd Interrupt Handling�Ƃ����Ĉȉ��ɉ��������B
-�@https://www.freertos.org/deferred_interrupt_processing.html
-�@
-�@����̓n�[�h�E�F�A���璼�ڌĂяo����銄�荞�݊֐��ł�
-�@���荞�ݗv���̋L�^��OS�w�ւ̒ʒm�݂̂����{���A���₩�Ɋ��荞�݊֐���
-�@�I�������邽�߂̃��J�j�Y���B
-�@#OS�����݂��Ȃ��ꍇ�́A���荞�݃R���g���[���ɗD��x��ݒ肵��
-�@ ���d���荞�݂��������@�ŏ��؂邪�A
-�@ ���̎d�g�݂̓}�C�R���̎d�g�݂Ɉˑ�����B
-�@ 
-�@���荞�݊֐�����̒ʒm�́Adeferred interrupt handler task�Ƃ����̂�
-�@���������B���̃^�X�N�͒ʏ�̃A�v���P�[�V�����^�X�N���D��x�������B
-�@
-�@When to use deferred interrupt handling�F
-�@���̃��J�j�Y���͈ȉ�3�_�̂悤�ȃP�[�X�ɈЗ͂𔭊�����B
-�@�E���荞�ݐM���ɉ����Ē����������K�v
-�@�E���荞�ݏ������ŃN���e�B�J���ȏ��������͂Ŋ��S�Ɏ�������̂�����Ɗ�����ꍇ
-�@�@(RTOS���񋟂���API�݂̂ō\�z�����ق����ȒP�E���S�ł��낤)
-�@�E���܂肫������������Ȃ�������������ꍇ
-�@�@�i���炩�̏����ɂ�菈�����Ԃ��L�яk�݂���ꍇ�j
-�@�@
-�@��Ether�̎�M�����͂܂��ɏ�L�P�[�X�ɊY������B
-�@
-�@Techniques for deferring interrupt processing to a task�F
-�@�������@�͈ȉ�2�ʂ�Ƃ̂��ƁB
-�@�@�@1�̃^�X�N�ŏW���Ǘ�����i���Ƃ��΃^�C�}�[�^�X�N�j
-�@�@�u���荞�ݔ������t���OON���^�C�}�[�^�X�N�N����deferred interrupt�ŏ����v
-�@�@�A�A�v�����R���g���[������iTask Notification���g�p�j
-�@�@�u���荞�ݔ�����Noticication��deferred interrupt�ŏ����v
-�@�@
-�@�@�A�̗��_�͊��荞�ݔ������珈�����s�܂ł̃��C�e���V������A�Ƃ̂��ƁB
-�@
-�@�|�[�e�B���O�K�C�h��prvEMACDeferredInterruptHandlerTask()�̃T���v����
-�@�A���g���Ă���悤���B�A���g���Ď������Ă݂�B
-�@
-�@Ether���Ď����Ė������[�v����^�X�N�����Breceive_check()�����̃^�X�N�Ƃ���B
-�@
-�@Ether�֘A�̏��������s��xNetworkInterfaceInitialise()�Ń^�X�N�����΂悢�ł��낤�B
-�@xTaskCreate()�Ń^�X�N�n���h�������Areceive_check()��o�^����B
+　xNetworkInterfaceInitialise()の構造は特に問題なさそう。
+　xNetworkInterfaceOutput()の実装は、送信ディスクリプタの開放が抜けていた。
+　　→送信完了後に、vReleaseNetworkBufferAndDescriptor( pxDescriptor );を追加
+　
+　問題の受信側であるが、NOTE1にBufferAllocation_2.cを使用する場合は
+　割り込みの最中にdiscriptorとEthernet buffersの割り当てが行えない、
+　と書いてあった。このため、タスクを1個立ち上げてそこで受信割り込みから
+　通知を受けた後バッファ割り当てを行い、IPタスクに通知を行うとのこと。
+　これはDeferrd Interrupt Handlingといって以下に解説がある。
+　https://www.freertos.org/deferred_interrupt_processing.html
+　
+　これはハードウェアから直接呼び出される割り込み関数では
+　割り込み要因の記録とOS層への通知のみを実施し、速やかに割り込み関数を
+　終了させるためのメカニズム。
+　#OSが存在しない場合は、割り込みコントローラに優先度を設定して
+　 多重割り込みを許可する手法で乗り切るが、
+　 この仕組みはマイコンの仕組みに依存する。
+　 
+　割り込み関数からの通知は、deferred interrupt handler taskというので
+　処理される。このタスクは通常のアプリケーションタスクより優先度が高い。
+　
+　When to use deferred interrupt handling：
+　このメカニズムは以下3点のようなケースに威力を発揮する。
+　・割り込み信号に応じて長い処理が必要
+　・割り込み処理内でクリティカルな処理を自力で完全に実装するのが難しいと感じる場合
+　　(RTOSが提供するAPIのみで構築したほうが簡単・安全であろう)
+　・決まりきった動作をしない処理をさせる場合
+　　（何らかの条件により処理時間が伸び縮みする場合）
+　　
+　→Etherの受信処理はまさに上記ケースに該当する。
+　
+　Techniques for deferring interrupt processing to a task：
+　実装方法は以下2通りとのこと。
+　　①1個のタスクで集中管理する（たとえばタイマータスク）
+　　「割り込み発生→フラグON→タイマータスク起動→deferred interruptで処理」
+　　②アプリがコントロールする（Task Notificationを使用）
+　　「割り込み発生→Noticication→deferred interruptで処理」
+　　
+　　②の利点は割り込み発生から処理実行までのレイテンシが減る、とのこと。
+　
+　ポーティングガイドのprvEMACDeferredInterruptHandlerTask()のサンプルは
+　②を使っているようだ。②を使って実装してみる。
+　
+　Etherを監視して無限ループするタスクを作る。receive_check()をこのタスクとする。
+　
+　Ether関連の初期化を行うxNetworkInterfaceInitialise()でタスクを作ればよいであろう。
+　xTaskCreate()でタスクハンドルを作り、receive_check()を登録する。
 	return_code = xTaskCreate(receive_check, "ETHER_RECEIVE_CHECK_TASK", 100/* stack size (word) */, 0,  configMAX_PRIORITIES, &ether_receive_check_task_handle);
 	if(return_code == xTaskCreate)
 	{
@@ -898,53 +913,53 @@ RX65N Envision Kit�ARX65N RSK(2MB��/�Í��킠��i)���^�[�Q�b�g�ɃR�[�h�����e���ێ
 	}
 
 
-�@����ɔ����Acheck_ether_link()��receive_check()�����s���Ă����̂���߂�B
-�@����ŁANotify�Ŏ�M�C�x���g���󂯂�̂ł͂Ȃ��āA
-�@vTaskDelay()��10ms��1��|�[�����O����ȈՎ����ɂ���B
-�@
-�@���łɁAxNetworkInterfaceInitialise()�Ń^�C�}�[�^�X�N������Ă݂�B
-�@���́AR_CMT_CreatePeriodic()�Ŋ��荞�݊֐������I�ɌĂяo���Ă���Ƃ����
-�@�^�C�}�[�^�X�N�ɒu��������B
-�@https://www.freertos.org/FreeRTOS-timers-xTimerCreate.html
-�@
-�@xTimerCreate()�Ń^�C�}�[�n���h��������āA�����xTimerStart()�ɓ��͂��銴�����B
-�@
-�@timer_handle = xTimerCreate("ETHER_TIMER", 10, pdTRUE, &timer_id, check_ether_link);
-�@xTimerStart(timer_handle, 0);
-�@
-�@�Ƃ������Ƃ��납�B����`�̕ϐ��̓O���[�o���Œ�`���Ă����B
-�@����ŁAreceive_check()��FreeRTOS�z���̃^�X�N�Ƃ��ČĂяo���ꂽ�B
-�@
-�@�|�[�e�B���O�K�C�h��prvEMACDeferredInterruptHandlerTask()�̃T���v���ɏ]����
-�@API�Ăяo���������m���߂Ă����B
-�@
-�@�E  ulTaskNotifyTake()
-�@�@������͏�L�u�A�A�v�����R���g���[������v�ꍇ�ɕK�v�ȃC�x���g�ʒm��t���B
-�@�@�@�����vTaskDelay()���g���ĉ������Ă���̂ŕs�v�B
-�@�E pxGetNetworkBufferWithDescriptor( xBytesReceived, 0 );
-�@�@����M�f�[�^���ɉ������o�b�t�@���m�ۂ��āA�f�B�X�N���v�^�𐶐����Ė߂�l��
-�@�@�@�Ԃ��Ă����API�B
-�@�@�@RX�}�C�R����Ether�R���g���[���h���C�o�́Alan_read()�̖߂�l�Ŏ�M�f�[�^����
-�@�@�@�߂��Ă����Breceived_data_size�ɓ���Ă����B
-�@�@�@�܂��A�����̃|�C���^�ɁA�o�b�t�@�|�C���^�������Ă����B
-�@�@�@memcpy()�ŃR�s�[�����FreeRTOS+TCP���̃o�b�t�@�ɃR�s�[����΂悢�ł��낤�B
-�@�@�@�i���ƂŃ[���R�s�[�Ή��ɐi��������j
-�@�E�f�B�X�N���v�^�ւ̃f�[�^�ݒ�A�C�x���g�ʒm�p�̍\���̂̐ݒ�A���ɖ��Ȃ�����
-�@				pxBufferDescriptor->xDataLength = received_data_size;
+　これに伴い、check_ether_link()でreceive_check()を実行していたのをやめる。
+　それで、Notifyで受信イベントを受けるのではなくて、
+　vTaskDelay()で10msに1回ポーリングする簡易実装にする。
+　
+　ついでに、xNetworkInterfaceInitialise()でタイマータスクを作ってみる。
+　今は、R_CMT_CreatePeriodic()で割り込み関数を定期的に呼び出しているところを
+　タイマータスクに置き換える。
+　https://www.freertos.org/FreeRTOS-timers-xTimerCreate.html
+　
+　xTimerCreate()でタイマーハンドルを作って、それをxTimerStart()に入力する感じか。
+　
+　timer_handle = xTimerCreate("ETHER_TIMER", 10, pdTRUE, &timer_id, check_ether_link);
+　xTimerStart(timer_handle, 0);
+　
+　といったところか。未定義の変数はグローバルで定義しておく。
+　これで、receive_check()がFreeRTOS配下のタスクとして呼び出された。
+　
+　ポーティングガイドのprvEMACDeferredInterruptHandlerTask()のサンプルに従って
+　API呼び出し順序を確かめていく。
+　
+　・  ulTaskNotifyTake()
+　　→これは上記「②アプリがコントロールする」場合に必要なイベント通知受付口。
+　　　今回はvTaskDelay()を使って横着しているので不要。
+　・ pxGetNetworkBufferWithDescriptor( xBytesReceived, 0 );
+　　→受信データ長に応じたバッファを確保して、ディスクリプタを生成して戻り値で
+　　　返してくれるAPI。
+　　　RXマイコンのEtherコントローラドライバは、lan_read()の戻り値で受信データ長を
+　　　戻してくれる。received_data_sizeに入れておく。
+　　　また、引数のポインタに、バッファポインタを書いてくれる。
+　　　memcpy()でコピーすればFreeRTOS+TCP側のバッファにコピーすればよいであろう。
+　　　（あとでゼロコピー対応に進化させる）
+　・ディスクリプタへのデータ設定、イベント通知用の構造体の設定、特に問題なさそう
+　				pxBufferDescriptor->xDataLength = received_data_size;
 				xRxEvent.eEventType = eNetworkRxEvent;
 				xRxEvent.pvData = pxBufferDescriptor;
 
-�@���s���Ċm�F���Ă݂���A��͂�pxGetNetworkBufferWithDescriptor()������I�����Ȃ��B
-�@pxGetNetworkBufferWithDescriptor()�ɐ����čĊm�F���Ă����B
-�@
-�@�Ȃ񂩃Z�}�t�H���������ĂȂ��l�q�H
-�@���M��xNetworkInterfaceOutput()�Ńf�B�X�N���v�^���m�ۂ��đ��M���������Ƃ���
-�@�����[�X�o�b�t�@��API���Ă�ł���͂������E�E�E�H
-�@
-�@�Ȃ���lan_write()�����M�������Ă���̂�-5��Ԃ��Ă��āAif�����U�ɂȂ��Ă����B
-�@�b��ŋU�̂Ƃ��������[�X�o�b�t�@���ĂԂ悤�ɂ����B
-�@
-�@	return_code = lan_write(0, tmp_buf, 14, tmp_buf + 14, pxNetworkBuffer->xDataLength - 14);
+　実行して確認してみるも、やはりpxGetNetworkBufferWithDescriptor()が正常終了しない。
+　pxGetNetworkBufferWithDescriptor()に潜って再確認していく。
+　
+　なんかセマフォが解放されてない様子？
+　送信側xNetworkInterfaceOutput()でディスクリプタを確保して送信完了したときに
+　リリースバッファのAPIを呼んでいるはずだが・・・？
+　
+　なぜかlan_write()が送信成功しているのに-5を返していて、if文が偽になっていた。
+　暫定で偽のときもリリースバッファを呼ぶようにした。
+　
+　	return_code = lan_write(0, tmp_buf, 14, tmp_buf + 14, pxNetworkBuffer->xDataLength - 14);
 	if(return_code > 0)
 	{
 		/* Call the standard trace macro to log the send event. */
@@ -954,96 +969,96 @@ RX65N Envision Kit�ARX65N RSK(2MB��/�Í��킠��i)���^�[�Q�b�g�ɃR�[�h�����e���ێ
 	}
 	else
 	{
-		/* �Ȃ��� lan_write()��-5��Ԃ��B���ƂŊm�F����B�� */
+		/* なぜか lan_write()が-5を返す。あとで確認する。★ */
 		vReleaseNetworkBufferAndDescriptor(pxNetworkBuffer);
 	}
 	
-�@�����܂ł̎�����DHCP�V�[�P���X����������悤�ɂȂ����B
-�@ping�������ł��Ă���B����FreeRTOS+TCP�̈ڐA�����I�I�I�I
-�@�i���ۑ�R����ł����j
-�@
-�@RSK�œ���m�F���Ă����̂ŁAEnvision Kit���ɂ��l�b�g���[�N�C���^�t�F�[�X�̃R�[�h��
-�@�o�^���ăR�~�b�g�B(r5066)
-�@
+　ここまでの実装でDHCPシーケンスが完了するようになった。
+　ping応答もできている。無事FreeRTOS+TCPの移植完了！！！！
+　（★課題山盛りですが）
+　
+　RSKで動作確認していたので、Envision Kit側にもネットワークインタフェースのコードを
+　登録してコミット。(r5066)
+　
 --------------------------------------------------------------------------
 2018/02/18
-�@rx65n_envision_kit�ō�ƊJ�n�B
-�@
-�@�ǂ��ɂ��f�o�b�K���d�����BFreeRTOS�p�̃X�^�b�N(FreeRTOSConfig.h�Őݒ�)��
-�@����Ă��Ȃ��悤�ȋC������BFreeRTOS���V�X�e���X�^�b�N���ɉe�����Ă��邩�H
+　rx65n_envision_kitで作業開始。
+　
+　どうにもデバッガが重たい。FreeRTOS用のスタック(FreeRTOSConfig.hで設定)が
+　足りていないような気がする。FreeRTOSがシステムスタック側に影響しているか？
 
-�@���݂�RX65N��RAM�g�p�󋵂�ύX���Ă݂�B
-�@���GUI���ڂ����Ƃ��Ƀ`�����h�~�̂��߃_�u���o�b�t�@�ɂ������������v�����Ȃ��B
+　現在のRX65NのRAM使用状況を変更してみる。
+　後でGUIを載せたときにチラつき防止のためダブルバッファにしたかったが致し方なし。
 
-�@0x00000000�Ԓn(256KB)�F�t���o�b�t�@1
-�@0x00800000�Ԓn(256KB)�F�t���o�b�t�@2
-�@0x00840000�Ԓn(128KB)�F�V�X�e���̈�
-�@��
-�@0x00000000�Ԓn(256KB)�F�V�X�e���̈�(B�Z�N�V����(FreeRTOS�X�^�b�N�A�q�[�v�A���̑��ϐ���))
-�@0x00800000�Ԓn(256KB)�F�t���o�b�t�@2
-�@0x00840000�Ԓn(128KB)�F�V�X�e���̈�(B�Z�N�V�����ȊO(�V�X�e���X�^�b�N��Ether�o�b�t�@��))
+　0x00000000番地(256KB)：液晶バッファ1
+　0x00800000番地(256KB)：液晶バッファ2
+　0x00840000番地(128KB)：システム領域
+　↓
+　0x00000000番地(256KB)：システム領域(Bセクション(FreeRTOSスタック、ヒープ、その他変数等))
+　0x00800000番地(256KB)：液晶バッファ2
+　0x00840000番地(128KB)：システム領域(Bセクション以外(システムスタックやEtherバッファ等))
 
-�@����ŁA�f�o�b�K�d�������ۂ����P���ꂽ�B
-�@main()���[�v��vTaskDelay(10000);�����Ė������[�v�����A
-�@main()���[�v�������Ă邩�m�F���郁�b�Z�[�W���o�͂���悤�ɂ����B
-�@
-�@����ғ����Ă���悤���B�������܂�DHCP Discover�p�P�b�g��
-�@�o�͂��邽�߂̑��M�֐�xNetworkInterfaceOutput()�͌Ă΂�Ȃ��悤���B
+　これで、デバッガ重たい現象が改善された。
+　main()ループにvTaskDelay(10000);を入れて無限ループさせ、
+　main()ループが生きてるか確認するメッセージを出力するようにした。
+　
+　安定稼働しているようだ。ただしまだDHCP Discoverパケットを
+　出力するための送信関数xNetworkInterfaceOutput()は呼ばれないようだ。
 
-�@���������I��FreeRTOS��FreeRTOS+TCP����͓�̃��O(�����������Ă���H)�͏o�͂���Ă���B(�����ׂ�)��OK
-�@�����X�e�[�g�}�V���͓��������Ă���l�q���B
+　ただし定常的にFreeRTOSかFreeRTOS+TCPからは謎のログ(文字化けしている？)は出力されている。(★調べる)→OK
+　何やらステートマシンは動き続けている様子だ。
 
-�@�ЂƂ܂����肵���̂ŁA��������R�~�b�g����B(r5008)
+　ひとまず安定したので、いったんコミットする。(r5008)
 
-�@���b�Z�[�W�̕��������̌����͂����ƁA#include <stdio.h> ���������炾�B
-�@FreeRTOS�{�̂̃R�[�h�ŃC���N���[�h����킯�ɂ������Ȃ����A�K���R���t�B�O�t�@�C����
-�@���[�U��`�����ɓf���o����Ă���i�D�Ȃ̂ł������#include <stdio.h>��ǉ��B
-�@\rx65n_envision_kit_aws\src\amazon-freertos-master\demos\renesas\rx65n_envision_kit\common\config_files
-�@�@FreeRTOSConfig.h
-�@�@FreeRTOSIPConfig.h
+　メッセージの文字化けの原因はきっと、#include <stdio.h> が無いからだ。
+　FreeRTOS本体のコードでインクルードするわけにもいかないが、幸いコンフィグファイルは
+　ユーザ定義部分に吐き出されている格好なのでそちらに#include <stdio.h>を追加。
+　\rx65n_envision_kit_aws\src\amazon-freertos-master\demos\renesas\rx65n_envision_kit\common\config_files
+　　FreeRTOSConfig.h
+　　FreeRTOSIPConfig.h
 
-�@�������AFreeRTOS��FreeRTOS+TCP�̃V�X�e�����O�������悤�ɂȂ����B
-�@�@�G���[���̃g���[�X���O��������݂����Ȃ̂ŁA���Ƃł�����o�͂Ɍq���ł݂悤�B
-�@�@�t���\�������₩�ɂȂ��Ă����B
-�@�@�o�b�N���O��������悤�ɁAUART�ł��o�͂����ق����悢�B
-�@�@RSK�͕W����UART��USB�V���A���ϊ������USB����o�Ă��邪�A
-�@�@Envision Kit�͂��̎d�|�����Ȃ��B�iE2OB�̋@�\�̓f�o�b�K�g�p����UART�o�͂ł��Ȃ��̂ŋp���j
-�@�@Envision Kit��PMOD��SCI2���z������Ă��āAPMOD���W���[����USB�V���A���ϊ������邩��
-�@�@�����t�����UART��USB����o����B�i�O�Ɏ����Ă����Ƃł����j
-�@�@�@��https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
-�@�@�@�@�������Envision Kit��CH14��1-6�ɑ}���΂悢�B
-�@�@�@�@�@SCI2��UART���[�h�Ŏg�p�����PC�ɃV�X�e�����O�𑗂��B
-�@�@�@�@�@�R�[�h�ł����ƁAlcd_conf.h�� my_sw_charput_function()��printf()�o�RBSP����Ă΂�邪�A
-�@�@�@�@�@���͂����ɉt����1�����o�͂���悤�ɂ��Ă���Ƃ��낪����A�����ɕ��s����SCI����o�͂���
-�@�@�@�@�@�悤�ɃR�[�h�ǉ�����΂悢�B(����Ń����e)
+　→無事、FreeRTOSとFreeRTOS+TCPのシステムログが見れるようになった。
+　　エラー時のトレースログもだせるみたいなので、あとでこれも出力に繋いでみよう。
+　　液晶表示が賑やかになってきた。
+　　バックログが見えるように、UARTでも出力したほうがよい。
+　　RSKは標準でUARTがUSBシリアル変換されてUSBから出てくるが、
+　　Envision Kitはその仕掛けがない。（E2OBの機能はデバッガ使用時はUART出力できないので却下）
+　　Envision KitはPMODにSCI2が配線されていて、PMODモジュールでUSBシリアル変換があるから
+　　それを付ければUARTをUSBから出せる。（前に試してちゃんとできた）
+　　　→https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
+　　　　→これをEnvision KitのCH14の1-6に挿せばよい。
+　　　　　SCI2をUARTモードで使用すればPCにシステムログを送れる。
+　　　　　コードでいうと、lcd_conf.hで my_sw_charput_function()がprintf()経由BSPから呼ばれるが、
+　　　　　今はここに液晶に1文字出力するようにしているところがあり、ここに並行してSCIから出力する
+　　　　　ようにコード追加すればよい。(★後でメンテ)
 
-�@���ĉt���\���̃V�X�e�����O�����ł�������x�����N���Ă��邩������悤�ɂȂ����B
-�@�V�X�e�����O���e��R�����Ă݂�B
-�@�@���Ă̒�ADHCP discover�v���Z�X���A�������Ȃ��ă^�C���A�E�g���āA���g���C������������Ă���B
-�@
-�@�f�B�X�N���v�^��4�ݒ�ɂ����̂ɁA(now59)�Ƃ��\������Ă�̂ŁA�f�B�X�N���v�^����̒�����
-�@���炩����ĂȂ��悤���B�����������M�֐�(xNetworkInterfaceOutput())����Ă΂�ĂȂ��̂ŁA
-�@���M�����̍ŏ��̕��ł����Ă����B
-�@�m������AFreeRTOSIPConfig.h��60��Ether�h���C�o���̒�`ETHER_CFG_EMAC_TX_DESCRIPTORS�i���g��4)��
-�@�ǂݍ��ނ悤�ɂ����͂������E�E�E�H
-�@
-�@FreeRTOSIPConfig.h���m�F�����炢�̊Ԃɂ��f�t�H���g��60�ɖ߂��Ă��B
-�@�K�`���K�`������Ăăf�t�H���g�ŏ㏑�����Ă��܂����悤���B������x�C���B
-�@
-�@���Ғʂ�(now59)�̕\����(now3)�ƂȂ����B�ˑR�Ƃ���xNetworkInterfaceOutput()�͌Ă΂�Ȃ��B
-�@�����������Ƃ��Ă��邩�B
-�@
-�@FreeRTOS+TCP��IP�w�̎���(FreeRTOS_TCP_IP.c)���m�F���Ă����B
-�@xNetworkInterfaceOutput()���Ăяo���Ă���̂�950�s��1�����̂݁B
-�@�R�����g�� /* Send! */ �Ə����ėL���ċC���������Ă���̂ŊԈႢ�Ȃ����낤�B
-�@
-�@���̌Ăяo�����̎����́AprvTCPReturnPacket()�B���̊֐��̐擪�Ƀu���[�N��
-�@����������A�����Ȃ��B��ʂɏ���Ă����B
-�@
-�@FreeRTOS_TCP_IP.c �̎����Ɋ֐��Ăяo�������L�ڂ���Ă���B���肪�����B
-�@prvTCPReturnPacket()���Ăяo���Ă���Ƃ����Ђ��[����u���[�N�\���ĖԂ��͂�B
-�@prvTCPSendRepeated()�AprvTCPPrepareSend()�AprvTCPHandleState()�̐擪�Ƀu���[�N�͂�B
-�@
+　さて液晶表示のシステムログだけでもある程度何が起きているか分かるようになった。
+　システムログ内容を紐解いてみる。
+　　→案の定、DHCP discoverプロセスが、応答がなくてタイムアウトして、リトライ制御をし続けている。
+　
+　ディスクリプタを4個設定にしたのに、(now59)とか表示されてるので、ディスクリプタ周りの調整が
+　何らか足りてないようだ。そもそも送信関数(xNetworkInterfaceOutput())すら呼ばれてないので、
+　送信処理の最初の方でこけてそう。
+　確か昨日、FreeRTOSIPConfig.hで60をEtherドライバ側の定義ETHER_CFG_EMAC_TX_DESCRIPTORS（中身は4)を
+　読み込むようにしたはずだが・・・？
+　
+　FreeRTOSIPConfig.hを確認したらいつの間にかデフォルトの60に戻ってた。
+　ガチャガチャやっててデフォルトで上書きしてしまったようだ。もう一度修正。
+　
+　期待通り(now59)の表示は(now3)となった。依然としてxNetworkInterfaceOutput()は呼ばれない。
+　何かを見落としているか。
+　
+　FreeRTOS+TCPのIP層の実装(FreeRTOS_TCP_IP.c)を確認していく。
+　xNetworkInterfaceOutput()を呼び出しているのは950行目1か所のみ。
+　コメントに /* Send! */ と書いて有って気合が入っているので間違いないだろう。
+　
+　この呼び出し口の実装は、prvTCPReturnPacket()。この関数の先頭にブレークを
+　しかけるも、反応なし。上位に上っていく。
+　
+　FreeRTOS_TCP_IP.c の実装に関数呼び出し順が記載されている。ありがたい。
+　prvTCPReturnPacket()を呼び出しているところを片っ端からブレーク貼って網をはる。
+　prvTCPSendRepeated()、prvTCPPrepareSend()、prvTCPHandleState()の先頭にブレークはる。
+　
  * IP-Task:
  *		xTCPTimerCheck()				// Check all sockets ( declared in FreeRTOS_Sockets.c )
  *		xTCPSocketCheck()				// Either send a delayed ACK or call prvTCPSendPacket()
@@ -1062,384 +1077,384 @@ RX65N Envision Kit�ARX65N RSK(2MB��/�Í��킠��i)���^�[�Q�b�g�ɃR�[�h�����e���ێ
  *			xNetworkInterfaceOutput()	// Sends data to the NIC
  
  
-�@���ʁA�ǂ��ɂ��u���[�N���Ȃ��B
-�@
-�@��������IP�^�X�N�ɑ��M�v�����͂��ĂȂ��̂ł͂Ȃ����B
-�@DHCP�v���Z�X����IP�^�X�N�ɑ��M�v�����o���������猩�����Ă݂�B
-�@
-�@DHCP�v���Z�X����IP�^�X�N�ɑ΂��鑗�M�v���́AFreeRTOS_DHCP.c��
-�@926�s�ڂ�FreeRTOS_sendto()�Ǝv����B���̒����m�F���Ă����B
-�@
-�@�i��ł����ƁAFreeRTOS_Socket.c��855�s�ڂ�
-�@pxUDPPayloadBuffer_to_NetworkBuffer()���Ă΂��B
-�@�����܂ł̏����ɃG���[�Ȃǂ͔������Ă��Ȃ��l�q�B
-�@
-�@FreeRTOS_IP.c��917�s�ڂ̕���ɂ��ǂ蒅�����B
-�@if( ( ( ( uint32_t ) pucBuffer ) & ( sizeof( pucBuffer ) - 1 ) ) == 0 )��
-�@�U�ɂȂ邽�߁A�o�b�t�@�|�C���^���o�^���ꂸpxResult��NULL���Z�b�g����
-�@�����Ă��܂��B���ꂪ�������B
-�@
-�@2/17�ɓK���Ɏ�������vNetworkInterfaceAllocateRAMToBuffers()���������B
+　結果、どこにもブレークしない。
+　
+　そもそもIPタスクに送信要求が届いてないのではないか。
+　DHCPプロセスからIPタスクに送信要求を出す方向から見直してみる。
+　
+　DHCPプロセスからIPタスクに対する送信要求は、FreeRTOS_DHCP.cの
+　926行目のFreeRTOS_sendto()と思われる。この中を確認していく。
+　
+　進んでいくと、FreeRTOS_Socket.cの855行目の
+　pxUDPPayloadBuffer_to_NetworkBuffer()が呼ばれる。
+　ここまでの処理にエラーなどは発生していない様子。
+　
+　FreeRTOS_IP.cの917行目の分岐にたどり着いた。
+　if( ( ( ( uint32_t ) pucBuffer ) & ( sizeof( pucBuffer ) - 1 ) ) == 0 )が
+　偽になるため、バッファポインタが登録されずpxResultにNULLがセットされ
+　抜けてしまう。これが原因か。
+　
+　2/17に適当に実装したvNetworkInterfaceAllocateRAMToBuffers()が原因か。
 
-�@��Lif()���̏������m�F����ƁA����瑗�M�o�b�t�@�̃A���C�����g��
-�@���Ă��邩�ǂ������m�F���邽�߂̂��̗̂l�q�B
-�@
-�@���������߂��āAFreeRTOS_Socket.c��829�s�ڂ̏�������ňȉ�����B
-�@if( ( xFlags & FREERTOS_ZERO_COPY ) == 0 )
-�@
-�@�����FREERTOS_ZERO_COPY��ON�̂ق��ɗ���Ă����Ă���̂������̂悤���B
-�@�[���R�s�[�����͌�񂵂ɂ���ƌ��߂��̂ŁA�Ȃ�Ń[���R�s�[���L����
-�@�Ȃ��Ă���̂����ׂ�B
-�@
-�@FreeRTOS_DHCP.c��926�s�ڂ��悭�݂�ƁAFREERTOS_ZERO_COPY�𒼐ڎw�肵�Ă����B
-�@�Ƃ������Ƃ́ADHCP���g�p����Ƃ��̓[���R�s�[�K�{�Ƃ������ƁB
-�@if( FreeRTOS_sendto( xDHCPData.xDHCPSocket, pucUDPPayloadBuffer, ( sizeof( DHCPMessage_t ) + xOptionsLength ), FREERTOS_ZERO_COPY, &xAddress, sizeof( xAddress ) ) == 0 )
+　上記if()文の条件を確認すると、何やら送信バッファのアライメントが
+　取れているかどうかを確認するためのものの様子。
+　
+　少し巻き戻って、FreeRTOS_Socket.cの829行目の条件分岐で以下ある。
+　if( ( xFlags & FREERTOS_ZERO_COPY ) == 0 )
+　
+　これでFREERTOS_ZERO_COPYがONのほうに流れていっているのが原因のようだ。
+　ゼロコピー実装は後回しにすると決めたので、なんでゼロコピーが有効に
+　なっているのか調べる。
+　
+　FreeRTOS_DHCP.cの926行目をよくみると、FREERTOS_ZERO_COPYを直接指定していた。
+　ということは、DHCPを使用するときはゼロコピー必須ということ。
+　if( FreeRTOS_sendto( xDHCPData.xDHCPSocket, pucUDPPayloadBuffer, ( sizeof( DHCPMessage_t ) + xOptionsLength ), FREERTOS_ZERO_COPY, &xAddress, sizeof( xAddress ) ) == 0 )
 
-�@DHCP�@�\�͂������ɐ؂邱�Ƃ͂ł��Ȃ��̂ŁA
-�@��Ƀ[���R�s�[�̎������ς܂����ق����ǂ��������B
-�@
-�@Amazon FreeRTOS�S����ZERO_COPY��Grep�BPIC�̃T���v���Ɉȉ�2�s�𔭌��B
-�@�����RX����FreeRTOSIPConfig.h�ɓ����B
-�@#define ipconfigZERO_COPY_TX_DRIVER              ( 1 )
-�@#define ipconfigZERO_COPY_RX_DRIVER              ( 1 )
-�@
-�@���ƁA#include "pack_struct_start.h"��#include "pack_struct_end.h"�ɋ��܂ꂽ�\���̂�
-�@typedef�ɑ��R�[�h����̃V���{���Q��(Ctrl+���N���b�N)���ł����A�G���[�\���ɂȂ��Ă���B
-�@�R���p�C���͒ʂ�̂ŃR���p�C���O�����̍\����͂ŃG���[�ɂȂ��Ă��銴���B
-�@�����c�[���J������ɖ₢���킹�Ă݂�B
-�@
-�@�|���Ď茳�̎����B
-�@FreeRTOS_IP.c��917�s�ڂ̕����������x���Ă݂�B���ꂪ�ʂ�Ȃ��Ɛ�ɐi�܂Ȃ��B
-�@�@if( ( ( ( uint32_t ) pucBuffer ) & ( sizeof( pucBuffer ) - 1 ) ) == 0 )
+　DHCP機能はさすがに切ることはできないので、
+　先にゼロコピーの実装を済ませたほうが良さそうだ。
+　
+　Amazon FreeRTOS全文でZERO_COPYでGrep。PICのサンプルに以下2行を発見。
+　これをRX側のFreeRTOSIPConfig.hに入れる。
+　#define ipconfigZERO_COPY_TX_DRIVER              ( 1 )
+　#define ipconfigZERO_COPY_RX_DRIVER              ( 1 )
+　
+　あと、#include "pack_struct_start.h"と#include "pack_struct_end.h"に挟まれた構造体の
+　typedefに他コードからのシンボル参照(Ctrl+左クリック)ができず、エラー表示になっている。
+　コンパイルは通るのでコンパイル前処理の構文解析でエラーになっている感じ。
+　→★ツール開発部門に問い合わせてみる。
+　
+　翻って手元の実装。
+　FreeRTOS_IP.cの917行目の分岐をもう一度見てみる。これが通らないと先に進まない。
+　　if( ( ( ( uint32_t ) pucBuffer ) & ( sizeof( pucBuffer ) - 1 ) ) == 0 )
 
-�@�����ɍŏ��ɓ��B��������pucBuffer�̒l�́A0x84f716�B
-�@���̒l���|�C���^�T�C�Y(4)����1���������l�Ń}�X�N�����
-�@�������c������i��4�o�C�g�A���C�����g���ĂȂ���΁j�U�B
-�@0x84f716��4�̔{���ɂȂ��Ă��Ȃ���Βʂ�Ȃ��Ƃ������ƁB
-�@���̃P�[�X����4�̔{���ɂȂ��ĂȂ��̂Œʂ�Ȃ��B
-�@
-�@���̒l���ǂ����痈�Ă��邩�Ƃ����ƁA
-�@FreeRTOS_DHCP.c��926�s�ڂ�pucUDPPayloadBuffer�ł���B
-�@���̃|�C���^�́A921�s�ڂ�prvCreatePartDHCPMessage()�ŏo�͂����B���̒��g��T��B
-�@�o�b�t�@�̈�́AFreeRTOS_GetUDPPayloadBuffer()�Ŏ擾����悤���B���̒��g��T��B
+　ここに最初に到達した時のpucBufferの値は、0x84f716。
+　この値がポインタサイズ(4)から1を引いた値でマスクを取り
+　何かが残ったら（＝4バイトアライメント取れてなければ）偽。
+　0x84f716が4の倍数になっていなければ通らないということ。
+　このケースだと4の倍数になってないので通らない。
+　
+　この値がどこから来ているかというと、
+　FreeRTOS_DHCP.cの926行目のpucUDPPayloadBufferである。
+　このポインタは、921行目のprvCreatePartDHCPMessage()で出力される。この中身を探る。
+　バッファ領域は、FreeRTOS_GetUDPPayloadBuffer()で取得するようだ。この中身を探る。
 
-�@���̃o�b�t�@�̈�́ABufferAllocation_1.c���犄�蓖�Ă��Ă���l�q�Ȃ̂ŁA
-�@BufferAllocation_1.c ���r���h���珜�O�ABufferAllocation_2.c���r���h�ΏۂƂ���B
-�@BufferAllocation_2.c �̓[���R�s�[�p�̃��������蓖�ċ@�\���B
-�@
-�@�����܂ł̎����ŁAxNetworkInterfaceOutput()�ɑ��M�f�[�^�������n�����悤�ɂȂ����B
+　このバッファ領域は、BufferAllocation_1.cから割り当てられている様子なので、
+　BufferAllocation_1.c をビルドから除外、BufferAllocation_2.cをビルド対象とする。
+　BufferAllocation_2.c はゼロコピー用のメモリ割り当て機構だ。
+　
+　ここまでの実装で、xNetworkInterfaceOutput()に送信データが引き渡されるようになった。
 
-�@�Ȃ��A����M�o�b�t�@�̎�舵���͗v���ӂ��B
-�@FreeRTOSIPConfig.h �ɁA ipconfigPACKET_FILLER_SIZE�Ƃ����}�N����2�Őݒ肳��Ă���B
-�@����́AEther�p�P�b�g���ȉ��\���ɂȂ��Ă��āAIP�w�b�_�ȍ~��32�r�b�g�A���C�����g���Ă��Ȃ�
-�@���ɋN������B����͐��E���ʂ̖��ł���A�ʏ�MAC�w��Ether�w�b�_��IP�w�b�_�̊Ԃ�2�o�C�g
-�@�p�f�B���O�����ݍ���ŉ������Ă���B�i���邢�̓f�[�^���R�s�[���Ȃ������艽�炩�̃y�i���e�B��w�����Ď����j
-�@RX�}�C�R����EtherMAC�͍K�����̃p�f�B���O�@�\�������Ă���̂Ń\�t�g����ŏ��ɉ����ł���͂��B
-�@
-�@Ether�p�P�b�g�\��
-�@[ETHER_HEADER(14 byte)][IP_HEADER(20 byte)][TCP_HEADER(20 byte)][PAYLOAD(0-1460 byte)]
-�@�����ۂɃn�[�h�E�F�A����M�f�[�^���������W�J�����
-�@[ETHER_HEADER(14 byte)][IP_HEADER(20 byte)][TCP_HEADER(20 byte)][PAYLOAD(0-1460 byte)]�E�E�E�H�v����
-�@[ETHER_HEADER(14 byte)][pad(2 byte)][IP_HEADER(20 byte)][TCP_HEADER(20 byte)][PAYLOAD(0-1460 byte)]�E�E�E�H�v�L��
-�@
-�@�ЂƂ܂�����̍\���łǂ̂悤�ɂ��̕ӂ肪���߂���Ă��邩�m�F���A���M���̎�����i�߂Ă����B
-�@
-�@�P����xNetworkInterfaceOutput()�ɓn���Ă����f�[�^��
-�@t4_driver.c�������Ă��� lan_write() �֐��Ɉ����n���Ă݂�B
-�@
-�@�[���R�s�[�̊T�O�𖳎����邪�A���Ԃ�AxNetworkInterfaceOutput()�œn�����f�[�^��
-�@Ether���M�o�b�t�@�̃|�C���^�ł��邽�߁A��������e���|�����Ɋi�[���Ă���
-�@Ether�h���C�o�ɓn�����Ƃɂ���B�c�����܂��S�e��������Ȃ��̂Ŏd���Ȃ��B���ƂŕK�������B��
-�@
-�@�����܂łŁARX65N����ADHCP discover�p�P�b�g���o�͂ł���悤�ɂȂ����BWireshark�Ŋm�F�ρB
-�@DHCP�T�[�o����DHCP offer�p�P�b�g���Ԃ��Ă����̂ŁA������DHCP discover�Ƃ��Ĉ���ꂽ�悤���B
-�@RX65N���͂�����܂��󂯂����t���ĂȂ��̂ŁA����ȏ��DHCP�V�[�P���X�͐i��ł��Ȃ��B
-�@
-�@MAC�w�Ŏ�M�����EDMAC�]���͊������Ċ��荞�݂͔������Ă���̂ŁA
-�@���̊��荞�݂��L���b�`����FreeRTOS+TCP���Ɏ�M���荞�݃C�x���g��`�������
-�@���Ă��΂����͂����B
-�@
-�@�|�[�e�B���O�K�C�h�����Ă݂�B
-�@xSendEventStructToIPTask()�Ŏ�M���荞�݃C�x���g��ʒm����΂����悤���B
+　なお、送受信バッファの取り扱いは要注意だ。
+　FreeRTOSIPConfig.h に、 ipconfigPACKET_FILLER_SIZEというマクロが2で設定されている。
+　これは、Etherパケットが以下構成になっていて、IPヘッダ以降が32ビットアライメント取れていない
+　問題に起因する。これは世界共通の問題であり、通常MAC層でEtherヘッダとIPヘッダの間に2バイト
+　パディングを挟み込んで解決している。（あるいはデータをコピーしなおしたり何らかのペナルティを背負って実装）
+　RXマイコンのEtherMACは幸いこのパディング機能を持っているのでソフト次第で上手に解決できるはず。
+　
+　Etherパケット構成
+　[ETHER_HEADER(14 byte)][IP_HEADER(20 byte)][TCP_HEADER(20 byte)][PAYLOAD(0-1460 byte)]
+　↓実際にハードウェアが受信データをメモリ展開する際
+　[ETHER_HEADER(14 byte)][IP_HEADER(20 byte)][TCP_HEADER(20 byte)][PAYLOAD(0-1460 byte)]・・・工夫無し
+　[ETHER_HEADER(14 byte)][pad(2 byte)][IP_HEADER(20 byte)][TCP_HEADER(20 byte)][PAYLOAD(0-1460 byte)]・・・工夫有り
+　
+　ひとまず現状の構成でどのようにこの辺りが解釈されているか確認しつつ、送信側の実装を進めていく。
+　
+　単純にxNetworkInterfaceOutput()に渡ってきたデータを
+　t4_driver.cが持っている lan_write() 関数に引き渡してみる。
+　
+　ゼロコピーの概念を無視するが、たぶん、xNetworkInterfaceOutput()で渡されるデータは
+　Ether送信バッファのポインタであるため、いったんテンポラリに格納してから
+　Etherドライバに渡すことにする。歪だがまだ全貌が分からないので仕方ない。あとで必ず直す。★
+　
+　ここまでで、RX65Nから、DHCP discoverパケットが出力できるようになった。Wiresharkで確認済。
+　DHCPサーバからDHCP offerパケットが返ってきたので、正しいDHCP discoverとして扱われたようだ。
+　RX65N側はこれをまだ受ける口を付けてないので、これ以上はDHCPシーケンスは進んでいない。
+　
+　MAC層で受信からのEDMAC転送は完了して割り込みは発生しているので、
+　この割り込みをキャッチしてFreeRTOS+TCP側に受信割り込みイベントを伝える口を
+　つけてやればいいはずだ。
+　
+　ポーティングガイドを見てみる。
+　xSendEventStructToIPTask()で受信割り込みイベントを通知すればいいようだ。
 
-�@���荞�݃C�x���g��t4_driver.c �� lan_inthdr()�܂ŏオ���Ă��Ă���͂�����
-�@t4_driver.c �͍ŏI�I�ɂ͕s�v�Br_ether_rx��API�𒼐�NetworkInterface.c����
-�@�Ăяo���Ă�����΂悢�B���͂Ƃ肠������Ether���荞�݂ł͂Ȃ��A
-�@�����N��Ԃ����I�ɒ��ׂ� check_ether_link() �Ŏ�M�f�[�^���������ꍇ��
-�@FreeRTOS+TCP��xSendEventStructToIPTask()���Ăяo���R�[�h��ǉ�����B
-�@�����Ether���荞�݋쓮�ɕK�������B
-�@
-�@�������������A�ЂƂ܂���M�f�B�X�N���v�^�͐���ɉ�]���n�߂��B
-�@��M���N�G�X�g���󂯎����FreeRTOS+TCP�́A�uCANNOT ADD 1�v�ƃ��b�Z�[�W��f���Ă���B
-�@
-�@��M������pxGetNetworkBufferWithDescriptor()�Ńo�b�t�@/�f�B�X�N���v�^���m�ۂ���
-�@�f�B�X�N���v�^�Ƀo�b�t�@�|�C���^�Ǝ�M�f�[�^�������������xSendEventStructToIPTask()��
-�@�n���Ηǂ��悤���B
-�@
-�@����x�A�|�[�e�B���O�K�C�h�̃o�b�t�@�Ǘ��̍����悭�ǂ�ł݂�B
-�@https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Buffer_Management.html
-�@
-�@BufferAllocation_1.c ��Ether�o�b�t�@���ÓI��Ether�h���C�o�����ɂ���ꍇ�A
-�@BufferAllocation_2.c ��Ether�o�b�t�@�����I�Ƀq�[�v����m�ۂ����ꍇ�A�Ƃ���B
+　割り込みイベントはt4_driver.c の lan_inthdr()まで上がってきているはずだが
+　t4_driver.c は最終的には不要。r_ether_rxのAPIを直接NetworkInterface.cから
+　呼び出してあげればよい。今はとりあえずでEther割り込みではなく、
+　リンク状態を定期的に調べる check_ether_link() で受信データがあった場合に
+　FreeRTOS+TCPのxSendEventStructToIPTask()を呼び出すコードを追加する。
+　★後でEther割り込み駆動に必ず直す。
+　
+　汚い実装だが、ひとまず受信ディスクリプタは正常に回転し始めた。
+　受信リクエストを受け取ったFreeRTOS+TCPは、「CANNOT ADD 1」とメッセージを吐いている。
+　
+　受信したらpxGetNetworkBufferWithDescriptor()でバッファ/ディスクリプタを確保して
+　ディスクリプタにバッファポインタと受信データ長を書き込んでxSendEventStructToIPTask()で
+　渡せば良いようだ。
+　
+　今一度、ポーティングガイドのバッファ管理の項をよく読んでみる。
+　https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Buffer_Management.html
+　
+　BufferAllocation_1.c はEtherバッファが静的にEtherドライバ内部にある場合、
+　BufferAllocation_2.c はEtherバッファが動的にヒープから確保される場合、とある。
 
-�@�[���R�s�[���g�����g��Ȃ����Ɗ��Ⴂ���Ă������A�����ł͂Ȃ������B
-�@BufferAllocation_1.c ���g���悤�ɂ���B
-�@
-�@vNetworkInterfaceAllocateRAMToBuffers()�̎����̂͑��M�o�b�t�@�|�C���^��
-�@�n���悤�ɂ��Ă������A��M�o�b�t�@�̃|�C���^��n���悤�ɕύX�����B
-�@(���M���̃[���R�s�[�̎d�g�݂��s���B������܂���Œ��ׂ遚)
-�@
-�@BufferAllocation_1.c�ɕύX�������ƂŁA�f�B�X�N���v�^�̏����l�ɕs��������l�q�B
-�@������M���N�G�X�g��xSendEventStructToIPTask()�Ŕ�΂��O��
-�@pxGetNetworkBufferWithDescriptor()�����s����Ƃ��������Ȃ�B
-�@vNetworkInterfaceAllocateRAMToBuffers()�̎������������K�v�����肻���B
-�@
-�@����Ƃ��Ă͈��肵�Ă���̂łЂƂ܂��R�~�b�g����B(r5009)
-�@��������DHCP���M�͂ł��Ȃ��Ȃ��Ă���B�����炭�f�B�X�N���v�^�̕s���B
-�@�@xNetworkInterfaceOutput()���Ă΂�Ă��Ȃ���ԁB
-�@
-�@rx65n_rsk ���ɃR�[�h�𔽉f�����B(r5010)
-�@
-�@�ЂƂ܂��ABufferAllocation_2.c���g�����Ƃɂ��āA
-�@�S�̓�����m�F���邱�Ƃ�D�悷�邱�Ƃɂ���B
-�@DHCP���M�܂ŏo���邱�Ƃ��m�F�B
-�@��M�ɂ��Ă��C�x���g�ʒm��OS�w�܂œ͂��Ă��邪
-�@�f�B�X�N���v�^���̎�M�o�b�t�@�|�C���^���ُ�l�Ȃ̂�
-�@�f�[�^�̎󂯓n�����@�ɖ�肪����悤���B(r5011)
+　ゼロコピーを使うか使わないかと勘違いしていたが、そうではなかった。
+　BufferAllocation_1.c を使うようにする。
+　
+　vNetworkInterfaceAllocateRAMToBuffers()の実装体は送信バッファポインタを
+　渡すようにしていたが、受信バッファのポインタを渡すように変更した。
+　(送信側のゼロコピーの仕組みが不明。これもまた後で調べる★)
+　
+　BufferAllocation_1.cに変更したことで、ディスクリプタの初期値に不足がある様子。
+　何やら受信リクエストをxSendEventStructToIPTask()で飛ばす前に
+　pxGetNetworkBufferWithDescriptor()を実行するとおかしくなる。
+　vNetworkInterfaceAllocateRAMToBuffers()の実装を見直す必要がありそう。
+　
+　動作としては安定しているのでひとまずコミットする。(r5009)
+　→ただしDHCP送信はできなくなっている。おそらくディスクリプタの不調。
+　　xNetworkInterfaceOutput()も呼ばれていない状態。
+　
+　rx65n_rsk 側にコードを反映した。(r5010)
+　
+　ひとまず、BufferAllocation_2.cを使うことにして、
+　全体動作を確認することを優先することにする。
+　DHCP送信まで出来ることを確認。
+　受信についてもイベント通知はOS層まで届いているが
+　ディスクリプタ内の受信バッファポインタが異常値なので
+　データの受け渡し方法に問題があるようだ。(r5011)
 
 --------------------------------------------------------------------------
 2018/02/17
-�@rx65n_envision_kit�ō�ƊJ�n�B
+　rx65n_envision_kitで作業開始。
 
-�@NoMaY������̏���Amazon FreeRTOS�� 1.2.0 �Ƀo�[�W�����A�b�v����Ă���Ƃ̂��ƁB
-�@1.2.0�̃R�[�h���_�E�����[�h���A�����m�F�B
-�@NoMaY���̏��ʂ�AMQTT����̃Z�L�����e�B�������ǉ�����Ă���l�q�B
-�@RX65N�ɈڐA�ς݂�FreeRTOS�{�̕����͓��ɉe���Ȃ��B
-�@���|�W�g�����̃R�[�h��1.2.0�̂��̂ɒu�������Ă����B
+　NoMaY氏からの情報でAmazon FreeRTOSが 1.2.0 にバージョンアップされているとのこと。
+　1.2.0のコードをダウンロードし、差分確認。
+　NoMaY氏の情報通り、MQTT周りのセキュリティ実装が追加されている様子。
+　RX65Nに移植済みのFreeRTOS本体部分は特に影響なし。
+　リポジトリ内のコードを1.2.0のものに置き換えていく。
 
-�@���������΃o�[�W�����\�L�����ɂȂ�B"version"��Amazon FreeRTOS�S�̂�grep���Ă݂��B
-�@Amazon FreeRTOS�S�̂��܂���o�[�W������`�͂܂��Ȃ��悤���B
-�@Amazon FreeRTOS 1.2.0 �ɓ����\�t�g�̎�v�ȃo�[�W�����͈ȉ��̒ʂ�B
-�@�E�A�v���Fv0.9.0
-�@�@\amazon-freertos-master\demos\common\include\aws_application_version.h(29,13)  [SJIS]: #define APP_VERSION_MAJOR  0
-�@�@\amazon-freertos-master\demos\common\include\aws_application_version.h(30,13)  [SJIS]: #define APP_VERSION_MINOR  9
-�@�@\amazon-freertos-master\demos\common\include\aws_application_version.h(31,13)  [SJIS]: #define APP_VERSION_BUILD  0
-�@�Embed TLS�Fv2.6.0
-�@�@\amazon-freertos-master\lib\third_party\mbedtls\include\mbedtls\version.h(40,17)  [SJIS]: #define MBEDTLS_VERSION_MAJOR  2
-�@�@\amazon-freertos-master\lib\third_party\mbedtls\include\mbedtls\version.h(41,17)  [SJIS]: #define MBEDTLS_VERSION_MINOR  6
-�@�@\amazon-freertos-master\lib\third_party\mbedtls\include\mbedtls\version.h(42,17)  [SJIS]: #define MBEDTLS_VERSION_PATCH  0
-�@�EPKCS11�Fv2.40.0
-�@�@\amazon-freertos-master\lib\third_party\pkcs11\pkcs11t.h(14,18)  [SJIS]: #define CRYPTOKI_VERSION_MAJOR 2
-�@�@\amazon-freertos-master\lib\third_party\pkcs11\pkcs11t.h(15,18)  [SJIS]: #define CRYPTOKI_VERSION_MINOR 40
-�@�@\amazon-freertos-master\lib\third_party\pkcs11\pkcs11t.h(16,18)  [SJIS]: #define CRYPTOKI_VERSION_AMENDMENT 0
-�@�EFreeRTOS�J�[�l���Fv10.0.1
-�@�@\amazon-freertos-master\lib\include\task.h(46,19)  [SJIS]: #define tskKERNEL_VERSION_NUMBER "V10.0.1"
-�@�@\amazon-freertos-master\lib\include\task.h(47,19)  [SJIS]: #define tskKERNEL_VERSION_MAJOR 10
-�@�@\amazon-freertos-master\lib\include\task.h(48,19)  [SJIS]: #define tskKERNEL_VERSION_MINOR 0
-�@�@\amazon-freertos-master\lib\include\task.h(49,19)  [SJIS]: #define tskKERNEL_VERSION_BUILD 1
-�@�EFreeRTOS+TCP�F�����H
+　そういえばバージョン表記がきになる。"version"でAmazon FreeRTOS全体をgrepしてみた。
+　Amazon FreeRTOS全体を包含するバージョン定義はまだないようだ。
+　Amazon FreeRTOS 1.2.0 に内包するソフトの主要なバージョンは以下の通り。
+　・アプリ：v0.9.0
+　　\amazon-freertos-master\demos\common\include\aws_application_version.h(29,13)  [SJIS]: #define APP_VERSION_MAJOR  0
+　　\amazon-freertos-master\demos\common\include\aws_application_version.h(30,13)  [SJIS]: #define APP_VERSION_MINOR  9
+　　\amazon-freertos-master\demos\common\include\aws_application_version.h(31,13)  [SJIS]: #define APP_VERSION_BUILD  0
+　・mbed TLS：v2.6.0
+　　\amazon-freertos-master\lib\third_party\mbedtls\include\mbedtls\version.h(40,17)  [SJIS]: #define MBEDTLS_VERSION_MAJOR  2
+　　\amazon-freertos-master\lib\third_party\mbedtls\include\mbedtls\version.h(41,17)  [SJIS]: #define MBEDTLS_VERSION_MINOR  6
+　　\amazon-freertos-master\lib\third_party\mbedtls\include\mbedtls\version.h(42,17)  [SJIS]: #define MBEDTLS_VERSION_PATCH  0
+　・PKCS11：v2.40.0
+　　\amazon-freertos-master\lib\third_party\pkcs11\pkcs11t.h(14,18)  [SJIS]: #define CRYPTOKI_VERSION_MAJOR 2
+　　\amazon-freertos-master\lib\third_party\pkcs11\pkcs11t.h(15,18)  [SJIS]: #define CRYPTOKI_VERSION_MINOR 40
+　　\amazon-freertos-master\lib\third_party\pkcs11\pkcs11t.h(16,18)  [SJIS]: #define CRYPTOKI_VERSION_AMENDMENT 0
+　・FreeRTOSカーネル：v10.0.1
+　　\amazon-freertos-master\lib\include\task.h(46,19)  [SJIS]: #define tskKERNEL_VERSION_NUMBER "V10.0.1"
+　　\amazon-freertos-master\lib\include\task.h(47,19)  [SJIS]: #define tskKERNEL_VERSION_MAJOR 10
+　　\amazon-freertos-master\lib\include\task.h(48,19)  [SJIS]: #define tskKERNEL_VERSION_MINOR 0
+　　\amazon-freertos-master\lib\include\task.h(49,19)  [SJIS]: #define tskKERNEL_VERSION_BUILD 1
+　・FreeRTOS+TCP：無し？
 
-�@��Ƃɖ߂�B
+　作業に戻る。
 
-�@�Ƃɂ����uFreeRTOS-Plus-TCP�v���v���W�F�N�g�o�^���Ă݂�B
-�@�u\FreeRTOS-Plus-TCP\source\portable�v�Ƀf�o�C�X���̓Ǝ�������
-�@�Ǝ��쐬����K�v������B�o�b�t�@�Ǘ��uBufferManagement�v�R���p�C������`�uCompiler�v
-�@�l�b�g���[�N�w�uNetworkInterface�v��3��ނ�Ǝ��쐬���Ȃ���΂Ȃ�Ȃ��B
+　とにかく「FreeRTOS-Plus-TCP」をプロジェクト登録してみる。
+　「\FreeRTOS-Plus-TCP\source\portable」にデバイス毎の独自部分を
+　独自作成する必要がある。バッファ管理「BufferManagement」コンパイラ毎定義「Compiler」
+　ネットワーク層「NetworkInterface」の3種類を独自作成しなければならない。
 
-�@http://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/26876#26876
-�@��LURL��NoMaY���̐�s�����𓪂ɓ���Ȃ���A�R���p�C���J�n�B
+　http://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/26876#26876
+　上記URLのNoMaY氏の先行調査を頭に入れながら、コンパイル開始。
 
-�@(�R���p�C���G���[1)FreeRTOS+TCP�֘A�̃w�b�_�t�@�C��������Ȃ�
-�@�@���u\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\include�v�ɃC���N���[�h�p�X��ʂ�
-�@(�R���p�C���G���[2)"FreeRTOSIPConfig.h"��������Ȃ�
-�@�@���u\amazon-freertos-master\demos\vendor\board\common\�v�ɂ���悤���B
-�@�@�@�x���_����BSP�̃R���t�B�O�ɓ����Ɨǂ��悤���B
-�@�@�@�u\rx65n_envision_kit_aws\src\smc_gen\r_config�v�ɓ���Ă����B]
-�@�@�@�@�����Ƃ� \amazon-freertos-master\demos\renesas\rx65n_envision_kit\common\config_files 
-�@�@�@�@�@��FreeRTOS�̃R���t�B�O�����z���B������
-�@(�R���p�C���G���[3)"pack_struct_start.h"��������Ȃ�
-�@�@������́ATCP/IP�̃w�b�_��\���\���̂� pack �I�v�V������t���邽�߂�
-�@�@�@�}���`�R�[�h�Ή��p�̃w�b�_�B
-�@�@�@�u\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\portable\Compiler\Renesas�v�ɃC���N���[�h�p�X��ʂ�
-�@(SH�p�R�[�h����������Ă���̂ŁARX�p�R�[�h�ɕύX/NoMaY���̐�s�����Q��)
-�@�@��"pack_struct_start.h", "pack_struct_end.h"
-�@(�R���p�C���G���[4)"FreeRTOS_HTTP_commands.h"��������Ȃ�
-�@�@���u\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\protocols\include�v�ɂɃC���N���[�h�p�X��ʂ�
-�@(�R���p�C���G���[5)"ff_stdio.h"��������Ȃ�
-�@�@��"\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\protocols\HTTP\FreeRTOS_HTTP_server.c"
-�@�@�@�G���[���͂��̃t�@�C���B
-�@�@�@FTP�T�[�o�̃R�[�h����t�@�C���V�X�e���n�̃\�t�g���Ăяo����Ă���l�q�B
-�@�@�@���͂܂�FTP�T�[�o�@�\�͗v��Ȃ��̂ŃR�[�h���̂��v���W�F�N�g���珜�O���Ă����B
-�@�@�@TCP/IP�̏�ʂɂ�����v���g�R���Q�iHTTP��FTP��NTP�ƃT�[�o�ݒu�p�R�[�h�j�Ɋւ���ȉ��t�@�C�����v���W�F�N�g���珜�O�B
-�@�@�@�EFreeRTOS_HTTP_server.c
-�@�@�@�EFreeRTOS_HTTP_commands.c
-�@�@�@�EFreeRTOS_FTP_server.c
-�@�@�@�EFreeRTOS_FTP_commands.c
-�@�@�@�EFreeRTOS_TCP_server.c
-�@�@�@�ENTPDemo.c
-�@�@(�R���p�C�����[�j���O1)
-�@�@�@��pack�I�v�V��������̃��[�j���O�������ς��ł�̂ŁANoMaY���̐�s�������Q�l�ɏC���B
-�@�@
-�@�@<<�����܂łŃR���p�C���ʂ���>>
-�@�@
-�@�@(�����N�G���[1)
-�@�@�@E0562300:Duplicate symbol "_uxGetMinimumFreeNetworkBuffers"
-�@�@�@�@���o�b�t�@�Ǘ��uBufferManagement�v��2�����悤�ȃt�@�C���������Ă���̂������ł��낤�B
-�@�@�@�@�@���g�͂��ƂŊm�F����Ƃ��āABufferAllocation_2.c���r���h���珜�O���Ƃ��B
-�@�@�@�@�@
-�@�@(�����N�G���[2)
-�@�@�@E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
-�@�@�@E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_Sockets.obj"
-�@�@�@E0562310:Undefined external symbol "_pcApplicationHostnameHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
-�@�@�@E0562310:Undefined external symbol "_vNetworkInterfaceAllocateRAMToBuffers" referenced in ".\src\FreeRTOS-Plus-TCP\source\portable\BufferManagement\BufferAllocation_1.obj"
-�@�@�@E0562310:Undefined external symbol "_xApplicationDNSQueryHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DNS.obj"
-�@�@�@E0562310:Undefined external symbol "_vApplicationIPNetworkEventHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
-�@�@�@E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_ARP.obj"
-�@�@�@E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
-�@�@�@E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_TCP_IP.obj"
-�@�@�@E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_UDP_IP.obj"
-�@�@�@E0562310:Undefined external symbol "_xNetworkInterfaceInitialise" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
+　(コンパイルエラー1)FreeRTOS+TCP関連のヘッダファイル見つからない
+　　→「\amazon-freertos-master\lib\FreeRTOS-Plus-TCP\include」にインクルードパスを通す
+　(コンパイルエラー2)"FreeRTOSIPConfig.h"が見つからない
+　　→「\amazon-freertos-master\demos\vendor\board\common\」にあるようだ。
+　　　ベンダ毎のBSPのコンフィグに入れると良いようだ。
+　　　「\rx65n_envision_kit_aws\src\smc_gen\r_config」に入れておく。]
+　　　　★あとで \amazon-freertos-master\demos\renesas\rx65n_envision_kit\common\config_files 
+　　　　　にFreeRTOSのコンフィグを引越し。→完了
+　(コンパイルエラー3)"pack_struct_start.h"が見つからない
+　　→これは、TCP/IPのヘッダを表す構造体に pack オプションを付けるための
+　　　マルチコード対応用のヘッダ。
+　　　「\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\portable\Compiler\Renesas」にインクルードパスを通す
+　(SH用コードが実装されているので、RX用コードに変更/NoMaY氏の先行調査参照)
+　　→"pack_struct_start.h", "pack_struct_end.h"
+　(コンパイルエラー4)"FreeRTOS_HTTP_commands.h"が見つからない
+　　→「\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\protocols\include」ににインクルードパスを通す
+　(コンパイルエラー5)"ff_stdio.h"が見つからない
+　　→"\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\protocols\HTTP\FreeRTOS_HTTP_server.c"
+　　　エラー元はこのファイル。
+　　　FTPサーバのコードからファイルシステム系のソフトが呼び出されている様子。
+　　　今はまだFTPサーバ機能は要らないのでコード自体をプロジェクトから除外しておく。
+　　　TCP/IPの上位にあたるプロトコル群（HTTPとFTPとNTPとサーバ設置用コード）に関する以下ファイルをプロジェクトから除外。
+　　　・FreeRTOS_HTTP_server.c
+　　　・FreeRTOS_HTTP_commands.c
+　　　・FreeRTOS_FTP_server.c
+　　　・FreeRTOS_FTP_commands.c
+　　　・FreeRTOS_TCP_server.c
+　　　・NTPDemo.c
+　　(コンパイルワーニング1)
+　　　→packオプション周りのワーニングがいっぱいでるので、NoMaY氏の先行調査を参考に修正。
+　　
+　　<<ここまででコンパイル通った>>
+　　
+　　(リンクエラー1)
+　　　E0562300:Duplicate symbol "_uxGetMinimumFreeNetworkBuffers"
+　　　　→バッファ管理「BufferManagement」に2個同じようなファイルが入っているのが原因であろう。
+　　　　　中身はあとで確認するとして、BufferAllocation_2.cをビルドから除外しとく。
+　　　　　
+　　(リンクエラー2)
+　　　E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
+　　　E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_Sockets.obj"
+　　　E0562310:Undefined external symbol "_pcApplicationHostnameHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
+　　　E0562310:Undefined external symbol "_vNetworkInterfaceAllocateRAMToBuffers" referenced in ".\src\FreeRTOS-Plus-TCP\source\portable\BufferManagement\BufferAllocation_1.obj"
+　　　E0562310:Undefined external symbol "_xApplicationDNSQueryHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DNS.obj"
+　　　E0562310:Undefined external symbol "_vApplicationIPNetworkEventHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
+　　　E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_ARP.obj"
+　　　E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
+　　　E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_TCP_IP.obj"
+　　　E0562310:Undefined external symbol "_xNetworkInterfaceOutput" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_UDP_IP.obj"
+　　　E0562310:Undefined external symbol "_xNetworkInterfaceInitialise" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
 
-�@�@�@���l�b�g���[�N�w(IP�w)�ƃf�[�^�����N�w(Ether�w)�̃C���^�t�F�[�X�̎����̂����������B
-�@�@�@�@�����FreeRTOS+TCP�̃|�[�e�B���O�K�C�h�ɏ]���Ď�������΂悳���B
-�@�@�@�@���b�L�[�Ȃ��ƂɁASH2A�p��NetworkInterface.c���p�ӂ���Ă���ł͂Ȃ����B�iAmazon��SH2A�Ńg���C�A�������̂��ȁH�j
-�@�@�@�@SH2A��RX��Ether�R���g���[���͓����ŁAEther�h���C�o�����������Ȃ̂ŁASH2A�p�̃R�[�h��q�؂��āA
-�@�@�@�@�ȉ��t�@�C�����쐬�B
-�@�@�@�@\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.c
-�@�@
-�@�@<<�V���ȃR�[�h��ǉ������̂ŃR���p�C���G���[����>>
+　　　→ネットワーク層(IP層)とデータリンク層(Ether層)のインタフェースの実装体が無い感じ。
+　　　　これはFreeRTOS+TCPのポーティングガイドに従って実装すればよさげ。
+　　　　ラッキーなことに、SH2A用のNetworkInterface.cが用意されているではないか。（AmazonがSH2Aでトライアルしたのかな？）
+　　　　SH2AとRXのEtherコントローラは同じで、Etherドライバも似た感じなので、SH2A用のコードを拝借して、
+　　　　以下ファイルを作成。
+　　　　\rx65n_envision_kit_aws\src\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.c
+　　
+　　<<新たなコードを追加したのでコンパイルエラー発生>>
 
-�@�@(�R���p�C���G���[6)
-�@�@�@E0520005:Could not open source file "hwEthernet.h"
-�@�@�@�@��RX�}�C�R����Ether�h���C�o�̃w�b�_�t�@�C���́Ar_ether_rx_if.h�ł���B�ύX�B
-�@�@
-�@�@(�R���p�C���G���[7)
-�@�@�@E0520020:Identifier "NetworkBufferDescriptor_t" is undefined
-�@�@�@�@��Amazon FreeRTOS�S�̂�grep����ƁAFreeRTOS_IP.h �ɒ�`���������B
-�@�@�@�@�@��NetworkInterface.c�� #include "FreeRTOS_IP.h" �𑫂��Ă�����B
-�@�@�@�@
-�@�@(�R���p�C���G���[8)
-�@�@�@E0520136:Struct "xNETWORK_BUFFER" has no field "pucBuffer"
-�@�@�@�@��xNETWORK_BUFFER�ɂ�pucBuffer�͖����悤���B
-�@�@�@�@�@���̃G���[��vEMACCopyWrite()�֐����̂��̂ł���̂ŁA�����Ƒ��M���ł��Ȃ��Ȃ�
-�@�@�@�@�@���낤����ǁA�ЂƂ܂��R�����g�A�E�g���Ă����B
-�@�@�@�@
-�@�@<<�����܂łŃR���p�C���ʂ���>>
+　　(コンパイルエラー6)
+　　　E0520005:Could not open source file "hwEthernet.h"
+　　　　→RXマイコンのEtherドライバのヘッダファイルは、r_ether_rx_if.hである。変更。
+　　
+　　(コンパイルエラー7)
+　　　E0520020:Identifier "NetworkBufferDescriptor_t" is undefined
+　　　　→Amazon FreeRTOS全体をgrepすると、FreeRTOS_IP.h に定義があった。
+　　　　　→NetworkInterface.cに #include "FreeRTOS_IP.h" を足してあげる。
+　　　　
+　　(コンパイルエラー8)
+　　　E0520136:Struct "xNETWORK_BUFFER" has no field "pucBuffer"
+　　　　→xNETWORK_BUFFERにはpucBufferは無いようだ。
+　　　　　このエラーはvEMACCopyWrite()関数内のものであるので、きっと送信ができなくなる
+　　　　　だろうけれど、ひとまずコメントアウトしておく。
+　　　　
+　　<<ここまででコンパイル通った>>
 
-�@�@(�����N�G���[3)
-�@�@�@(�����N�G���[2)�Ɣ�r���āA_xNetworkInterfaceOutput()�A_xNetworkInterfaceInitialise()�̃����N�G���[���������B
-�@�@�@������ǁA�܂��唼�̃C���^�t�F�[�X�֐����������BSH2A�ł̃R�[�h�̓g���C�A�����X�ɒ��߂�ꂽ�悤���B
-�@�@�@���͋�֐�������Ă����āA���Ƃœ������|�[�e�B���O�K�C�h�����Ȃ���������Ă݂�B
-�@�@�@�֐��̒�`�̓|�[�e�B���O�K�C�h�ɂ���͂����BNoMaY���̃���������B�ȉ��Q�l�ɂȂ肻���B
-�@�@
-�@�@�@Porting FreeRTOS+TCP to a Different Microcontroller
-�@�@�@http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Porting.html
-�@�@�@
-�@�@�@�����ƌ���ƁA���\���o�����߂ɂ́A���̃|�[�e�B���O�K�C�h��{�C�œǂޕK�v������B
-�@�@�@�P�ɓ����������Ȃ�Ƃɂ����֐����m���Ȃ��ł�����Ηǂ������B
-�@�@�@�K�v��API�͂��ł�RX�p��Ether�h���C�o�ɗL�銴���B
-�@�@�@����LAN�Ή����������̎������L���ɂȂ�B
-�@�@�@
-�@�@�@_xNetworkInterfaceOutput()�ƁA_xNetworkInterfaceInitialise()���^��FreeRTOS+TCP����
-�@�@�@�Ă΂��C���^�t�F�[�X�̂悤���B���̂͂ǂ����낤���B
-�@�@�@�R�[�h�̂���������画�肵�Ă����B
-�@�@�@
-�@�@E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
-�@�@E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_Sockets.obj"
-�@�@�@���֐�������A�������擾���邽�߂̊֐������҂��Ă���悤���B
-�@�@�@�@NetworkInterface.c�ɋ�֐���p�ӂ��Ă����B���ƂŒ��g������B
-�@�@�@�@���l�T�XTCP/IP��t4_driver.c�ɋ^�������𐶐����鎗���悤�Ȋ֐����L��̂ł���������Ă���B
-�@�@�@�@�ŏI�I�ɂ�RX65N�����̈Í���ɂ��闐���������API���g���Ƃ悢�ł��낤�B
-�@�@�@�@
-�@�@�@�@�֐��v���g�^�C�v�� uint32_t ulRand(void); FreeRTOSIPConfig.h ��extern�Ő錾������B
-�@�@�@�@NetworkInterface.c�Ɏ��́ANetworkInterface.h�Ƀv���g�^�C�v�錾��u���΂悢���ȁB
-�@�@�@�@
-�@�@E0562310:Undefined external symbol "_pcApplicationHostnameHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
-�@�@�@���|�[�e�B���O�K�C�h�ɍڂ��ĂȂ��̂ŁAAmazon FreeRTOS�S��grep����\�z�B
-�@�@�@�@DHCP�Ńz�X�g����o�^����@�\�����邪�A�z�X�g�������[�U��`�֐��ň����n����d�g�݂̂悤���B
-�@�@�@�@DHCP���쒆�ɂ��̊֐����Ă΂�ă��[�U���w�肵�����O��DHCP�ɂ��擾�����B
-�@�@�@�@FreeRTOS+TCP�R���t�B�O(FreeRTOSIPConfig.h)��ON/OFF�ł���B
-�@�@�@�@#define ipconfigDHCP_REGISTER_HOSTNAME           1
-�@�@�@
-�@�@�@�@�������̃T���v��(PIC�p�AWin�p�j��main.c�Ɏ����̂��������B
-�@�@�@�@�R�����g��ǂނƁADHCP�Ń��[�U�̖��O���l�b�g���[�N�ɓo�^����ۂ�
-�@�@�@�@DHCP�̃R�[�h�����̃��[�U�̖��O��ǂݍ��ނƂ��ɌĂяo�����[�U��`�֐��ł���B
-�@�@�@�@�܂�main�֐��t�߂Ɏ������Ă����̂��Ó��B
-�@�@�@�@
-�@�@�@�@�ȉ�PIC�̃T���v���BLLMNR�ANBNS��OFF�ADHCP_REGISTER_HOSTNAME��ON�̂Ƃ��ɕK�v�Ȋ֐��B
-�@�@�@�@�ȉ�PIC�̃R�[�h�����̂܂�main�t��(rx65n_envision_kit_aws.c)�Ɏ����Ă���B
-�@�@�@�@IP�R���t�B�O��LLMNR�ANBNS��OFF�ɂ��Ă����B
-�@�@�@�@#include "FreeRTOSIPConfig.h"�̃C���N���[�h���ǉ����Ă����B
-�@�@�@�@
-�@�@�@�@#if ( ipconfigUSE_LLMNR != 0 ) || ( ipconfigUSE_NBNS != 0 ) || ( ipconfigDHCP_REGISTER_HOSTNAME == 1 )
-�@�@�@�@const char * pcApplicationHostnameHook( void )
-�@�@�@�@{
-�@�@�@�@    /* Assign the name "FreeRTOS" to this network node.  This function will
-�@�@�@�@     * be called during the DHCP: the machine will be registered with an IP
-�@�@�@�@     * address plus this name. */
-�@�@�@�@    return "RX65N_FREERTOS_TCP_TEST_BY_SHELTY";
-�@�@�@�@}
-�@�@�@�@#endif
+　　(リンクエラー3)
+　　　(リンクエラー2)と比較して、_xNetworkInterfaceOutput()、_xNetworkInterfaceInitialise()のリンクエラーが消えた。
+　　　だけれど、まだ大半のインタフェース関数が未実装。SH2A版のコードはトライアル早々に諦められたようだ。
+　　　今は空関数を作っておいて、あとで動かしつつポーティングガイドを見ながら実装してみる。
+　　　関数の定義はポーティングガイドにあるはずだ。NoMaY氏のメモを見る。以下参考になりそう。
+　　
+　　　Porting FreeRTOS+TCP to a Different Microcontroller
+　　　http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/Embedded_Ethernet_Porting.html
+　　　
+　　　ざっと見ると、性能を出すためには、このポーティングガイドを本気で読む必要がある。
+　　　単に動かすだけならとにかく関数同士をつないであげれば良さそう。
+　　　必要なAPIはすでにRX用のEtherドライバに有る感じ。
+　　　無線LAN対応時もここの実装がキモになる。
+　　　
+　　　_xNetworkInterfaceOutput()と、_xNetworkInterfaceInitialise()が真にFreeRTOS+TCPから
+　　　呼ばれるインタフェースのようだ。他のはどうだろうか。
+　　　コードのくっつき具合から判定していく。
+　　　
+　　E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
+　　E0562310:Undefined external symbol "_ulRand" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_Sockets.obj"
+　　　→関数名から、乱数を取得するための関数を期待しているようだ。
+　　　　NetworkInterface.cに空関数を用意しておく。あとで中身をつくる。
+　　　　ルネサスTCP/IPのt4_driver.cに疑似乱数を生成する似たような関数が有るのでそれを持ってくる。
+　　　　最終的にはRX65N内蔵の暗号器にある乱数発生器のAPIを使うとよいであろう。
+　　　　
+　　　　関数プロトタイプは uint32_t ulRand(void); FreeRTOSIPConfig.h にexternで宣言がある。
+　　　　NetworkInterface.cに実体、NetworkInterface.hにプロトタイプ宣言を置けばよいかな。
+　　　　
+　　E0562310:Undefined external symbol "_pcApplicationHostnameHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DHCP.obj"
+　　　→ポーティングガイドに載ってないので、Amazon FreeRTOS全文grepから予想。
+　　　　DHCPでホスト名を登録する機能があるが、ホスト名をユーザ定義関数で引き渡せる仕組みのようだ。
+　　　　DHCP動作中にこの関数が呼ばれてユーザが指定した名前がDHCPにより取得される。
+　　　　FreeRTOS+TCPコンフィグ(FreeRTOSIPConfig.h)でON/OFFできる。
+　　　　#define ipconfigDHCP_REGISTER_HOSTNAME           1
+　　　
+　　　　いくつかのサンプル(PIC用、Win用）でmain.cに実装体があった。
+　　　　コメントを読むと、DHCPでユーザの名前をネットワークに登録する際に
+　　　　DHCPのコードがそのユーザの名前を読み込むときに呼び出すユーザ定義関数である。
+　　　　まあmain関数付近に実装しておくのが妥当。
+　　　　
+　　　　以下PICのサンプル。LLMNR、NBNSがOFF、DHCP_REGISTER_HOSTNAMEがONのときに必要な関数。
+　　　　以下PICのコードをそのままmain付近(rx65n_envision_kit_aws.c)に持ってくる。
+　　　　IPコンフィグでLLMNR、NBNSはOFFにしておく。
+　　　　#include "FreeRTOSIPConfig.h"のインクルードも追加しておく。
+　　　　
+　　　　#if ( ipconfigUSE_LLMNR != 0 ) || ( ipconfigUSE_NBNS != 0 ) || ( ipconfigDHCP_REGISTER_HOSTNAME == 1 )
+　　　　const char * pcApplicationHostnameHook( void )
+　　　　{
+　　　　    /* Assign the name "FreeRTOS" to this network node.  This function will
+　　　　     * be called during the DHCP: the machine will be registered with an IP
+　　　　     * address plus this name. */
+　　　　    return "RX65N_FREERTOS_TCP_TEST_BY_SHELTY";
+　　　　}
+　　　　#endif
 
-�@�@E0562310:Undefined external symbol "_vNetworkInterfaceAllocateRAMToBuffers" referenced in ".\src\FreeRTOS-Plus-TCP\source\portable\BufferManagement\BufferAllocation_1.obj"
-�@�@�@���|�[�e�B���O�K�C�h�ɍڂ��Ă�B
-�@�@�@�@BufferAllocation_1.c�݂̂��g�p����ꍇ�ɕK�v�ɂȂ�֐��̂悤���B
-�@�@�@�@��قǁABufferAllocation_2.c�̓r���h�ΏۊO�ɂ������A���̃o�b�t�@�m�ۂ����܂��g�����Ȃ��΁A
-�@�@�@�@���\���オ�o���銴���B���Ԃ�AEther�w����f�[�^���z���グ�鎞��TCP/IP�w�ɑ΂���
-�@�@�@�@�f�[�^�R�s�[�œn�����A�|�C���^�œn�����i�[���R�s�[�j�؂�ւ�����̂��B
-�@�@�@�@�������[���R�s�[�͎������ʓ|�BRX�}�C�R����Ether�h���C�o�̓[���R�s�[�Ή��Ȃ̂ŁA
-�@�@�@�@���Ƃł������萫�\�]�����Ȃ����荞�݂����Ă݂�B
-�@�@�@�@���\�͂��Ƃŉ��P����Ƃ��āA����vNetworkInterfaceAllocateRAMToBuffers()���������Ă����B
-�@�@�@�@�����̂͌�ōl����Ƃ��āA����vNetworkInterfaceAllocateRAMToBuffers����ɂ��Ă����B
-�@�@�@
-�@�@E0562310:Undefined external symbol "_xApplicationDNSQueryHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DNS.obj"
-�@�@�@�����̊Ԃɂ������Ă��B���Ԃ�"pcApplicationHostnameHook"�̑Ώ�������Ɗ֌W���Ă���悤���B
-�@�@�@�@��Œ��ׂ�B
-�@�@�@�@
-�@�@E0562310:Undefined external symbol "_vApplicationIPNetworkEventHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
-�@�@�@���Ō��1���B
-�@�@�@�@�|�[�e�B���O�K�C�h�ɍڂ��ĂȂ��̂ŁAAmazon FreeRTOS�S��grep����\�z�B
-�@�@�@�@PIC�̃T���v�����q�b�g�BIP�w����̃C�x���g�ʒm�p�̗l�q�B
-�@�@�@�@�R�[�h������ƁADHCP�����������������̃R�[���o�b�N��������Ă銴���B
-�@�@�@�@���ɂ����낢��ȃC�x���g�����ł������BPIC�̃R�[�h��main�t��(rx65n_envision_kit_aws.c)�Ɏ����Ă���B
-�@�@�@�@�l�b�g���[�N�C���^�t�F�[�X����荞�񂾂Ƃ��̓���m�F�ɖ��ɗ��ł��낤�B
-�@�@�@�@
-�@�@�@�@PIC���L�̈ȉ��R�[�h�͏��O���Ă����B
-�@�@�@  /* The network is up so we can run. */
+　　E0562310:Undefined external symbol "_vNetworkInterfaceAllocateRAMToBuffers" referenced in ".\src\FreeRTOS-Plus-TCP\source\portable\BufferManagement\BufferAllocation_1.obj"
+　　　→ポーティングガイドに載ってる。
+　　　　BufferAllocation_1.cのみを使用する場合に必要になる関数のようだ。
+　　　　先ほど、BufferAllocation_2.cはビルド対象外にしたが、このバッファ確保をうまく使いこなせば、
+　　　　性能向上が出来る感じ。たぶん、Ether層からデータを吸い上げる時にTCP/IP層に対して
+　　　　データコピーで渡すか、ポインタで渡すか（ゼロコピー）切り替えるものだ。
+　　　　ただしゼロコピーは実装が面倒。RXマイコンのEtherドライバはゼロコピー対応なので、
+　　　　あとでじっくり性能評価しながら作り込みをしてみる。
+　　　　性能はあとで改善するとして、今はvNetworkInterfaceAllocateRAMToBuffers()を実装しておく。
+　　　　実装体は後で考えるとして、今はvNetworkInterfaceAllocateRAMToBuffersを空にしておく。
+　　　
+　　E0562310:Undefined external symbol "_xApplicationDNSQueryHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_DNS.obj"
+　　　→いつの間にか消えてた。たぶん"pcApplicationHostnameHook"の対処あたりと関係しているようだ。
+　　　　後で調べる。
+　　　　
+　　E0562310:Undefined external symbol "_vApplicationIPNetworkEventHook" referenced in ".\src\FreeRTOS-Plus-TCP\source\FreeRTOS_IP.obj"
+　　　→最後の1個だ。
+　　　　ポーティングガイドに載ってないので、Amazon FreeRTOS全文grepから予想。
+　　　　PICのサンプルがヒット。IP層からのイベント通知用の様子。
+　　　　コードを見ると、DHCP処理が完了した時のコールバックが書かれてる感じ。
+　　　　他にもいろいろなイベントが飛んできそう。PICのコードをmain付近(rx65n_envision_kit_aws.c)に持ってくる。
+　　　　ネットワークインタフェースを作り込んだときの動作確認に役に立つであろう。
+　　　　
+　　　　PIC特有の以下コードは除外しておく。
+　　　  /* The network is up so we can run. */
         if( ( SYSTEM_Init() == pdPASS ) && ( xTasksAlreadyCreated == pdFALSE ) )
         {
             /* Run all demos. */
             DEMO_RUNNER_RunDemos();
             xTasksAlreadyCreated = pdTRUE;
         }
-�@�@�@
-�@�@<<�����܂łŃ����N�ʂ���>>
-�@�@
-�@�@�@�_�E�����[�h���Ď��s���Ă݂�B
-�@�@�@�]���ʂ�A���l�T�XTCP/IP���N�����A����DHCP��IP�A�h���X�擾�ł��Ă���B
-�@�@�@FreeRTOS+TCP����ꂽ���ƂŁA�]���̓���(���Ether�h���C�o����)�ɉe���Ȃ����Ƃ��m�F�B
-�@�@�@���ꂩ��Amain�t��(rx65n_envision_kit_aws.c)���������A���l�T�XTCP/IP�̏�����������
-�@�@�@���O���Ă����A�����FreeRTOS+TCPno���������������Ă����B
-�@�@�@
-�@�@�@configPRINTF()��L���ɂ��邽�߁AFreeRTOS.h�̈ȉ���ύX
-�@�@�@	#define configPRINTF( X )
-�@�@�@	��
-�@�@�@	#define configPRINTF( X ) printf X
-�@�@�@	
-�@�@�@FreeRTOS_debug_printf()��L���ɂ��邽�߁AFreeRTOSIPConfig.h�̈ȉ���ύX
-�@�@�@	#define ipconfigHAS_DEBUG_PRINTF    0
-�@�@�@	��
-�@�@�@	#define ipconfigHAS_DEBUG_PRINTF    1
-�@�@�@	
-�@�@�@RX65N�̍���̃V�X�e����printf()�o�͂��t���\���Ɍq���ł���̂ŁA
-�@�@�@�����FreeRTOS�֘A�̃V�X�e�����O���t���\���ɏo�Ă���͂��B
-�@�@�@
-�@�@�@PIC�̃R�[�h������ƁAFreeRTOS_IPInit()���Ăяo����TCP/IP�̏�����������悤���B
-�@�@�@FreeRTOS_IPInit()�̎����̂��m�F����B
-�@�@�@��1�`��4������IP�֘A�̃p�����[�^�BDHCP�L���ł���Ύ����擾����͂��Ȃ̂Őݒ�s�v�B
-�@�@�@��5������MAC�A�h���X�͓��͕K�v�ł��낤�B�K����MAC�A�h���X�̔z�������ē��͂���B
+　　　
+　　<<ここまででリンク通った>>
+　　
+　　　ダウンロードして実行してみる。
+　　　従来通り、ルネサスTCP/IPが起動し、無事DHCPでIPアドレス取得できている。
+　　　FreeRTOS+TCPを入れたことで、従来の動作(主にEtherドライバ部分)に影響ないことを確認。
+　　　これから、main付近(rx65n_envision_kit_aws.c)を改造し、ルネサスTCP/IPの初期化部分を
+　　　除外していき、代わりにFreeRTOS+TCPno初期化部分を入れていく。
+　　　
+　　　configPRINTF()を有効にするため、FreeRTOS.hの以下を変更
+　　　	#define configPRINTF( X )
+　　　	↓
+　　　	#define configPRINTF( X ) printf X
+　　　	
+　　　FreeRTOS_debug_printf()を有効にするため、FreeRTOSIPConfig.hの以下を変更
+　　　	#define ipconfigHAS_DEBUG_PRINTF    0
+　　　	↓
+　　　	#define ipconfigHAS_DEBUG_PRINTF    1
+　　　	
+　　　RX65Nの今回のシステムはprintf()出力を液晶表示に繋いであるので、
+　　　これでFreeRTOS関連のシステムログが液晶表示に出てくるはず。
+　　　
+　　　PICのコードを見ると、FreeRTOS_IPInit()を呼び出せばTCP/IPの初期化が走るようだ。
+　　　FreeRTOS_IPInit()の実装体を確認する。
+　　　第1～第4引数はIP関連のパラメータ。DHCP有効であれば自動取得するはずなので設定不要。
+　　　第5引数のMACアドレスは入力必要であろう。適当にMACアドレスの配列を作って入力する。
       FreeRTOS_IPInit(0, 0, 0, 0, renesas_mac_address);
-      ���̂Ƃ���main()�͈ȉ��̂悤�Ɏ����B
+      このときのmain()は以下のように実装。
 
 void main(void)
 {
@@ -1461,111 +1476,111 @@ void main(void)
     	FreeRTOS_IPInit(0, 0, 0, 0, renesas_mac_address);
 }
 
-�@�@�@FreeRTOS_IPInit()�I����AIP�^�X�N���N�����āAprvIPTask()�͌Ă΂ꂽ�悤���B
-�@�@�@eNetworkDownEvent��prvProcessNetworkDownEvent()���Ă΂ꂽ�Ƃ���Ŗ\���B
-�@�@�@�ڍׂ�ǂ������Ă����B
-�@�@�@
-�@�@�@xNetworkInterfaceInitialise()���Ă΂�邪�������֐���������ԁB
-�@�@�@�ЂƂ܂�lan_open()���Ă�ł����BxNetworkInterfaceInitialise()�Ƃ��Ă�
-�@�@�@�߂�l�� 1(pdTRUE) �������̂悤�����Alan_open()�͐����� 0 ���߂�̂Œ������Ă����B
-�@�@�@RX�}�C�R����Ether�́ALAN�P�[�u���}���̏�Ԃ��m�F���邽�߁AR_ETHER_LinkProcess()�����I��
-�@�@�@�Ăяo���K�v������BFreeRTOS�Ń^�X�N�𐶐����ĊĎ�������Ηǂ����A
-�@�@�@�܂�FreeRTOS�̎g�������悭�킩��Ȃ����߁ACMT��1�`���l������ĊĎ�������B(��Œ��ׂ�)����OK
-�@�@�@
-�@�@�@���Ԃ�ALAN�P�[�u���}���̃C�x���g��TCP/IP���ɒʒm����d�g�݂����邪�A�ЂƂ܂��A
-�@�@�@xNetworkInterfaceInitialise()�����������Ƃ��Ƀ����N�A�b�v�������Ă���悤��
-�@�@�@xNetworkInterfaceInitialise()�����ő҂悤�ɂ��Ă����B(��ł����Ǝ�������)��
-�@�@�@
-�@�@�@�\���͂Ȃ��Ȃ����B�ł�xNetworkInterfaceInitialise()�����s�������ɖ\������̂ł́H(��Œ��ׂ�)����������ɖ��Ȃ�
-�@�@�@IP�^�X�N�̃��[�v�����������Ă��邱�Ƃ��m�F�B
-�@�@�@
-�@�@�@TCP/IP�N�����͂�����DHCP�������ł��낤����ADHCP�̏�����ǂ������Ă����B
-�@�@�@�ǂ�����DHCP�̏���ł���ADHCP Discover Packet�̐������s���Ă��āA
-�@�@�@���̌�A�l�b�g���[�N�w�ɑ��M����͂��ł���B
-�@�@�@
-�@�@�@DHCP�̑��M�̑O�ɁA�����������M��M�p�̃o�b�t�@���K�؂Ɋ��蓖�Ă��Ă��Ȃ��͂��B
-�@�@�@�Ȃ��Ȃ�AvNetworkInterfaceAllocateRAMToBuffers()��������������B
-�@�@�@�܂��͂���𒲐�����B
-�@�@�@
-�@�@�@�|�[�e�B���O�K�C�h������ƁAipconfigNUM_NETWORK_BUFFER_DESCRIPTORS �Œ�`����镪�����A
-�@�@�@�o�b�t�@�����蓖�Ă�A�Ə����Ă���B��������ƁAFreeRTOSIPConfig.h��60�ƒ�`����Ă���B
-�@�@�@�����炭�����Ŋ��蓖�Ă�ׂ��͑��M�o�b�t�@�݂̂Ǝv����B(�{�����H�j�������M�o�b�t�@�ł͂Ȃ���M�o�b�t�@�B
-�@�@�@RX�}�C�R����Ether�̎��ۂ̑��M�o�b�t�@���́Ar_ether_rx_config.h��ETHER_CFG_EMAC_TX_DESCRIPTORS�Œ�`�����B
-�@�@�@60�̑���ɁA�����ǂݍ���ł����B
-�@�@�@
-�@�@�@ETHER_CFG_EMAC_TX_DESCRIPTORS���f�t�H���g1������ǁA1�̂܂܂��Ɩ\������B
-�@�@�@4�ɑ��₷�BETHER_CFG_EMAC_RX_DESCRIPTORS��4�ɑ��₷�B(�Ȃ����H�j����1�ł����v�ɂȂ����B
-�@�@�@
-�@�@�@vNetworkInterfaceAllocateRAMToBuffers()�̎����̂́AEther�h���C�o�ɂ�����
-�@�@�@���M�o�b�t�@�̃|�C���^��FreeRTOS+TCP�ɓn���悤�Ɏ�������B
-�@�@�@
-�@�@�@vDHCPProcess()������ɐi�ށB
-�@�@�@�@���g�͓`���I��switch-case�̃X�e�[�g�}�V���ł���B
-�@�@�@�@�\�z�ʂ�A�ŏ��̏�Ԃ�discover request�̑��M���������B
-�@�@�@�@/* Send the first discover request. */
-�@�@�@�@prvSendDHCPDiscover()�ɐ����Ă����B
-�@�@�@�@�@����ɑ��M���N�G�X�g���o�Ă���悤�����AvApplicationStackOverflowHook()�Œ�~����B
-�@�@�@
-�@�@�@r_bsp_config.h�ŃX�^�b�N�𑝂₵�Ă݂�BFreeRTOS�̓��[�U�X�^�b�N���g�p����悤���B
-�@�@�@�@#pragma stacksize si=0x400
-�@�@�@�@��
-�@�@�@�@#pragma stacksize si=0x2000
+　　　FreeRTOS_IPInit()終了後、IPタスクが起動して、prvIPTask()は呼ばれたようだ。
+　　　eNetworkDownEventのprvProcessNetworkDownEvent()が呼ばれたところで暴走。
+　　　詳細を追いかけていく。
+　　　
+　　　xNetworkInterfaceInitialise()が呼ばれるが初期化関数が無い状態。
+　　　ひとまずlan_open()を呼んでおく。xNetworkInterfaceInitialise()としては
+　　　戻り値は 1(pdTRUE) が成功のようだが、lan_open()は成功時 0 が戻るので調整しておく。
+　　　RXマイコンのEtherは、LANケーブル挿抜の状態を確認するため、R_ETHER_LinkProcess()を定期的に
+　　　呼び出す必要がある。FreeRTOSでタスクを生成して監視させれば良いが、
+　　　まだFreeRTOSの使い方がよくわからないため、CMTを1チャネル消費して監視させる。(後で調べる)★→OK
+　　　
+　　　たぶん、LANケーブル挿抜のイベントをTCP/IP側に通知する仕組みがあるが、ひとまず、
+　　　xNetworkInterfaceInitialise()が完了したときにリンクアップ完了しているように
+　　　xNetworkInterfaceInitialise()内部で待つようにしておく。(後でちゃんと実装する)★
+　　　
+　　　暴走はなくなった。でもxNetworkInterfaceInitialise()が失敗したら常に暴走するのでは？(後で調べる)★→現状特に問題なし
+　　　IPタスクのループが動き続けていることを確認。
+　　　
+　　　TCP/IP起動時はきっとDHCPが動くであろうから、DHCPの処理を追いかけていく。
+　　　どこかでDHCPの初手である、DHCP Discover Packetの生成を行っていて、
+　　　その後、ネットワーク層に送信するはずである。
+　　　
+　　　DHCPの送信の前に、そもそも送信受信用のバッファが適切に割り当てられていないはず。
+　　　なぜなら、vNetworkInterfaceAllocateRAMToBuffers()が未実装だから。
+　　　まずはこれを調整する。
+　　　
+　　　ポーティングガイドを見ると、ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS で定義される分だけ、
+　　　バッファを割り当てよ、と書いてある。検索すると、FreeRTOSIPConfig.hに60と定義されている。
+　　　おそらくここで割り当てるべきは送信バッファのみと思われる。(本当か？）★→送信バッファではなく受信バッファ。
+　　　RXマイコンのEtherの実際の送信バッファ数は、r_ether_rx_config.hのETHER_CFG_EMAC_TX_DESCRIPTORSで定義される。
+　　　60の代わりに、これを読み込んでおく。
+　　　
+　　　ETHER_CFG_EMAC_TX_DESCRIPTORSがデフォルト1だけれど、1のままだと暴走する。
+　　　4に増やす。ETHER_CFG_EMAC_RX_DESCRIPTORSも4に増やす。(なぜか？）★→1でも大丈夫になった。
+　　　
+　　　vNetworkInterfaceAllocateRAMToBuffers()の実装体は、Etherドライバにおける
+　　　送信バッファのポインタをFreeRTOS+TCPに渡すように実装する。
+　　　
+　　　vDHCPProcess()を内部に進む。
+　　　　中身は伝統的なswitch-caseのステートマシンである。
+　　　　予想通り、最初の状態にdiscover requestの送信があった。
+　　　　/* Send the first discover request. */
+　　　　prvSendDHCPDiscover()に潜っていく。
+　　　　　正常に送信リクエストが出ているようだが、vApplicationStackOverflowHook()で停止する。
+　　　
+　　　r_bsp_config.hでスタックを増やしてみる。FreeRTOSはユーザスタックも使用するようだ。
+　　　　#pragma stacksize si=0x400
+　　　　↓
+　　　　#pragma stacksize si=0x2000
 
-�@�@�@�@#pragma stacksize su=0x1000
-�@�@�@�@��
-�@�@�@�@#pragma stacksize su=0x2000
+　　　　#pragma stacksize su=0x1000
+　　　　↓
+　　　　#pragma stacksize su=0x2000
 
-�@�@�@�X�^�b�N�����G���Ă�����A���x��IP�^�X�N�̃��[�v��
-�@�@�@���s�����Ƃ���Ŗ\������悤�ɂȂ��Ă��܂����B���ɂ��߂��Ȃ��Ȃ����B
-�@�@�@(�����Ă����Ԃ��o�b�N�A�b�v���Ă����΂悩�����j
-�@�@�@
-�@�@�@�����͂����ŏI���I
+　　　スタック周りを触っていたら、何度かIPタスクのループを
+　　　実行したところで暴走するようになってしまった。元にも戻せなくなった。
+　　　(動いている状態をバックアップしておけばよかった）
+　　　
+　　　今日はここで終わり！
 
 --------------------------------------------------------------------------
 2018/02/14
-rx65n_rsk_aws�ō�ƊJ�n�B
-FreeRTOS�� 8.2.2�̃R�[�h���������Ă����B
+rx65n_rsk_awsで作業開始。
+FreeRTOSの 8.2.2のコードを結合していく。
 
-FreeRTOS����port.c�� #include "iodefine.h"���������̂ŁA 
-#include "platform.h" �ɕύX
+FreeRTOS内のport.cに #include "iodefine.h"があったので、 
+#include "platform.h" に変更
 
-\rx65n_rsk_aws\src\amazon-freertos-master\lib\FreeRTOS\Source\portable\MemMang��
-heap_3.c �� heap_4.c �������r���h�ΏۂɂȂ��Ă��邪�Aheap_4.c �݂̂��K�؁B
-���ł����Ȃ̂��͒m��Ȃ��B�@�i�Ȃ�ł���Œ��ׂ�j
+\rx65n_rsk_aws\src\amazon-freertos-master\lib\FreeRTOS\Source\portable\MemMangの
+heap_3.c と heap_4.c が両方ビルド対象になっているが、heap_4.c のみが適切。
+何でそうなのかは知らない。　（なんでか後で調べる）
 
-�C���N���[�h�t�@�C���p�X�̒����Ȃǂ��o�� 8.2.2�̊��œ���m�F�����B
-FreeRTOS�̃R�[�h�� 9.0.0�ɕύX������m�F�����B
-FreeRTOS�̃R�[�h�� 11.0.0�ɕύX������m�F�����B
+インクルードファイルパスの調整などを経て 8.2.2の環境で動作確認完了。
+FreeRTOSのコードを 9.0.0に変更し動作確認完了。
+FreeRTOSのコードを 11.0.0に変更し動作確認完了。
 
-rx65n_envision_kit�Ƀ{�[�h��ˑ������̃R�[�h���ڐA������m�F�B���Ȃ��B
+rx65n_envision_kitにボード非依存部分のコードを移植し動作確認。問題なし。
 
 --------------------------------------------------------------------------
 2018/02/12
-�R�[�h�����ĊJ�B
+コード調整再開。
 
-�悸�����l����BNoMaY���͏�ʃ��C���[����̒��������{���Ă���̂ŁA
-���͉��ʃ��C���[����ςݏグ�Ă����A�ǂ��^�C�~���O�Ń}�[�W����̂��ǂ��B
-NoMaY���̊������݂�Ƒ傫��4�_�X�e�b�v�����肻���B
-�@FreeRTOS�œ��삳����
-�AFreeRTOS+TCP�𓮍삳����
-�Bmbed TLS�𓮍삳����
-�C���ۂ�AWS�Ɍq��
+先ず作戦を考える。NoMaY氏は上位レイヤーからの調整を実施しているので、
+私は下位レイヤーから積み上げていき、良いタイミングでマージするのが良い。
+NoMaY氏の活動をみると大きく4点ステップがありそう。
+①FreeRTOSで動作させる
+②FreeRTOS+TCPを動作させる
+③mbed TLSを動作させる
+④実際にAWSに繋ぐ
 
-�悸�͇@��Ή����邽�߁ARX65N�p�ɗp�ӂ��ꂽOS�p�b�P�[�W���Q�l�ɂ���B
+先ずは①を対応するため、RX65N用に用意されたOSパッケージを参考にする。
 https://www.renesas.com/en-us/software/D6001925.html
 
-���̒��ɂ́A�����FIT���W���[���������Ă��邱�Ƃ�NoMaY���̒����ɂ��m�F�ς݁B
+この中には、特殊なFITモジュールが入っていることはNoMaY氏の調査により確認済み。
 r_bsp_rtos
 r_cmt_rtos
 
-�����(2017/12/29)�̂��̂Ɋ܂܂��ȉ�2�_�ƒu�������Ă���
-FreeRTOS�ƌ����ł���̂ł͂Ȃ����B
+これを(2017/12/29)のものに含まれる以下2点と置き換えてやれば
+FreeRTOSと結合できるのではないか。
 r_bsp
 r_cmt_rx
 
-diff���Ƃ��āA�N���e�B�J���ȂƂ����(2017/12/29)�ɔ��f���Ă����B
+diffをとって、クリティカルなところを(2017/12/29)に反映していく。
 
-(1)r_bsp �� resetprg.c ��OS�p�̃C���N���[�h�t�@�C�����Ă�ł�Ƃ���
+(1)r_bsp の resetprg.c でOS用のインクルードファイルを呼んでるところ
 #if BSP_CFG_RTOS_USED == 0      // Non-OS
 #elif BSP_CFG_RTOS_USED == 1    // FreeRTOS
     #include    "freertos_usr_func.h"    // FreeRTOS's user configuration
@@ -1574,13 +1589,13 @@ diff���Ƃ��āA�N���e�B�J���ȂƂ����(2017/12/29)�ɔ��f���Ă����B
 #elif BSP_CFG_RTOS_USED == 4    // Renesas RI600V4 & RI600PX
 #endif
 
-(2) r_bsp �� resetprg.c �� r_cmt_rx �� r_cmt_rx.c �ɂ����āA
-�@��L�}�N���ɔ���FreeRTOS�p�̃R�[�h�e��
-�@�i�J�[�l���̃X�P�W���[�����Ăяo���Ă���Ƃ���Ȃǁj�����f�B
+(2) r_bsp の resetprg.c と r_cmt_rx の r_cmt_rx.c において、
+　上記マクロに伴いFreeRTOS用のコード各所
+　（カーネルのスケジューラを呼び出しているところなど）も反映。
 
-(3) r_bsp �� r_bsp.h ��FreeRTOS�̃w�b�_�t�@�C���Q�̃C���N���[�h��ǉ��B
-�@���[�U�����RX�}�C�R����FIT�Q�̃w�b�_�t�@�C��platform.h ���C���N���[�h
-�@����΂悢�悤�ɂȂ�B
+(3) r_bsp の r_bsp.h にFreeRTOSのヘッダファイル群のインクルードを追加。
+　ユーザからはRXマイコンのFIT群のヘッダファイルplatform.h をインクルード
+　すればよいようになる。
 
 #if BSP_CFG_RTOS_USED == 0      // Non-OS
 #elif BSP_CFG_RTOS_USED == 1    // FreeRTOS
@@ -1596,13 +1611,13 @@ diff���Ƃ��āA�N���e�B�J���ȂƂ����(2017/12/29)�ɔ��f���Ă����B
 #elif BSP_CFG_RTOS_USED == 4    // Renesas RI600V4 & RI600PX
 #endif
 
-(3)BSP�̃R���t�B�O(r_bsp_config.h)�ɂ��郊�A���^�C��OS�؂�ւ���
-�@�}�N��(BSP_CFG_RTOS_USED)��FreeRTOS��I������B
-�@����ƁA(2)�Ŕ��f����������FreeRTOS�֘A�̃R�[�h���L���ɂȂ�B
-�@FreeRTOS�ɑΉ�����}�N���ԍ���(1)�B
-�@�f�t�H���g��(0)����RTOS���g��Ȃ��ݒ�ƂȂ�B
+(3)BSPのコンフィグ(r_bsp_config.h)にあるリアルタイムOS切り替えの
+　マクロ(BSP_CFG_RTOS_USED)でFreeRTOSを選択する。
+　すると、(2)で反映した部分のFreeRTOS関連のコードが有効になる。
+　FreeRTOSに対応するマクロ番号は(1)。
+　デフォルトの(0)だとRTOSを使わない設定となる。
 
-(4)BSP�̃R���t�B�O(r_bsp_config.h)�ɂ���^�C�}�`���l���̎w��ɂ��Ĉȉ��ǉ��B
+(4)BSPのコンフィグ(r_bsp_config.h)にあるタイマチャネルの指定について以下追加。
 /* This macro is used to select which CMT channel used for system timer of RTOS.
  * The setting of this macro is only valid if the macro BSP_CFG_RTOS_USED is set to a value other than 0. */
 #if (BSP_CFG_RTOS_USED != 0)
@@ -1615,24 +1630,24 @@ diff���Ƃ��āA�N���e�B�J���ȂƂ����(2017/12/29)�ɔ��f���Ă����B
 #define BSP_CFG_RTOS_SYSTEM_TIMER		(0)
 #endif
 
-���āA���Ɏg�p����FreeRTOS�̃o�[�W�����B
-��������m�F�������Ƃ�����̂�8.2.2�ŁA��LRX65N�p�ɗp�ӂ��ꂽ
-OS�p�b�P�[�W��9.0.0�ŁAAmazon FreeRTOS��11.0.0�ł���B
-�ЂƂ܂��A8.2.2�������Ă��āA�����𖄂߂Ă��������Ői�߂�B
+さて、次に使用するFreeRTOSのバージョン。
+私が動作確認したことがあるのは8.2.2で、上記RX65N用に用意された
+OSパッケージは9.0.0で、Amazon FreeRTOSは11.0.0である。
+ひとまず、8.2.2を持ってきて、差分を埋めていく感じで進める。
 
-���͉�ЂƘA�g���邽�߁A�{�[�h��RX65N RSK�ɏ�芷���B
-�ȍ~�Arx65n_rsk_aws �t�H���_�Ɉړ��B
+協力会社と連携するため、ボードをRX65N RSKに乗り換え。
+以降、rx65n_rsk_aws フォルダに移動。
 
 --------------------------------------------------------------------------
 2018/02/09
-������ɂ��J���ꎞ��~�B
+諸事情により開発一時停止。
 
 --------------------------------------------------------------------------
 2017/12/29 
-RX65N Envision Kit��f�ނɂ���B
-�w������LAN�R�l�N�^��SD�X���b�g�Ȃǂ��t���ĂȂ��̂ő��݂��K�v�B
-�悸��e2 studio �̃X�}�[�g�R���t�B�O���[�^�@�\��
-�ȉ����W���[�����C���|�[�g����B
+RX65N Envision Kitを素材にする。
+購入時はLANコネクタとSDスロットなどが付いてないので増設が必要。
+先ずはe2 studio のスマートコンフィグレータ機能で
+以下モジュールをインポートする。
 - r_bsp
 - r_cmt_rx
 - r_ether_rx
@@ -1640,21 +1655,21 @@ RX65N Envision Kit��f�ނɂ���B
 - r_t4_rx
 - r_t4_driver_rx
 
-�˂����Ether�֘A�̓���m�F���ł���B
-�@�[�q�ݒ��RX65N Envision Kit�̃R�[�h�Ɠ��������ǂ������ׂȂ��璲���B
-�@�����ɂ����Ether�֘A�͓����͂��B
+⇒これでEther関連の動作確認ができる。
+　端子設定はRX65N Envision Kitのコードと等しいかどうか調べながら調整。
+　同じにすればEther関連は動くはず。
 - r_pincfg
 
-FIT���W���[���ȊO�̈ȉ��\�[�X�R�[�h��RX65N Envision Kit�̃R�[�h���痬�p����B
+FITモジュール以外の以下ソースコードはRX65N Envision Kitのコードから流用する。
 - lcd_conf.c
 - r_ascii.c
 - r_ascii.h
 - r_simple_graphic.c
 - r_simple_graphic_if.h
 
-�˂����printf()��RX65N Envision Kit�̉t���ɕ����\�����\�B
-�@�V�X�e�����O����ʂɏo���B
-�@�|�[�e�B���O���i�߂΁ASegger��GUI���ڂ��ăE�B���h�E�`���ɂ������B
+⇒これでprintf()でRX65N Envision Kitの液晶に文字表示が可能。
+　システムログを画面に出す。
+　ポーティングが進めば、SeggerのGUIも載せてウィンドウ形式にしたい。
 
-�����܂ł̓���m�F��PC����ping���ʂ邱�Ƃ��m�F�����B
+ここまでの動作確認でPCからpingが通ることを確認した。
 
