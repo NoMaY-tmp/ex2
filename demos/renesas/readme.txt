@@ -54,6 +54,8 @@ Getting start steps:
          The device drivers code you confirmed are generated into following directory,
          and some settings (include path, section, link the library, etc) will be applied.
          <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/
+         ** notice **
+         No need to change your device setting from R5F565NEHxFB to R5F565NEDxFB on your Board Tab.
  step9:  Build
  step10: Execute, confirm console log will show the Echo message from AWS.
          The log will be output from G1CUSB connector as UART/USB.
@@ -70,6 +72,10 @@ I hope this solution will be helpful for embedded system developer in W/W.
 --------------------------------------------------------------------------
 Change Logs
 --------------------------------------------------------------------------
+v0.0.5:
+[UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.7.
+[UPDATED] Readme text step8 for additional notice.
+
 v0.0.4:
 [UPDATED] Readme text encode from SJIS to UTF8.
 [UPDATED] Readme text step8 for more details.
@@ -202,6 +208,11 @@ RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットに�
 --------------------------------------------------------------------------
 ■課題まとめ★
 --------------------------------------------------------------------------
+　2018/06/10
+　　スマートコンフィグレータのデバイス設定(暗号有品のRX65N)と
+　　プロジェクトのデバイス設定(暗号無品のRX65N)とで食い違っていて、
+　　スマートコンフィグレータ上で警告が出ている。
+　　
 　2018/05/01
 　　2018/05/01のポーティング記録参照
 　
@@ -225,6 +236,18 @@ RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットに�
 --------------------------------------------------------------------------
 ■ポーティング記録	★印が解決すべき課題
 --------------------------------------------------------------------------
+2018/06/10
+　特に進捗はしなかった。
+　NoMaY氏がコードのメンテを進め、本家v127へ追従してくれている。
+　動作確認してv005としてコミットする。
+　そろそろSilexモジュールの動作確認も進めなくてはいけない。
+　6/8-6/10の3連休もメール処理で終わってしまいそうである。
+　何とかしなくては。
+
+2018/06/03
+　特に進捗はしなかった。
+　Readmeを少し書き換えてv004としてコミットする。
+　
 2018/05/27
 　特に進捗はしなかった。
 　NoMaY氏がコードのメンテを進め、本家v126へ追従してくれている。
@@ -237,7 +260,7 @@ RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットに�
 　Silex側のTCP/IP機能を使わないオプションが無い様子。
 　作戦は考えたが、出張週間がまだ続くため検討の時間がない。
 　出張が続くとメールが溜まりコードの整備が進まない。
-　出張がひと段落した後、6/8-6/11の間が3連休なのでここでどうにかしたい。
+　出張がひと段落した後、6/8-6/10の間が3連休なのでここでどうにかしたい。
 　
 　[対応方法]
 　以下構成とする。これはこれでRX130、RX231、RX65Nで無線LAN実現方法として
