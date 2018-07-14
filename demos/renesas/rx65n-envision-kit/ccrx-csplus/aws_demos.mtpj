@@ -3438,16 +3438,16 @@
       <Type>Category</Type>
       <ParentItem>e82aa7d2-83a2-4d48-a0bb-34c4146a4ce4</ParentItem>
     </Instance>
-    <Instance Guid="08c572fc-c713-478f-8ed3-6195534ae8d8">
-      <Name>r01an1856ej0320-rx.pdf</Name>
+    <Instance Guid="8eb404da-6439-43d7-8919-e4601b30b0cb">
+      <Name>r01an1856ej0321-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_cmt_rx\doc\en\r01an1856ej0320-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_cmt_rx\doc\en\r01an1856ej0321-rx.pdf</RelativePath>
       <ParentItem>4d0307dd-852e-48cf-be61-1d0c04912708</ParentItem>
     </Instance>
-    <Instance Guid="cc8cd137-654a-46e1-ac59-0c948a2e1b89">
-      <Name>r01an1856jj0320-rx.pdf</Name>
+    <Instance Guid="c32483f2-10ed-4ccc-b5a2-c6f68ab8a0ec">
+      <Name>r01an1856jj0321-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_cmt_rx\doc\ja\r01an1856jj0320-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_cmt_rx\doc\ja\r01an1856jj0321-rx.pdf</RelativePath>
       <ParentItem>f6d4b68c-5c48-4145-a39b-019281318db8</ParentItem>
     </Instance>
     <Instance Guid="13d6c360-d392-48aa-af3e-a836a6a8be6a">
@@ -3559,16 +3559,16 @@
       <Type>Category</Type>
       <ParentItem>1aa45059-55cd-46cf-94e6-898035931adb</ParentItem>
     </Instance>
-    <Instance Guid="4e9d313f-3ae4-4848-a2fe-1ce918869a61">
-      <Name>r01an2009ej0113-rx.pdf</Name>
+    <Instance Guid="e0d1df04-fae9-47bc-b72b-b888b2a16acf">
+      <Name>r01an2009ej0114-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_ether_rx\doc\en\r01an2009ej0113-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_ether_rx\doc\en\r01an2009ej0114-rx.pdf</RelativePath>
       <ParentItem>7a53a2f4-2289-4a8f-b8bf-d4623d677d71</ParentItem>
     </Instance>
-    <Instance Guid="7dc0434e-8596-40fb-84aa-2e5a4443d880">
-      <Name>r01an2009jj0113-rx.pdf</Name>
+    <Instance Guid="a2ddd4e7-37fd-4e35-a9aa-474647f65641">
+      <Name>r01an2009jj0114-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_ether_rx\doc\ja\r01an2009jj0113-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_ether_rx\doc\ja\r01an2009jj0114-rx.pdf</RelativePath>
       <ParentItem>015d81f3-c9f0-4127-a213-72e95058949e</ParentItem>
     </Instance>
     <Instance Guid="4510dc11-10e9-4ad1-98b6-df81b3ef759d">
@@ -3667,16 +3667,16 @@
       <Type>Category</Type>
       <ParentItem>2cd158ef-ffe0-4817-9b0f-57c2d9e37b8b</ParentItem>
     </Instance>
-    <Instance Guid="34c2fbe6-33ae-4ad8-83bf-28a6c2ac38a9">
-      <Name>r01an2184eu0320-rx.pdf</Name>
+    <Instance Guid="e0529431-01ba-4652-bcf2-6ed0cb333000">
+      <Name>r01an2184eu0330-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0320-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0330-rx.pdf</RelativePath>
       <ParentItem>1e1d7aa3-d0fe-4c5c-8363-20deb069bcd9</ParentItem>
     </Instance>
-    <Instance Guid="98824753-c66a-4669-af33-f5c0432e3a02">
-      <Name>r01an2184ju0320-rx.pdf</Name>
+    <Instance Guid="3a1b27a8-ece6-4c76-b09d-fc09af961cde">
+      <Name>r01an2184ju0330-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0320-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0330-rx.pdf</RelativePath>
       <ParentItem>238623ab-6b2e-4579-aeee-0fc2132f121e</ParentItem>
     </Instance>
     <Instance Guid="c2630110-482c-4803-8c7f-66c165adeee7">
@@ -4035,16 +4035,16 @@
       <Type>Category</Type>
       <ParentItem>ee8f1a9c-33d4-4574-969b-57c63a0b3691</ParentItem>
     </Instance>
-    <Instance Guid="e9c34fa1-3844-490a-b3ad-09ea4026b29f">
-      <Name>r01an1815ej0200-rx.pdf</Name>
+    <Instance Guid="506e3743-3180-4a87-923b-f18195935d6a">
+      <Name>r01an1815ej0201-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_sci_rx\doc\en\r01an1815ej0200-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_sci_rx\doc\en\r01an1815ej0201-rx.pdf</RelativePath>
       <ParentItem>46f17a06-966a-4864-814e-cc1b3fc5dfc9</ParentItem>
     </Instance>
-    <Instance Guid="0acf1dab-21c0-438d-a943-e34856d824dd">
-      <Name>r01an1815jj0200-rx.pdf</Name>
+    <Instance Guid="720d3661-7e54-4a72-a54f-332847bc75d6">
+      <Name>r01an1815jj0201-rx.pdf</Name>
       <Type>File</Type>
-      <RelativePath>src\smc_gen\r_sci_rx\doc\ja\r01an1815jj0200-rx.pdf</RelativePath>
+      <RelativePath>src\smc_gen\r_sci_rx\doc\ja\r01an1815jj0201-rx.pdf</RelativePath>
       <ParentItem>500feb03-e760-4398-9f64-86dca34f33e8</ParentItem>
     </Instance>
     <Instance Guid="1449e125-7b37-4bfa-bc43-21cac3adeb97">
@@ -4661,7 +4661,7 @@
       <SetAllBuildModeValue-0>False</SetAllBuildModeValue-0>
       <PreBuildCommands-0 />
       <PostBuildCommands-0 />
-      <TimeTagModified--1>-8586749801653404544</TimeTagModified--1>
+      <TimeTagModified--1>-8586700569443019843</TimeTagModified--1>
       <OutputMessageFormat-1>%TargetFiles%</OutputMessageFormat-1>
       <FormatBuildOptionList-1>%TargetFiles% : %Program% %Options%</FormatBuildOptionList-1>
       <PreBuildCommands-1>@src\realtime_OS_pkg\alternative\.pre-build.bat
@@ -4721,7 +4721,7 @@
       <GeneralOptionIsa-1>RXv2</GeneralOptionIsa-1>
       <GeneralOptionOutput-1>LoadModuleFile</GeneralOptionOutput-1>
       <GeneralOptionPic-1>False</GeneralOptionPic-1>
-      <GeneralOptionSimultaneousBuild-1>True</GeneralOptionSimultaneousBuild-1>
+      <GeneralOptionSimultaneousBuild-1>False</GeneralOptionSimultaneousBuild-1>
       <GeneralOptionCpu-1>RX600</GeneralOptionCpu-1>
       <GeneralOptionEnableParallelBuilding-1>False</GeneralOptionEnableParallelBuilding-1>
       <GeneralOptionOutputFolder-1>%ConfigDir%</GeneralOptionOutputFolder-1>
@@ -7797,14 +7797,6 @@ D_2=R_2
       <ItemAddTime>636570005241668496</ItemAddTime>
       <ItemAddTimeCount>1</ItemAddTimeCount>
     </Instance>
-    <Instance Guid="08c572fc-c713-478f-8ed3-6195534ae8d8">
-      <ItemAddTime>636570005242862304</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="cc8cd137-654a-46e1-ac59-0c948a2e1b89">
-      <ItemAddTime>636570005243905632</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
     <Instance Guid="13d6c360-d392-48aa-af3e-a836a6a8be6a">
       <ItemAddTime>636570005252111808</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
@@ -7845,14 +7837,6 @@ D_2=R_2
       <ItemAddTime>636570005268253296</ItemAddTime>
       <ItemAddTimeCount>1</ItemAddTimeCount>
     </Instance>
-    <Instance Guid="4e9d313f-3ae4-4848-a2fe-1ce918869a61">
-      <ItemAddTime>636570005269406976</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="7dc0434e-8596-40fb-84aa-2e5a4443d880">
-      <ItemAddTime>636570005270530560</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
     <Instance Guid="4510dc11-10e9-4ad1-98b6-df81b3ef759d">
       <ItemAddTime>636570005280963840</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
@@ -7872,14 +7856,6 @@ D_2=R_2
     <Instance Guid="fb5385fa-a838-4b7a-9408-0052f35e63c4">
       <ItemAddTime>636570005346853136</ItemAddTime>
       <ItemAddTimeCount>1</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="34c2fbe6-33ae-4ad8-83bf-28a6c2ac38a9">
-      <ItemAddTime>636570005348054864</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="98824753-c66a-4669-af33-f5c0432e3a02">
-      <ItemAddTime>636570005349056304</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
     </Instance>
     <Instance Guid="c2630110-482c-4803-8c7f-66c165adeee7">
       <ItemAddTime>636570005358770272</ItemAddTime>
@@ -8009,14 +7985,6 @@ D_2=R_2
       <ItemAddTime>636622539810677744</ItemAddTime>
       <ItemAddTimeCount>1</ItemAddTimeCount>
     </Instance>
-    <Instance Guid="e9c34fa1-3844-490a-b3ad-09ea4026b29f">
-      <ItemAddTime>636622539811229504</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="0acf1dab-21c0-438d-a943-e34856d824dd">
-      <ItemAddTime>636622539811680944</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
     <Instance Guid="1449e125-7b37-4bfa-bc43-21cac3adeb97">
       <ItemAddTime>636622539818653184</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
@@ -8032,6 +8000,38 @@ D_2=R_2
     <Instance Guid="fb9c6e1e-995b-47e3-8e5f-a0fee6d49342">
       <ItemAddTime>636622539833921888</ItemAddTime>
       <ItemAddTimeCount>2</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="8eb404da-6439-43d7-8919-e4601b30b0cb">
+      <ItemAddTime>636671791410913730</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="c32483f2-10ed-4ccc-b5a2-c6f68ab8a0ec">
+      <ItemAddTime>636671791410973898</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="e0d1df04-fae9-47bc-b72b-b888b2a16acf">
+      <ItemAddTime>636671791411084187</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="a2ddd4e7-37fd-4e35-a9aa-474647f65641">
+      <ItemAddTime>636671791411144335</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="e0529431-01ba-4652-bcf2-6ed0cb333000">
+      <ItemAddTime>636671791411274690</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="3a1b27a8-ece6-4c76-b09d-fc09af961cde">
+      <ItemAddTime>636671791411324819</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="506e3743-3180-4a87-923b-f18195935d6a">
+      <ItemAddTime>636671791411495272</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="720d3661-7e54-4a72-a54f-332847bc75d6">
+      <ItemAddTime>636671791411545406</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
     </Instance>
     <Instance Guid="a7be515f-f007-45ed-9059-4e1500c0f74d">
       <TimeTagModified-SourceItem0--0>-8586749963190738128</TimeTagModified-SourceItem0--0>
@@ -10337,10 +10337,10 @@ D_2=R_2
       <DebuggerProperty-EssentialProperty-Clock-MainClockFrequency>120000</DebuggerProperty-EssentialProperty-Clock-MainClockFrequency>
       <DebuggerProperty-EssentialProperty-Clock-Operatingfrequency>1200000</DebuggerProperty-EssentialProperty-Clock-Operatingfrequency>
       <DebuggerProperty-EssentialProperty-Clock-AllowChangeClock>No</DebuggerProperty-EssentialProperty-Clock-AllowChangeClock>
-      <DebuggerProperty-EssentialProperty-EmulatorConnect-SerialNumber />
       <DebuggerProperty-EssentialProperty-TargetConnect-TargetSupplyPower>No</DebuggerProperty-EssentialProperty-TargetConnect-TargetSupplyPower>
       <DebuggerProperty-EssentialProperty-TargetConnect-TargetSuppliedVoltage>Use3_3V</DebuggerProperty-EssentialProperty-TargetConnect-TargetSuppliedVoltage>
       <DebuggerProperty-EssentialProperty-TargetConnect-UserVCC>2147483647</DebuggerProperty-EssentialProperty-TargetConnect-UserVCC>
+      <DebuggerProperty-EssentialProperty-TargetConnect-CommunicationMethodForE2Lite>Jtag</DebuggerProperty-EssentialProperty-TargetConnect-CommunicationMethodForE2Lite>
       <DebuggerProperty-EssentialProperty-TargetConnect-CommunicationMethod>Jtag</DebuggerProperty-EssentialProperty-TargetConnect-CommunicationMethod>
       <DebuggerProperty-EssentialProperty-TargetConnect-JtagClock>Jtag_06_000</DebuggerProperty-EssentialProperty-TargetConnect-JtagClock>
       <DebuggerProperty-EssentialProperty-TargetConnect-FineBaudRate>Fine_1500000</DebuggerProperty-EssentialProperty-TargetConnect-FineBaudRate>
@@ -10673,7 +10673,7 @@ D_2=R_2
       <DebuggerProperty-HookProperty-HookTransaction-Broke-Length>0</DebuggerProperty-HookProperty-HookTransaction-Broke-Length>
       <DebuggerProperty-HookProperty-HookTransaction-Connected-Length>0</DebuggerProperty-HookProperty-HookTransaction-Connected-Length>
       <DebuggerProperty-HookProperty-HookTransaction-Disconnecting-Length>0</DebuggerProperty-HookProperty-HookTransaction-Disconnecting-Length>
-      <DebuggerProperty-EssentialProperty-TargetConnect-CommunicationMethodForE2Lite>Jtag</DebuggerProperty-EssentialProperty-TargetConnect-CommunicationMethodForE2Lite>
+      <DebuggerProperty-EssentialProperty-EmulatorConnect-SerialNumber />
     </Instance>
   </Class>
   <Class Guid="100f3761-3d7e-4559-b1d8-375a0c7bf682">
@@ -10821,7 +10821,7 @@ D_2=R_2
   <Class Guid="90536345-15c8-40cb-957c-e59974e4bf78">
     <Instance Guid="90536345-15c8-40cb-957c-e59974e4bf78">
       <GenerateFileFolder>C:\Renesas\AmazonFreeRTOS\amazon-freertos-1.2.2\demos\renesas\rx65n-envision-kit\ccrx-csplus</GenerateFileFolder>
-      <SmcExePath>C:\Renesas\SmartConfigurator\RX\eclipse\SmartConfigurator.exe</SmcExePath>
+      <SmcExePath>C:\Renesas\Renesas Electronics\SmartConfigurator\RX\eclipse\SmartConfigurator.exe</SmcExePath>
       <CodeGeneratorFilesGuid>45cbc1cb-c6d9-4f01-879e-28adbdb17e8a</CodeGeneratorFilesGuid>
       <SCFGFile>aws_demos.scfg</SCFGFile>
     </Instance>

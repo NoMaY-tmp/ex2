@@ -6,7 +6,7 @@ This guide is for your environment setup and confirm demos behavior.
 
 SheltyDog@Renesas writes this guide and has responsibility of this project.
 If you have any question/suggestion/opinion, please visit following page and post it.
-https://github.com/NoMaY-jp/amazon-freertos/tree/master
+https://github.com/NoMaY-jp/amazon-freertos-renesas-rx
 
 Now Amazon provides great real time OS with network software for
 MCU (like some peripheral with 100MHz class CPU) as "Amazon FreeRTOS".
@@ -22,7 +22,7 @@ Getting start steps:
  step1:  Refer to the Development Environment (recommended) section to get the board and tools.
  step2:  Setup tools for your PC.
  step3:  Download RX65N Amazon FreeRTOS from GitHub. (Maybe you already done)
-         https://github.com/NoMaY-jp/amazon-freertos/tree/master
+         https://github.com/NoMaY-jp/amazon-freertos-renesas-rx
  step4:  Make your AWS account, and make your "Things" on AWS,
          and enable Security Policy to allow all your device will connect to your "Things".
  step5:  Make your device certification and private key and settings put this into your source code.
@@ -72,6 +72,16 @@ I hope this solution will be helpful for embedded system developer in W/W.
 --------------------------------------------------------------------------
 Change Logs
 --------------------------------------------------------------------------
+v0.0.6:
+[ADDED] Support RX65N GR-ROSE.
+[ADDED] Compiler pre-processor macro "__RX" to fix e2 studio local issue for pre-build code analysis.
+[ADDED] Settings for indexer e2 studio local issue for pre-build code analysis.
+        - e2 studio project for each of the board, RX65N RSK, RX65N Envision Kit, RX65N GR-ROSE.
+[UPDATED] prvMiscInitialization() call timing to avoid the system bus error comes from corrupting printf() output.
+[UPDATED] MAC address from temporary MAC address to renesas sample code MAC address.
+[UPDATED] e2 studio version from v620 to v630.
+[UPDATED] RX Driver Package version from v113 to v114.
+
 v0.0.5:
 [UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.7.
 [UPDATED] Readme text step8 for additional notice.
@@ -88,7 +98,7 @@ v0.0.2:
 [REMOVED] Getting start step7 from #ifdef 0 to 1.
 [UPDATED] Clarify Getting start root directory path same as download zip "amazon-freertos-master".
 
-v0.0.1:
+v0.0.1: released
 [ADDED] RX65N supports Amazon FreeRTOS Release Version 1.2.3 in tentative.
         Only confirmed Echo demo using Ethernet.
 
@@ -103,7 +113,7 @@ Compiler: CC-RX V2.08 (you need non-expired evaluation license or product licens
     [en] https://www.renesas.com/en-us/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
 
-IDE: e2 studio V6.2.0
+IDE: e2 studio V6.3.0
     [en] https://www.renesas.com/en-us/products/software-tools/tools/ide/e2studio.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/ide/e2studio.html
     
@@ -111,7 +121,7 @@ Debugger: E1 Emulator (no need to buy because Renesas Starter Kit has this one i
     [en] https://www.renesas.com/en-us/products/software-tools/tools/emulator/e1.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/emulator/e1.html
 
-Device Driver: RX Driver Package
+Device Driver: RX Driver Package v114
     [en] https://www.renesas.com/en-us/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
 
@@ -134,20 +144,137 @@ Board: RX65N Envision Kit
     [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
 
-         The log will be output from CN14(PMOD:1-6pin) connector as UART/USB.
+         The log will be output from CN14(PMOD:1-6pin) connector as PMOD UART/USB.
          Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
          and "LF" only as return code for your console.
          PMOD UART/USB convertor is provided by Digilent.
          https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
-         
+
+         Comment:
+           RX65N Envision Kit has no parts related Ethernet.
+           Please implements LAN8720A and RJ45 connector onto your RX65N Envision Kit.
+
+Board: RX65N GR-ROSE proto1
+    [en] now preparing
+    [ja] now preparing
+         [event info] http://gadget.renesas.com/ja/event/2018/RenesasNight13.html
+
+         The log will be output from CN9 10pin=TxD12(PE1) connector as UART.
+         Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
+         and "LF" only as return code for your console.
+         PMOD UART/USB convertor can be used for this signal.
+         https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
+
+         Please contact as following.
+         PMOD UART/USB ----- RX65N GR-ROSE CN9
+         1             -----
+         2             ----- 10pin
+         3             -----
+         4             -----
+         5             ----- 5pin
+         6             ----- 6pin
+
+         This pin assign is wrong. We will fix this after proto2.
+
+         [How to connect E1 Emulator]
+         GR-ROSE CN2-TH 4pins are connected to RX65N Debug Interface called FINE.
+         You can connect E1 or E2 Emulator to this pins as following.
+         GR-ROSE CN2-TH ----- Emulator 14pin connector
+         pin1(VCC)      ----- pin8
+         pin2(GND)      ----- pin2, pin12, pin14
+         pin3(MD)       ----- pin7
+         pin4(#RES)     ----- pin13
+
+         Workaround for circuit bug:
+           You have to connect ESP-WROOM-02D pin4 to GND (CN1 pin1)
+           before connecting debugger from IDE operation (e2 studio has "BUG" icon for start debugging).
+           And, you have to release ESP-WROOM-02D pin4 from GND after connecting.
+           You can see pin1 on left-upper corner nearby "E" character on "ESPRESSIF" logo.
+           Pin4 is lower 4pins from pin1.
+
 IDE: CS+
     [en] https://www.renesas.com/en-us/products/software-tools/tools/ide/csplus.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/ide/csplus.html
 
-Comment:
- RX65N Envision Kit has no parts related Ethernet.
- Please implements LAN8720A and RJ45 connector onto your RX65N Envision Kit.
- 
+--------------------------------------------------------------------------
+Connection Pattern
+--------------------------------------------------------------------------
+  pattern1:
+  osi	protocol	implemented into
+  7	aws		Amazon FreeRTOS
+  7	mqtt		Amazon FreeRTOS
+  6	ssl/tls		wifi module
+  5	socket		wifi module
+  4	tcp		wifi module
+  3	ip		wifi module
+  2	ether		wifi module
+  1	phy		wifi module
+
+  RX65N Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+  RX231 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+  RX130 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+  RX65N Target Board + Cloud Option Board (with Espressif ESP8266)
+  RX231 Target Board + Cloud Option Board (with Espressif ESP8266)
+  RX130 Target Board + Cloud Option Board (with Espressif ESP8266)
+  RX65N GR-ROSE (with Espressif ESP8266)
+
+  pattern2:
+  osi	protocol	implemented into
+  7	aws		Amazon FreeRTOS
+  7	mqtt		Amazon FreeRTOS
+  6	ssl/tls		Amazon FreeRTOS
+  5	socket		Amazon FreeRTOS
+  4	tcp		Amazon FreeRTOS
+  3	ip		Amazon FreeRTOS
+  2	ether		Amazon FreeRTOS(RX Ether specific)
+  1	phy		ether-phy
+
+  RX65N RSK <first step>
+  RX65N Envision Kit <first step>
+  RX65N GR-ROSE
+  RXxxN Envision Kit (Murata Type 1FX on board)
+  
+  pattern3:
+  osi	protocol	implemented into
+  7	aws		Amazon FreeRTOS
+  7	mqtt		Amazon FreeRTOS
+  6	ssl/tls		Amazon FreeRTOS
+  5	socket		Amazon FreeRTOS
+  4	tcp		Amazon FreeRTOS
+  3	ip		Amazon FreeRTOS
+  2	ether		Amazon FreeRTOS(RX SDIO-wifi specific)
+  1	phy		wifi radio
+
+  RX65N RSK + SDIO wifi SDK (with Murata Type 1FX)
+  RX65N Envision Kit + SDIO wifi SDK (with Murata Type 1FX)
+  RXxxN Envision Kit (Murata Type 1FX on board)
+  
+--------------------------------------------------------------------------
+Development Environment (tested or no matrix)
+--------------------------------------------------------------------------
+
+Borad number:
+ (1)Renesas Starter Kit+ for RX65N-2MB
+ (2)RX65N Envision Kit
+ (3)RX65N GR-ROSE proto1
+
+IDE number:
+ (1)e2 studio
+ (2)CS+
+ (3)IAR
+
+Compiler number:
+ (1)CC-RX
+ (2)GCC
+ (3)IAR
+
+v0.0.6:
+         IDE      (1)         (2)         (3)
+         Compiler (1) (2) (3) (1) (2) (3) (1) (2) (3)
+Board (1)          x           x                     
+      (2)          x           x          N/A N/A    
+      (3)          x                      N/A N/A    
+
 --------------------------------------------------------------------------
 RX65N Device Introduction
 --------------------------------------------------------------------------
@@ -236,6 +363,59 @@ RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットに�
 --------------------------------------------------------------------------
 ■ポーティング記録	★印が解決すべき課題
 --------------------------------------------------------------------------
+2018/07/14
+　しばらくぶりの更新。この1か月は内部調整に奔走。この開発は、とても楽しい。
+　出張ラッシュがひと段落しての3連休。NoMaY氏がGCC対応のプロジェクトファイルを
+　コミットしてくれている。これを試したい。
+　その前に、GR-ROSEへのAmazon FreeRTOS移植を実施する。
+　
+　GR-ROSEとは、がじぇっとるねさすプロジェクトの最新ボード。RX65N搭載。
+　ロボットの制御基板をターゲットとした小型ボードであり、通信制御、
+　リアルタイム制御用にAmazon FreeRTOSを標準搭載することにした。
+　http://gadget.renesas.com/ja/event/2018/RenesasNight13.html
+　
+　OS/ドライバ周りのインテグレートをシェルティが担当。
+　ネットワーク層の上位にROSと呼ばれるロボット制御プロトコルを搭載。
+　ROSはAIBOにも載っているソフトウェアとのこと。
+　
+　RX65N Envision Kitのe2 studio用プロジェクトのファイルをコピーして作業開始。
+　リンクフォルダの設定等を調整していく。
+　あとはスマートコンフィグレータでEther周り、UART周りの端子を調整。
+
+　Ether周りは特に問題なし。
+　あっさりとGR-ROSEでAmazon Web Serviceに繋ぐことができた。
+　
+　UARTはPMODコネクタに出ているが、PMODのpin7とpin8にSCI-ch1のRxD1、TxD1、
+　PMODのpin9とpin10にSCI-ch12のRxD12、TxD12が配線されている。
+　PMODのUART仕様はpin3がRxD(PMOD側が入力)、pin4がTxD(PMOD側が出力)であり、
+　回路構成と合致しない。
+　このPMODはSPI用途なので間違ってはいないが、Amazon FreeRTOSにはUART入出力も必要である。
+　(システムログ出力や、アカウントデータのインストールのため等)
+　
+　RX65N側のUSBのCommunication Device ClassでPC側と通信する手も有るが、
+　ファームウェアにUSBドライバが必須になり得策ではない。
+　他のプロモーションボードでも同様に基本ファームウェア構成は限りなくシンプルに抑える方針であり、
+　システムログ出力はUSBではなく、SCIのUARTで行う。
+　
+　したがって、GR-ROSE proto1のPMODの配線を修正しUARTを使えるようにする。
+　RX65Nのピンマルチをうまくつかえば、ソフトウェアの切り替えでSPIとUARTが同一配線で実現可能。
+　現在RSPI1がPMODに配線されているが、残念ながらRSPIの送受信端子はSCIとピン互換ではない。
+　PMODに配線するSPIはSCIのSPIモードで妥協し、SCI-ch12のSPI端子4本(UART端子込)を
+　PMODのpin1-6に配線することにする。ついでにI2CバスのPMODモジュールも使えるようになる。
+　
+　まとめると以下。
+　
+　現状PMOD配線：
+　　RSPI-ch1(SPI)  ---> PMOD pin1-4 (fit to PMOD spec)
+　　SCI-ch1(UART)  ---> PMOD pin7-8 (not fit to PMOD spec)
+　　SCI-ch12(I2C)  ---> PMOD pin9-10 (not fit to PMOD spec)
+　次版PMOD配線：
+　　SCI-ch12(SPI(SS/MOSI/MISO/SCK))  ---> PMOD pin1-4 (fit to PMOD spec)
+　　SCI-ch12(UART(RxD/TxD))          ---> PMOD pin3-4 (fit to PMOD spec)
+　　SCI-ch12(I2C(SCL/SDA))           ---> PMOD pin3-4 (not fit to PMOD spec)
+　
+　ひとまずここでGitHubへのコミット作業。
+　
 2018/06/10
 　特に進捗はしなかった。
 　NoMaY氏がコードのメンテを進め、本家v127へ追従してくれている。

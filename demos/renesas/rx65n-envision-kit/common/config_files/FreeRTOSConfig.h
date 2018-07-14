@@ -219,12 +219,12 @@ extern void vLoggingPrintf( const char * pcFormat, ... );
  * to and from a real network connection on the host PC.  See the
  * configNETWORK_INTERFACE_TO_USE definition above for information on how to
  * configure the real network connection to use. */
-#define configMAC_ADDR0                      0x2E
-#define configMAC_ADDR1                      0x09
-#define configMAC_ADDR2                      0x0A
-#define configMAC_ADDR3                      0x02
-#define configMAC_ADDR4                      0xE0
-#define configMAC_ADDR5                      0x0A
+#define configMAC_ADDR0                      0x74
+#define configMAC_ADDR1                      0x90
+#define configMAC_ADDR2                      0x50
+#define configMAC_ADDR3                      0x00
+#define configMAC_ADDR4                      0x79
+#define configMAC_ADDR5                      0x03
 
 /* Default IP address configuration.  Used in ipconfigUSE_DHCP is set to 0, or
  * ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted. */

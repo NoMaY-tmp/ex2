@@ -115,7 +115,6 @@ int main( void )
 {
     /* Perform any hardware initialization that does not require the RTOS to be
      * running.  */
-    prvMiscInitialization();
 
     /* Start the scheduler.  Initialization that requires the OS to be running,
      * including the WiFi initialization, is performed in the RTOS daemon task
@@ -145,6 +144,8 @@ static void prvMiscInitialization( void )
 
 void vApplicationDaemonTaskStartupHook( void )
 {
+    prvMiscInitialization();
+
     if( SYSTEM_Init() == pdPASS )
     {
 #if(1)

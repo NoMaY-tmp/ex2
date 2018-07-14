@@ -259,10 +259,15 @@ void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkB
 {
 	uint32_t ul;
     uint8_t *buffer_address;
+
+#if (__CCRX__)
+    buffer_address = __sectop("B_ETHERNET_BUFFERS_1");
+#elif (__GNUC__)
     R_ATTRIB_SECTION_CHANGE_V(B_ETHERNET_BUFFERS_1)
     static uint8_t B_ETHERNET_BUFFERS_1[1];
     R_ATTRIB_SECTION_CHANGE_END
     buffer_address = B_ETHERNET_BUFFERS_1;
+#endif
 
 	for( ul = 0; ul < ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS; ul++ )
 	{
@@ -295,7 +300,8 @@ static int InitializeNetwork(void)
 #if (BSP_CFG_BOARD_REVISION == 0) || (BSP_CFG_BOARD_REVISION == 1)	/* RX65N RSK */
 	R_ETHER_PinSet_ETHERC0_MII();
 #elif (BSP_CFG_BOARD_REVISION == 2) 	/* RX65N Envision Kit */
-	R_ETHER_PinSet_ETHERC0_MII();
+	R_ETHER_PinSet_ETHERC0_RMII();
+#elif (BSP_CFG_BOARD_REVISION == 3) 	/* RX65N GR-ROSE proto1 */
 	R_ETHER_PinSet_ETHERC0_RMII();
 #endif
 	R_ETHER_Initial();

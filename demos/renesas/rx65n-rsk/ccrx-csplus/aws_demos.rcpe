@@ -600,10 +600,10 @@
           <Path>src\smc_gen\r_cmt_rx\r_cmt_rx_if.h</Path>
           <Category Name="doc">
             <Category Name="en">
-              <Path>src\smc_gen\r_cmt_rx\doc\en\r01an1856ej0320-rx.pdf</Path>
+              <Path>src\smc_gen\r_cmt_rx\doc\en\r01an1856ej0321-rx.pdf</Path>
             </Category>
             <Category Name="ja">
-              <Path>src\smc_gen\r_cmt_rx\doc\ja\r01an1856jj0320-rx.pdf</Path>
+              <Path>src\smc_gen\r_cmt_rx\doc\ja\r01an1856jj0321-rx.pdf</Path>
             </Category>
           </Category>
           <Category Name="ref">
@@ -628,10 +628,10 @@
           <Path>src\smc_gen\r_ether_rx\r_ether_rx_if.h</Path>
           <Category Name="doc">
             <Category Name="en">
-              <Path>src\smc_gen\r_ether_rx\doc\en\r01an2009ej0113-rx.pdf</Path>
+              <Path>src\smc_gen\r_ether_rx\doc\en\r01an2009ej0114-rx.pdf</Path>
             </Category>
             <Category Name="ja">
-              <Path>src\smc_gen\r_ether_rx\doc\ja\r01an2009jj0113-rx.pdf</Path>
+              <Path>src\smc_gen\r_ether_rx\doc\ja\r01an2009jj0114-rx.pdf</Path>
             </Category>
           </Category>
           <Category Name="ref">
@@ -656,10 +656,10 @@
           <Path>src\smc_gen\r_flash_rx\r_flash_rx_if.h</Path>
           <Category Name="doc">
             <Category Name="en">
-              <Path>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0320-rx.pdf</Path>
+              <Path>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0330-rx.pdf</Path>
             </Category>
             <Category Name="ja">
-              <Path>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0320-rx.pdf</Path>
+              <Path>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0330-rx.pdf</Path>
             </Category>
           </Category>
           <Category Name="ref">
@@ -733,10 +733,10 @@
           <Path>src\smc_gen\r_sci_rx\r_sci_rx_if.h</Path>
           <Category Name="doc">
             <Category Name="en">
-              <Path>src\smc_gen\r_sci_rx\doc\en\r01an1815ej0200-rx.pdf</Path>
+              <Path>src\smc_gen\r_sci_rx\doc\en\r01an1815ej0201-rx.pdf</Path>
             </Category>
             <Category Name="ja">
-              <Path>src\smc_gen\r_sci_rx\doc\ja\r01an1815jj0200-rx.pdf</Path>
+              <Path>src\smc_gen\r_sci_rx\doc\ja\r01an1815jj0201-rx.pdf</Path>
             </Category>
           </Category>
           <Category Name="ref">
@@ -1074,7 +1074,7 @@
       <BuildMode Name="HardwareDebug" Active="True">
         <GeneralOptions>
           <CommandsBefore>@src\realtime_OS_pkg\alternative\.pre-build.bat</CommandsBefore>
-          <SimultaneouslyBuild>true</SimultaneouslyBuild>
+          <SimultaneouslyBuild>false</SimultaneouslyBuild>
         </GeneralOptions>
         <CompileOptions>
           <Option>-isa=rxv2</Option>
@@ -1133,7 +1133,7 @@
           <Option>-include=src\realtime_OS_pkg\r_cmt_rtos_rx\src</Option>
           <Option>-include=src</Option>
           <Option>-change_message=information=21644</Option>
-          <Option>-output=obj</Option>
+          <Option>-output=obj=%ConfigDir%\%FileLeaf%.obj</Option>
           <Option>-debug</Option>
           <Option>-nologo</Option>
         </CompileOptions>
@@ -1141,6 +1141,7 @@
           <Option>-isa=rxv2</Option>
           <Option>-fpu</Option>
           <Option>-output=%ConfigDir%\%FileLeaf%.obj</Option>
+          <Option>-debug</Option>
           <Option>-nologo</Option>
         </AssembleOptions>
         <LinkOptions>
@@ -1428,7 +1429,7 @@
       <CodeGeneratorData></CodeGeneratorData>
       <GenerateFileFolder>C:\Renesas\AmazonFreeRTOS\amazon-freertos-1.2.2\demos\renesas\rx65n-rsk\ccrx-csplus</GenerateFileFolder>
       <SCFGFile>aws_demos.scfg</SCFGFile>
-      <SmcExePath>C:\Renesas\SmartConfigurator\RX\eclipse\SmartConfigurator.exe</SmcExePath>
+      <SmcExePath>C:\Renesas\Renesas Electronics\SmartConfigurator\RX\eclipse\SmartConfigurator.exe</SmcExePath>
       <CodeGeneratorFilesGuid>910132c6-f23c-4603-9339-25ce2e97d0f1</CodeGeneratorFilesGuid>
     </Extension_SmcCodePart>
   </Project>
