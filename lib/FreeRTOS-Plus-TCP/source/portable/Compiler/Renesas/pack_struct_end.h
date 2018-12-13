@@ -1,5 +1,5 @@
 /*
-FreeRTOS+TCP V2.0.4
+FreeRTOS+TCP V2.0.8
 Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -40,7 +40,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifdef __RX
 	#ifdef __CCRX__
 		;
-		#pragma unpack
+		#pragma packoption
 	#endif
 #endif
 

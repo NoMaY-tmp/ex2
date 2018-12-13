@@ -1,6 +1,6 @@
 /*
  * FreeRTOS Kernel V10.0.1
- * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -75,13 +75,6 @@
 #define ipconfigSOCK_DEFAULT_RECEIVE_BLOCK_TIME    ( 10000 )
 #define ipconfigSOCK_DEFAULT_SEND_BLOCK_TIME       ( 10000 )
 
-/* Include support for LLMNR: Link-local Multicast Name Resolution
- * (non-Microsoft) */
-#define ipconfigUSE_LLMNR                          ( 1 )
-
-/* Include support for NBNS: NetBIOS Name Service (Microsoft) */
-#define ipconfigUSE_NBNS                           ( 1 )
-
 /* Include support for DNS caching.  For TCP, having a small DNS cache is very
  * useful.  When a cache is present, ipconfigDNS_REQUEST_ATTEMPTS can be kept low
  * and also DNS may use small timeouts.  If a DNS reply comes in after the DNS
@@ -89,8 +82,6 @@
  * call to FreeRTOS_gethostbyname() will return immediately, without even creating
  * a socket. */
 #define ipconfigUSE_DNS_CACHE                      ( 1 )
-#define ipconfigDNS_CACHE_NAME_LENGTH              ( 16 )
-#define ipconfigDNS_CACHE_ENTRIES                  ( 4 )
 #define ipconfigDNS_REQUEST_ATTEMPTS               ( 2 )
 
 /* The IP stack executes it its own task (although any application task can make
@@ -116,7 +107,7 @@
  * number generation is performed via this macro to allow applications to use their
  * own random number generation method.  For example, it might be possible to
  * generate a random number by sampling noise on an analogue input. */
-extern uint32_t ulRand();
+uint32_t ulRand(void);
 #define ipconfigRAND32()    ulRand()
 
 /* If ipconfigUSE_NETWORK_EVENT_HOOK is set to 1 then FreeRTOS+TCP will call the
@@ -150,6 +141,7 @@ extern uint32_t ulRand();
 #define ipconfigUSE_DHCP                         1
 #define ipconfigDHCP_REGISTER_HOSTNAME           1
 #define ipconfigDHCP_USES_UNICAST                1
+#define ipconfigDHCP_SEND_DISCOVER_AFTER_AUTO_IP 0
 
 /* If ipconfigDHCP_USES_USER_HOOK is set to 1 then the application writer must
  * provide an implementation of the DHCP callback function,
@@ -302,11 +294,6 @@ extern uint32_t ulRand();
  * real program memory (RAM or flash) or just has a random non-zero value. */
 #define ipconfigIS_VALID_PROG_ADDRESS( x )    ( ( x ) != NULL )
 
-/* Include support for TCP hang protection.  All sockets in a connecting or
- * disconnecting stage will timeout after a period of non-activity. */
-#define ipconfigTCP_HANG_PROTECTION              ( 1 )
-#define ipconfigTCP_HANG_PROTECTION_TIME         ( 30 )
-
 /* Include support for TCP keep-alive messages. */
 #define ipconfigTCP_KEEP_ALIVE                   ( 1 )
 #define ipconfigTCP_KEEP_ALIVE_INTERVAL          ( 20 ) /* Seconds. */
@@ -319,6 +306,17 @@ extern uint32_t ulRand();
 
 #define ipconfigZERO_COPY_TX_DRIVER              ( 0 )
 #define ipconfigZERO_COPY_RX_DRIVER              ( 0 )
+
+/* Possible optimisation for expert users - requires network driver support.
+ * When ipconfigUSE_LINKED_RX_MESSAGES is set to non-zero value then
+ * instead of passing received packets into the IP task one at a time the
+ * network interface can chain received packets together and pass them into
+ * the IP task in one go.  The packets are chained using the pxNextBuffer
+ * member. This optimisation is useful when there is high network traffic.
+ * When ipconfigUSE_LINKED_RX_MESSAGES is set to 0 then only one buffer will
+ * be sent at a time.  This is the default way for +TCP to pass messages from
+ * the MAC to the TCP/IP stack. */
+#define ipconfigUSE_LINKED_RX_MESSAGES           ( 0 )
 
 #define portINLINE                               __inline
 

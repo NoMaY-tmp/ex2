@@ -1,12 +1,15 @@
 ----------------------------------------------
-Getting start for RX65N Amazon FreeRTOS
+Getting Start for RX MCUs Amazon FreeRTOS
 ----------------------------------------------
-Thank you for interesting about RX65N and Amazon FreeRTOS.
+Thank you for interesting about RX MCUs (RX65N is main) and Amazon FreeRTOS.
 This guide is for your environment setup and confirm demos behavior.
 
 SheltyDog@Renesas writes this guide and has responsibility of this project.
-If you have any question/suggestion/opinion, please visit following page and post it.
-https://github.com/NoMaY-jp/amazon-freertos-renesas-rx
+If you have any question/suggestion/opinion, please visit following site and post it.
+https://github.com/renesas-rx/amazon-freertos
+
+And, details discussion is progressing in following site. (Japanese)
+https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx
 
 Now Amazon provides great real time OS with network software for
 MCU (like some peripheral with 100MHz class CPU) as "Amazon FreeRTOS".
@@ -18,11 +21,12 @@ The download zip file name is "amazon-freertos-master.zip".
 Extract this zip or your clone directory has "demos" and "lib" directory readme, etc.
 This is our root directory called <root>.
 
-Getting start steps:
+Getting Start Steps:
  step1:  Refer to the Development Environment (recommended) section to get the board and tools.
- step2:  Setup tools for your PC.
- step3:  Download RX65N Amazon FreeRTOS from GitHub. (Maybe you already done)
-         https://github.com/NoMaY-jp/amazon-freertos-renesas-rx
+ step2:  Setup tools for your PC, Compiler and IDE are mandatory.
+         Others are just reference information, already implemented into step3 data, no need setup.
+ step3:  Download RX MCUs Amazon FreeRTOS from GitHub. (Maybe you already done)
+         https://github.com/renesas-rx/amazon-freertos
  step4:  Make your AWS account, and make your "Things" on AWS,
          and enable Security Policy to allow all your device will connect to your "Things".
  step5:  Make your device certification and private key and settings put this into your source code.
@@ -35,30 +39,17 @@ Getting start steps:
            clientcredentialCLIENT_PRIVATE_KEY_PEM[]
  step6:  Start Renesas IDE (e2 studio) and import Amazon FreeRTOS project.
          import sequence: file->import->existing project into workspace -> select a root directory
-         The project folder is placed into <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6
+         The project folder is placed into <root>/demos/renesas/rx65n-rsk/ccrx-e2studio
          Please specify this directory only.
- step7:  Get/Put Device Driver from Renesas Webpage and put it into your project.
-         Refer to following text.
-         <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
- step8:  Configure your environment using Smart Configurator.
-         Please double click aws_demos.scfg on your Project Explorer on e2 studio.
-         You can start Smart Configurator with already configured value.
-         You can confirm following modules are installed on your Component Tab. (But not generated the code)
-         - r_bsp
-         - r_sci_rx
-         - r_cmt_rx
-         - r_flash_rx
-         - r_ether_rx
-         - r_byteq
-         After confirmation, please click the generate button on Smart Configurator.
-         The device drivers code you confirmed are generated into following directory,
-         and some settings (include path, section, link the library, etc) will be applied.
-         <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/
-         ** notice **
-         No need to change your device setting from R5F565NEHxFB to R5F565NEDxFB on your Board Tab.
- step9:  Build
- step10: Execute, confirm console log will show the Echo message from AWS.
-         The log will be output from G1CUSB connector as UART/USB.
+         This directory is top of reference. You can also use other project.
+         Please select tested project shown into Development Environment (tested or no matrix) section
+         in this Readme.
+         Note: "DO NOT SET" the check for "Copy projects into workspace" in "Import Projects" dialog.
+               Because, some of source in "<root>/lib" folder are outside of project directory.
+               So if this check would exist, some of source in "<root>/lib" folder will be missing.
+ step7:  Build
+ step8:  Execute, confirm console log will show the Echo message from AWS.
+         The log will be output from G1CUSB (or other UART/USB) connector as UART/USB.
          Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
          and "LF" only as return code for your console.
   
@@ -72,6 +63,253 @@ I hope this solution will be helpful for embedded system developer in W/W.
 --------------------------------------------------------------------------
 Change Logs
 --------------------------------------------------------------------------
+v0.1.5:
+[UPDATED] Unifying BSP(CC-RX/GCC/IAR)
+[UPDATED] Increase configMINIMAL_STACK_SIZE value from 140 to 180
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N RSK GCC e2 studio with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite
+         RX65N Target Board + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Target Board + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite (on board)
+         RX65N Target Board + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+         RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite
+         RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite
+         RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite
+         
+v0.1.4:
+[ADDED] Missing parts for RX65N Target Board + Silex SX-ULPGN PMOD CC-RX
+        e2 studio with E2 Emulator Lite (on board).
+
+v0.1.3:
+[UPDATED] Follow the upstream from Amazon FreeRTOS v1.4.1.
+[FIXED] no use ET_LINKSTA setting for RX65N GR-ROSE projects.
+[ADDED] Following projetcs.
+         RX65N Target Board + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Target Board + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite (on board)
+         RX65N Target Board + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N RSK GCC e2 studio with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite
+         RX65N Target Board + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Target Board + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite (on board)
+         RX65N Target Board + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+         RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite
+         RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite
+         RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite
+
+v0.1.2:
+[UPDATED] Follow the upstream from Amazon FreeRTOS v1.3.2.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N RSK GCC e2 studio with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+         RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite
+         RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite
+         RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite
+
+v0.1.1:
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N RSK GCC e2 studio with E2 Emulator Lite
+         RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+
+v0.1.1-pre5:
+[REMOVED] link to FreeRTOS+TCP from rx65n-rsk-uart-wifi.
+[FIXED] Wrong behavior of rx65n-rsk-uart-wifi: can set optimize level 2, can set log-off.
+[UPDATED] Follow the upstream v1.3.0 excluding tests folder.
+[RESTRUCTUERED] Remove prototype for optimizing file structure.
+
+v0.1.1-pre4:
+[FIXED] Wrong project settings.
+[ADDED] Explanation of Renesas Starter Kit+ for RX65N-2MB + Silex SX-ULPGN PMOD environment in this readme.
+
+v0.1.1-pre3:
+[ADDED] Renesas Starter Kit+ for RX65N-2MB + Silex SX-ULPGN PMOD environment.
+
+v0.1.1-pre2:
+[UPDATED] aws_secure_sockets.c in rx65n-envision-kit and rx65n-gr-rose.
+
+v0.1.1-pre1:
+[CONFIRMED] Following changes by NoMaY-san.
+[UPDATED] Follow the upstream from Amazon FreeRTOS v1.3.0. <step 1/3>
+[ADDED] RX65N GR-ROSE's project for CC-RX & CS+.
+[MOVED] RX MCUs device driver HAL from /demos folder to /lib/third_party/mcu_vendor/renesas
+[FIXED] lack of called DI/EI operation in R_BSP_RegisterProtectDisable() and R_BSP_RegisterProtectEnable().
+[ADDED] Maybe a better way to get the start address of the _ETHERNET_BUFFERS section for GNURX projects.
+[FIXED] Correction of the SCFGcompiler.h because the R_ATTRIB_INTERRUPT/R_ATTRIB_STATIC_INTERRUPT macros
+        for GNURX projects were incorrect so that interrupt vectors were not generated.
+[RESTRUCTUERED] Restructuring folder structure of projects for CC-RX/e2 studio & CC-RX/CS+ & GNURX/e2 studio,
+                RX65N-RSK's trial of new folder structure reducing the effort to maintain various projects
+                but still keeping good usability.
+[ADDED] A workaround to avoid the problem that the BSP_CFG_RTOS_USED in the r_bsp_config.h
+        is set to (0) every time of code generation by the Smart Configurator.
+[RESTRUCTUERED] Restructuring folder structure of projects for CC-RX/e2 studio & CC-RX/CS+ & GNURX/e2 studio,
+                Improve the batch files and the handling of them.
+
+v0.1.0:
+[UPDATED] RX Driver Package version from v114 to v115 for all projects.
+[UPDATED] CS+, e2 studio to latest.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N RSK GCC e2 studio with E2 Emulator Lite
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+
+v0.1.0-pre10:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N GR-ROSE GCC/e2 studio project.
+[TESTED] Following projetcs.
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+
+v0.1.0-pre9:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N GR-ROSE CC-RX/e2 studio project.
+[TESTED] Following projetcs.
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+
+v0.1.0-pre8:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N Envision Kit GCC/e2 studio project.
+[TESTED] Following projetcs.
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite
+
+v0.1.0-pre7:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N Envision Kit CC-RX/e2 studio project.
+[TESTED] Following projetcs.
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite
+
+v0.1.0-pre6:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N Envision Kit CC-RX/CS+ project.
+[TESTED] Following projetcs.
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite
+         
+v0.1.0-pre5:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N RSK GCC/e2 studio project.
+           -> Copy smc_gen folder (excluding bsp) from RX65N RSK CC-RX CS+ project.
+[TESTED] Following projetcs.
+         RX65N RSK GCC e2 studio with E2 Emulator Lite
+         
+v0.1.0-pre4:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N RSK CC-RX/CS+ project.
+           -> Re-generate the code from RX Driver Package v115.
+           -> Merged unified macro code for multi compiler.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+
+v0.1.0-pre3:
+[FIXED] RX65N RSK CC-RX/e2 studio project has Ether driver is not latest.
+        Updated from v114 to v115.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+
+v0.1.0-pre2:
+[UPDATED] RX Driver Package version from v114 to v115 RX65N RSK CC-RX/e2 studio project.
+           -> Re-generate the code from RX Driver Package v115.
+           -> Merged unified macro code for multi compiler.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+
+v0.1.0-pre1:
+[UPDATED] e2 studio version from v630 to v700 on RX65N RSK CC-RX/e2 studio project.
+[UPDATED] RX Driver Package version from v114 to v115 RX65N RSK CC-RX/e2 studio project.
+[ADDED] RX65N RSK GCC/e2 studio project.
+[RESTRUCTUERED] RX65N RSK CC-RX/CS+ project.
+[RESTRUCTUERED] RX65N RSK CC-RX/e2 studio project.
+[FIXED] Device name tag (R5F565NEHxFB --> R5F565NEDxFB) on aws_demos.scfg
+        of each of RX65N Envision Kit project.
+[RESTRUCTUERED] RX65N Envision Kit CC-RX/CS+ project.
+[RESTRUCTUERED] RX65N Envision Kit GCC/e2 studio project.
+[RESTRUCTUERED] RX65N Envision Kit CC-RX/e2 studio project.
+
+v0.0.9:
+[NOTICE] Sorry, v0.0.8 includes wrong commit massage.
+         No differencies between v0.0.7 to v0.0.8, v0.0.9 excluding commit message.
+         v0.0.7 has following update.
+[UPDATED] Emulator settings to use the E2 Emulator Lite for all projects.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+v0.0.8:
+[NOTICE] Sorry, v0.0.7 includes wrong commit massage.
+         No differencies between v0.0.7 to v0.0.8 excluding commit message.
+         v0.0.7 has following update.
+[UPDATED] Emulator settings to use the E2 Emulator Lite for all projects.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+         
+v0.0.7:
+[UPDATED] Emulator settings to use the E2 Emulator Lite for all projects.
+[TESTED] Following projetcs.
+         RX65N RSK CC-RX e2 studio with E2 Emulator Lite
+         RX65N RSK CC-RX CS+ with E2 Emulator Lite
+         RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)
+         RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)
+         RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)
+         RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+         RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+         
+v0.0.7-pre4:
+[ADDED] RX65N GR-ROSE GCC e2 studio project code.
+
+v0.0.7-pre3:
+[FIXED] RX65N Envision Kit GCC e2 studio project code.
+
+v0.0.7-pre2:
+[FIXED] RX65N GR-ROSE CC-RX e2 studio project SCI/BSP settings.
+
+v0.0.7-pre1:
+[ADDED] GCC and IAR trial envirionment into Envision Kit project.
+[OMITTED] Step7-8 from Getting Start Steps.
+[ADDED] Configuired device driver from RX Driver Package to omit step7-8.
+
 v0.0.6:
 [ADDED] Support RX65N GR-ROSE.
 [ADDED] Compiler pre-processor macro "__RX" to fix e2 studio local issue for pre-build code analysis.
@@ -98,7 +336,7 @@ v0.0.2:
 [REMOVED] Getting start step7 from #ifdef 0 to 1.
 [UPDATED] Clarify Getting start root directory path same as download zip "amazon-freertos-master".
 
-v0.0.1: released
+v0.0.1:
 [ADDED] RX65N supports Amazon FreeRTOS Release Version 1.2.3 in tentative.
         Only confirmed Echo demo using Ethernet.
 
@@ -106,34 +344,36 @@ v0.0.1: released
 Development Environment (recommended)
 --------------------------------------------------------------------------
 Board: Renesas Starter Kit+ for RX65N-2MB
-    [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
+    [en] https://www.renesas.com/us/en/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
 
 Compiler: CC-RX V2.08 (you need non-expired evaluation license or product license to build Amazon FreeRTOS)
-    [en] https://www.renesas.com/en-us/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
+    [en] https://www.renesas.com/us/en/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
 
-IDE: e2 studio V6.3.0
-    [en] https://www.renesas.com/en-us/products/software-tools/tools/ide/e2studio.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/ide/e2studio.html
+IDE: e2 studio V7.1.0
+    [en] https://www.renesas.com/us/en/products/software-tools/tools/ide/e2studio.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/tools/ide/e2studio.html
     
-Debugger: E1 Emulator (no need to buy because Renesas Starter Kit has this one into package)
-    [en] https://www.renesas.com/en-us/products/software-tools/tools/emulator/e1.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/emulator/e1.html
+Debugger: E2 Emulator Lite (no need to buy because Renesas Starter Kit has this one into package)
+    [en] https://www.renesas.com/us/en/products/software-tools/tools/emulator/e2-emulator-lite.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/tools/emulator/e2-emulator-lite.html
+    
+    Notice: You can also use E1 Emulator but you have to modify the debugger settings on your IDE.
+    
+Device Driver: RX Driver Package v115
+    [en] https://www.renesas.com/us/en/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
 
-Device Driver: RX Driver Package v114
-    [en] https://www.renesas.com/en-us/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
-
-Special Device Driver for FreeRTOS:
-    [en] https://www.renesas.com/en-us/products/software-tools/software-os-middleware-driver/software-package/rx-real-time-os-package.html
-    [ja] none
+Special Device Driver for FreeRTOS: RX65N Group RX65N Real-time OS Package V1.1.00
+    [en] https://www.renesas.com/us/en/products/software-tools/software-os-middleware-driver/software-package/rx-real-time-os-package.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/software-os-middleware-driver/software-package/rx-real-time-os-package.html
     
 Comment:
  Renesas Starter Kit+ for RX65N-2MB is expensive/huge spec for just prototyping phase.
  I am preparing low-priced/small-spec kit as expansion board for "Target Board for RX Family".
-    [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
+    [en] https://www.renesas.com/us/en/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
  Current developments is using Ethernet but I will move this to WiFi.
  And I am also preparing to corresponds to GCC for release from CC-RX compiler limitation.
  
@@ -141,8 +381,8 @@ Comment:
 Development Environment (optional)
 --------------------------------------------------------------------------
 Board: RX65N Envision Kit
-    [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
-    [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
+    [en] https://www.renesas.com/us/en/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
 
          The log will be output from CN14(PMOD:1-6pin) connector as PMOD UART/USB.
          Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
@@ -168,17 +408,15 @@ Board: RX65N GR-ROSE proto1
          Please contact as following.
          PMOD UART/USB ----- RX65N GR-ROSE CN9
          1             -----
-         2             ----- 10pin
+         2(TxD)        ----- 10pin
          3             -----
          4             -----
-         5             ----- 5pin
-         6             ----- 6pin
+         5(GND)        ----- 5pin
+         6(VCC)        ----- 6pin
 
-         This pin assign is wrong. We will fix this after proto2.
-
-         [How to connect E1 Emulator]
+         [How to connect E2 Emulator Lite]
          GR-ROSE CN2-TH 4pins are connected to RX65N Debug Interface called FINE.
-         You can connect E1 or E2 Emulator to this pins as following.
+         You can connect E2 Emulator Lite to this pins as following.
          GR-ROSE CN2-TH ----- Emulator 14pin connector
          pin1(VCC)      ----- pin8
          pin2(GND)      ----- pin2, pin12, pin14
@@ -192,14 +430,110 @@ Board: RX65N GR-ROSE proto1
            You can see pin1 on left-upper corner nearby "E" character on "ESPRESSIF" logo.
            Pin4 is lower 4pins from pin1.
 
-IDE: CS+
+Board: RX64M GR-KAEDE
+    [en] http://gadget.renesas.com/en/product/kaede.html
+    [ja] http://gadget.renesas.com/ja/product/kaede.html
+
+         The log will be output from CN8 2pin=TxD7(P90) connector as UART.
+         Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
+         and "LF" only as return code for your console.
+         PMOD UART/USB convertor is provided by Digilent.
+         https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
+
+         Please contact as following.
+         PMOD UART/USB ----- RX64M GR-KAEDE CN8/CN10
+         1             -----
+         2(TxD)        ----- CN8-2pin
+         3             -----
+         4             -----
+         5(GND)        ----- CN10-1pin
+         6(VCC)        ----- CN10-2pin
+
+Board: RX63N GR-SAKURA II
+    [en] http://gadget.renesas.com/en/product/sakura.html
+    [ja] http://gadget.renesas.com/ja/product/sakura.html
+
+         The log will be output from CN8 2pin=TxD0(P20) connector as UART.
+         Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
+         and "LF" only as return code for your console.
+         PMOD UART/USB convertor is provided by Digilent.
+         https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
+
+         Please contact as following.
+         PMOD UART/USB ----- RX63N GR-SAKURA CN8/CN10
+         1             -----
+         2(TxD)        ----- CN8-2pin
+         3             -----
+         4             -----
+         5(GND)        ----- CN10-1pin
+         6(VCC)        ----- CN10-2pin
+         
+         Notice:
+         GR-SAKURA has 2 types. GR-SAKURA has 128KB-RAM, GR-SAKURA II has 256KB-RAM.
+         Please confirm your GR-SAKURA is GR-SAKURA II that has 256KB-RAM RX63N (R5F563NYDDFP).
+         Because Amazon FreeRTOS needs RAM size 128KB over.
+         
+Board: RX65N Target Board
+    [en] https://www.renesas.com/us/en/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
+    [ja] https://www.renesas.com/jp/ja/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
+
+         The log will be output from J2 16pin=TxD5(PA4) connector as UART.
+         Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
+         and "LF" only as return code for your console.
+         PMOD UART/USB convertor is provided by Digilent.
+         https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
+
+         Please contact as following.
+         PMOD UART/USB ----- RX65N Target Board J2
+         1             -----
+         2(TxD)        ----- 16pin
+         3             -----
+         4             -----
+         5(GND)        ----- 12pin
+         6(VCC)        ----- 10pin
+
+         The communication will be output/input from/to J1 45pin=TxD(PC7) and 46pin=RxD(PC6) as UART.
+         Silex SX-ULPGN PMOD can be connected.
+         Please contact as following.
+         PMOD UART     ----- RX65N Target Board J1
+         1             -----
+         2(TxD)        ----- 45pin
+         3(RxD)        ----- 46pin
+         4             -----
+         5(GND)        ----- 12pin
+         6(VCC)        ----- 14pin
+         
+WIFI Module: Silex SX-ULPGN PMOD
+    [en] https://www.renesas.com/us/en/products/synergy/gallery/partner-projects/silex-wifi-pmod.html
+    [ja] https://www.renesas.com/jp/ja/products/synergy/gallery/partner-projects/silex-wifi-pmod.html
+    
+         You can put this module into followin PMOD connector.
+           Renesas Starter Kit+ for RX65N-2MB: PMOD1
+         
+         And you have to update following settings in <root>/demos/common/include/aws_clientcredential.h
+           #define clientcredentialWIFI_SSID       "Paste Wi-Fi SSID here."
+           #define clientcredentialWIFI_PASSWORD   "Paste Wi-Fi password here."
+           
+IDE: CS+ v7.00.00
     [en] https://www.renesas.com/en-us/products/software-tools/tools/ide/csplus.html
     [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/ide/csplus.html
 
+Smart Configurator v1.4.0 (Standalone for CS+): 
+    [en] https://www.renesas.com/en-us/products/software-tools/tools/solution-toolkit/smart-configurator.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/solution-toolkit/smart-configurator.html
+    
+IDE/Compiler: EWRX/IAR v410
+    [en] https://www.iar.com/iar-embedded-workbench/#!?architecture=RX
+    [ja] https://www.iar.com/jp/iar-embedded-workbench/#!?architecture=RX
+
+Compiler: GCC for Renesas 4.8.4.201801-GNURX 
+    [en] https://gcc-renesas.com/
+    [ja] https://gcc-renesas.com/ja/
+    
 --------------------------------------------------------------------------
 Connection Pattern
 --------------------------------------------------------------------------
-  pattern1:
+  pattern1: wifi module has TCP/IP and SSL/TLS, Amazon recommends this pattern as RAM<16KB.
   osi	protocol	implemented into
   7	aws		Amazon FreeRTOS
   7	mqtt		Amazon FreeRTOS
@@ -210,15 +544,12 @@ Connection Pattern
   2	ether		wifi module
   1	phy		wifi module
 
-  RX65N Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
-  RX231 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
-  RX130 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
   RX65N Target Board + Cloud Option Board (with Espressif ESP8266)
   RX231 Target Board + Cloud Option Board (with Espressif ESP8266)
   RX130 Target Board + Cloud Option Board (with Espressif ESP8266)
   RX65N GR-ROSE (with Espressif ESP8266)
 
-  pattern2:
+  pattern2: MCU has TCP/IP and SSL/TLS and using MCU Ethernet, Amazon recommends this pattern as RAM<64KB.
   osi	protocol	implemented into
   7	aws		Amazon FreeRTOS
   7	mqtt		Amazon FreeRTOS
@@ -234,7 +565,7 @@ Connection Pattern
   RX65N GR-ROSE
   RXxxN Envision Kit (Murata Type 1FX on board)
   
-  pattern3:
+  pattern3: MCU has TCP/IP and SSL/TLS and using MCU SDIO for wifi, Amazon recommends this pattern as RAM<64KB.
   osi	protocol	implemented into
   7	aws		Amazon FreeRTOS
   7	mqtt		Amazon FreeRTOS
@@ -248,7 +579,26 @@ Connection Pattern
   RX65N RSK + SDIO wifi SDK (with Murata Type 1FX)
   RX65N Envision Kit + SDIO wifi SDK (with Murata Type 1FX)
   RXxxN Envision Kit (Murata Type 1FX on board)
-  
+
+  patternX: wifi module has TCP/IP and MCU has SSL/TLS, Amazon does NOT recommend this pattern!
+            This pattern needs RAM<64KB but only MCU SSL/TLS is running even if both MCU and wifi module
+            have SSL/TLS as function. This is very compromised pattern.
+            Because Silex wifi module does not have a SSL/TLS client authentication scheme that Amazon
+            Web Service requires.
+  osi	protocol	implemented into
+  7	aws		Amazon FreeRTOS
+  7	mqtt		Amazon FreeRTOS
+  6	ssl/tls		Amazon FreeRTOS
+  5	socket		Amazon FreeRTOS
+  4	tcp		wifi module
+  3	ip		wifi module
+  2	ether		wifi module
+  1	phy		wifi module
+
+  RX65N Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step>
+  RX231 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step> -> cannot be realized of lack of RAM
+  RX130 Target Board + Cloud Option Board (with Silex SX-ULPGN)	<first step> -> cannot be realized of lack of RAM
+
 --------------------------------------------------------------------------
 Development Environment (tested or no matrix)
 --------------------------------------------------------------------------
@@ -257,23 +607,42 @@ Borad number:
  (1)Renesas Starter Kit+ for RX65N-2MB
  (2)RX65N Envision Kit
  (3)RX65N GR-ROSE proto1
+ (4)RX64M GR-KAEDE
+ (5)Renesas Starter Kit+ for RX65N-2MB + Silex SX-ULPGN PMOD
+ (6)RX65N Target Board + Silex SX-ULPGN PMOD
+ (7)RX63N GR-SAKURA II
+
+Connection pattern number:
+ (1)pattern1: wifi module has TCP/IP and SSL/TLS, Amazon recommends this pattern as RAM<16KB.
+ (2)pattern2: MCU has TCP/IP and SSL/TLS and using MCU Ethernet, Amazon recommends this pattern as RAM<64KB.
+ (3)pattern3: MCU has TCP/IP and SSL/TLS and using MCU SDIO for wifi, Amazon recommends this pattern as RAM<64KB.
+ (4)patternX: wifi module has TCP/IP and MCU has SSL/TLS, Amazon does NOT recommend this pattern!
+ 
+/////////////////////////////////////////////////////////////
 
 IDE number:
  (1)e2 studio
  (2)CS+
- (3)IAR
+ (3)EWRX(IAR)
 
 Compiler number:
  (1)CC-RX
  (2)GCC
  (3)IAR
 
-v0.0.6:
-         IDE      (1)         (2)         (3)
-         Compiler (1) (2) (3) (1) (2) (3) (1) (2) (3)
-Board (1)          x           x                     
-      (2)          x           x          N/A N/A    
-      (3)          x                      N/A N/A    
+                 / IDE      (1)         (2)         (3)
+Board Connection / Compiler (1) (2) (3) (1) (2) (3) (1) (2) (3)
+(1)   (2)        /           x   x       x   -   -   -   -     
+(2)   (2)        /           x   x       x   -   -   -   -   * 
+(3)   (2)        /           x   x       x   -   -   -   -     
+(4)   (2)        /           x   x       x   -   -   -   -     
+(5)   (4)        /           x   x       x   -   -   -   -     
+(6)   (4)        /           x   x       x   -   -   -   -     
+(7)   (2)        /           x   x       x   -   -   -   -     
+
+  x: tested (MQTT echo demo)
+  *: now trying(still junk)
+  -: N/A
 
 --------------------------------------------------------------------------
 RX65N Device Introduction
@@ -335,10 +704,53 @@ RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットに�
 --------------------------------------------------------------------------
 ■課題まとめ★
 --------------------------------------------------------------------------
+　2018/11/25
+　　改行コードをLFにした方が良いのではないか。本家はLF、ルネサスはCRLFと
+　　なっている。
+　　
+　2018/09/24
+　　岡宮氏からGR-ROSE(GCC)用のリンカスクリプトをもらった。
+　　ユーザアプリによりRAMが割りあたる設定になっている。
+　　全体的にRAM割り当てを見直してから一斉に修正することにする。
+　　
+　2018/08/26
+　　性能面で改善点がまだありそうな予感がするので tracealyzer を導入して詳細評価する予定。
+　　RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Liteの
+　　プロジェクトのスマートコンフィグレータ設定に不要なEtherドライバが含まれているので
+　　スマートコンフィグレータの設定を変更する必要がある。NoMaY氏に相談。
+
+　2018/08/05
+　　スマートコンフィグレータでRX65N RSK 2MBボードの設定をしていると
+　　SCI6でP01、P00を使おうとすると警告がでる。なぜなのか。ツール部門に問い合わせてみる。
+　　
+　　WIFI環境 の aws_secure_sockets.c が古い状態。最新状態のテンプレートで作り込む。
+　　テンプレート：\lib\secure_sockets\portable\freertos_plus_tcp\aws_secure_sockets.c
+　　
+　2018/07/22
+　　スマートコンフィグレータのボード設定で RX65N RSK-2MB を選んでいるのに、
+　　BSPで選択されて出力されるボード毎のフォルダが generic_rx65n になっている。
+　　⇒将来ジェネリックのみになる予定。ボード依存部はスマートコンフィグレータ出力となる。
+　　　⇒8/5 解決。
+　　　
+　　r_bsp.h 以下ヘッダはAmazon FreeRTOSに存在しない。BSP開発者に修正依頼。
+　　ローカルではコメントアウトしておく。
+　　/*#include "croutine.h" Amazon FreeRTOS does not have this header file. */
+　　/*#include "freertos_start.h" Amazon FreeRTOS does not have this header file. */
+　　resetprg.c にも、#include "freertos_start.h" がある。上記と同様にコメントアウトしておく。
+　　⇒8/5 BSP開発者に修正依頼済み。
+　　
+　　コード生成すると、r_bsp_config.h の以下項目が必ず (0)に戻るようだ。
+　　コード生成するたびにこの値を確認しなければならない。
+　　まだ未対応ならスマートコンフィグレータ側はこの定義を無視するようにした方が良い。
+　　#define BSP_CFG_RTOS_USED               (1) // <-- Updated by GUI. Do not edit this value manually
+　　⇒現時点では公式未対応機能のためあえてこうしているとのこと。
+　　　⇒NoMaY氏に暫定処置していただいた。内容OK。
+　　　　⇒8/5 解決。
+　　　　
 　2018/06/10
 　　スマートコンフィグレータのデバイス設定(暗号有品のRX65N)と
 　　プロジェクトのデバイス設定(暗号無品のRX65N)とで食い違っていて、
-　　スマートコンフィグレータ上で警告が出ている。
+　　スマートコンフィグレータ上で警告が出ている。⇒7/22メンテで調整した。
 　　
 　2018/05/01
 　　2018/05/01のポーティング記録参照
@@ -363,6 +775,1218 @@ RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットに�
 --------------------------------------------------------------------------
 ■ポーティング記録	★印が解決すべき課題
 --------------------------------------------------------------------------
+2018/12/01
+　引き続きテスト環境の調整。
+　平日に別メンバーが進めた進捗を確認。
+　エラー件数は98個のテスト項目に対して全体で14件(TCP:3, MQTT:2,TLS:2,PKCS:7)。
+　
+　TCPのエラーを見てみる。
+　-AFQP_SECURE_SOCKETS_Threadsafe_SameSocketDifferentTasks 
+　-AFQP_SECURE_SOCKETS_Threadsafe_DifferentSocketsDifferentTasks
+　-AFQP_SOCKETS_Socket_InvalidInputParams
+　
+　AFQP_SECURE_SOCKETS_Threadsafe_SameSocketDifferentTasksを動かしてみると、
+　通信時にTCPウィンドウが足りずに再送等が発生しテストがスムーズに動いていないようだ。
+　過去性能評価したときに調整した設定パラメータに変更することでテストOKになった。
+
+　-----引用-----
+　　まず、\demos\renesas\rx65n-rsk\common\config_files\FreeRTOSIPConfig.h
+　デフォルトOFFになっているが、以下TCPウィンドウウィングメカニズムをONに
+　することでハードウェアの性能を最大限に引き出すことができる。
+　/* USE_WIN: Let TCP use windowing mechanism. */
+　#define ipconfigUSE_TCP_WIN                            ( 0 )
+　
+　また、性能を出すためにはTCPウィンドウウィングのために多くのRAMが
+　必要となる。以下設定変更を施すことでハードウェア性能が引き出せる。
+　/* Define the size of Tx buffer for TCP sockets. */
+　#define ipconfigTCP_TX_BUFFER_LENGTH                   ( 1460*8 )
+
+　さらにEtherドライバの受信ディスクリプタも複数用意する必要がある。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio\src\smc_gen\r_config\r_ether_rx_config.h
+　/* The number of Rx descriptors. */
+　#define ETHER_CFG_EMAC_RX_DESCRIPTORS               (12)
+　/* The number of Tx descriptors. */
+　#define ETHER_CFG_EMAC_TX_DESCRIPTORS               (4)
+　-----引用終わり-----
+　
+　AFQP_SECURE_SOCKETS_Threadsafe_DifferentSocketsDifferentTasksは、
+　SSL/TLS接続を別ソケット別タスクで並行して10回行うテスト。
+　Amazon FreeRTOSが想定する完了時間がタイムアウト時間として設定されているようで、
+　RX65Nでは正しく動いてはいるが時間切れになっているようだ。
+　最適化がOFFになっていたので、ONにして試してみる。
+　ギリギリセーフ？　OKになった。
+　
+　AFQP_SOCKETS_Socket_InvalidInputParamsは異常なソケット値を入れて
+　正しく検出するかのテスト。
+　正しく検出してvAssertCalled()を呼び出されてはいるが、ここでTEST_ABORT()してないので
+　そのまま次の処理に進んでいるようだ？
+　FreeRTOSConfig.hのconfigASSERT()の実装周りが期待値に達していないようだ。
+　configASSERT()からTEST_ABORT()が呼ばれている。unityのインクルードファイルを呼ばないと
+　TEST_ABORT()のシンボルが見つからないので、#include "unity_internals.h" を追加。
+　これでOKになった。
+　
+　次にTLSのエラーを見てみる。
+　-AFQP_TLS_ConnectMalformedCert(落ちるべきテストが通る)
+　-AFQP_TLS_ConnectUntrustedCert(落ちるべきテストが通る)
+　
+　TLSテスト側がテスト用の証明書と秘密鍵を登録しようとするが、PKCSの実装体(aws_pkcs11_pal.c)において
+　PKCS11_PAL_SaveObject()で同じラベル名が指定されても、リストに追加する実装になっていた。
+　同じラベル名が指定されたら、リスト中の同名のラベル名の登録を解除しなければならない。
+　このテストでは、システムで使用するラベル①と、テスト用のラベル②があり、ラベル①はシステム初期化時に、
+　ラベル②はTLSテスト初期化時にPKCS11_PAL_SaveObject()で渡される。
+　TLSテストは後にPKCS11_PAL_FindObject()を使用してラベル②に紐づくハンドルが出力されることを期待するが、
+　ラベル①に紐づくハンドルが出てきてしまう。ラベル①に紐づくハンドルに紐づく証明書、秘密鍵は正常なので
+　落ちるべきテストが通ってしまう。
+　PKCS11_PAL_SaveObject()とPKCS11_PAL_FindObject()の実装を修正してテストOKになった。
+　逆に、以下3個がエラーになった。テスト用の証明書データと秘密鍵がうまく作れていないようだ。これは後で確認する。
+　AFQP_TLS_ConnectEC
+　AFQP_TLS_ConnectRSA
+　AFQP_TLS_ConnectBYOCCredentials
+　
+　ここまでで一旦コードを登録。
+　
+　次にMQTTのエラーを見てみる。
+　以下2個がエラーを出力している。
+　AFQP_MQTT_Init_NULLParams
+　AFQP_MQTT_Connect_NULLParams
+　
+　mqttconfigASSERT()がabortできていないことが原因のようだ。
+　aws_mqtt_config.h のmqttconfigASSERT()の実装を修正し全件OKとなった。
+　
+　次にPKCSのエラーを見てみる。
+　以下7個がエラーを出力している。
+　AFQP_Verify_HappyPath
+　AFQP_Verify_InvalidParams
+　AFQP_TestRSAExport
+　AFQP_TestECDSAExport
+　AFQP_SignVerifyRoundTripWithCorrectRSAPublicKey
+　AFQP_SignVerifyRoundTripWithCorrectECPublicKey
+　AFQP_KeyGenerationEcdsaHappyPath
+　
+　AFQP_Verify_HappyPathを追いかけてみる。
+　どうやらPKCS11関連の証明書、秘密鍵をストレージに保存する際に属性情報がうまく保持できていないようだ。
+　public keyなのにprivate keyと判定されて属性エラーになって落ちている様子。
+　
+　PKCSの実装体(aws_pkcs11_pal.c)を見直す。
+　pkcs_data[xHandle - 1].Label.type の値で判断していたが、他社の実装を参考に
+　pkcs_data[xHandle - 1].Label.value の値がpkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLSなどと
+　一致しているかどうかで判断するように変更。
+　
+　これでエラーは残り以下2点になった。
+　
+　AFQP_SignVerifyRoundTripWithCorrectECPublicKey
+　AFQP_KeyGenerationEcdsaHappyPath
+　
+　local_storage[]の容量が足りないようなので増やしておく。
+　PKCS11_PAL_SaveObject()ですでに登録済みのラベルと同じラベルが来た時に、
+　すでに登録済みのラベルはPKCS_DATA_STATUS_DELETED状態にしているが、
+　すでにPKCS_DATA_STATUS_DELETED状態のラベルが居る場合の実装が抜けていた。
+　すでにPKCS_DATA_STATUS_DELETED状態のラベルは無視してサーチするように変更。
+　
+　これでエラーは残り以下1点になった。
+　
+　AFQP_KeyGenerationEcdsaHappyPath
+　
+　以下aws_pkcs11_mbedtls.c の1482行目あたりのコードが影響して署名検証に失敗している様子。
+　意図が分からないのでAmazon側に確認。
+　ひとまず保留。
+　
+        *pxPrivateKey = PKCS11_PAL_SaveObject( &pxPrivateTemplate->xLabel, pucDerFile + pkcs11KEY_GEN_MAX_DER_SIZE - xResult, xResult );
+        /* FIXME: This is a hack.*/
+        *pxPublicKey = *pxPrivateKey + 1;
+        xResult = CKR_OK;
+
+　ここまでで、全テストを通しで走らせてみる。エラーは残り2件。もう少しだ。
+
+　AFQP_KeyGenerationEcdsaHappyPath
+　AFQP_TLS_ConnectEC
+　
+　ここまでで一旦コードを登録。
+
+2018/11/25
+　3連休のまとめ。他の仕事があるので3日目はAmazon関連はこれにて終了。
+　テスト環境はだいたい整った。
+　　https://github.com/renesas-rx/amazon-freertos/tree/master/tests
+　　→Amazon FreeRTOS Qualification Program Developer Guide.pdf
+　　
+　マニュアルが良くできている。これを見ればだいたい分かる。
+　テストは最低限以下が必要。
+　　testrunnerFULL_TCP_ENABLED
+　　testrunnerFULL_MQTT_ENABLED
+　　testrunnerFULL_PKCS11_ENABLED
+　　testrunnerFULL_TLS_ENABLED
+　　testrunnerFULL_WIFI_ENABLED
+　　
+　現時点でRX63N GR-SAKURAにてtestrunnerFULL_TCP_ENABLEDが概ね動いているところ。
+　動いてないテストは以下2点。（AFQP_SECURE_SOCKETS_Threadsafe_SameSocketDifferentTasksの
+　後にまだ動いてないテストがある可能性有り）
+　　TEST(Full_TCP, AFQP_SOCKETS_Socket_InvalidInputParams)
+　　TEST(Full_TCP, AFQP_SECURE_SOCKETS_Threadsafe_SameSocketDifferentTasks)
+　
+　AFQP_SECURE_SOCKETS_Threadsafe_SameSocketDifferentTasksのあとにヒープ不足になって
+　システムが停止する状態。
+　
+　Full_TCPテストの通信相手は以下2種類。
+　　TCPのエコーサーバ
+　　TLSのエコーサーバ
+　　
+　これらはgo言語で書かれたプログラムで動作する。必要に応じてgo言語をPC環境にインストールが必要。
+　サーバプログラムは以下に格納されている。
+　　https://github.com/renesas-rx/amazon-freertos/tree/master/tools/echo_server
+　
+　これらを動かしておいて、マイコン上のソフトは以下コードにサーバ情報を設定しておけば良い。
+　　https://github.com/renesas-rx/amazon-freertos/blob/master/tests/common/include/aws_test_tcp.h
+　
+　サーバ証明書をセットする必要があるが、PEMからC言語に変換するツールが準備されている。
+　　https://github.com/renesas-rx/amazon-freertos/blob/master/tools/certificate_configuration/PEMfileToCString.html
+　
+　マニュアルを見てみるとあとややこしい感じがするのは、Appendix G: TLSくらいか。
+　改ざんされた証明書データを準備する必要などがあるようだが、まあマニュアル通りに進めていけば大丈夫そう。
+　
+　ひとまず以上。
+
+2018/11/24
+　GR-SAKURAでテスト環境を構築。
+　ひとまずビルドが通って何かしらテストログが出力されることを確認。
+　ただし、DHCPが完了する前にテストが走り始めてしまい、うまくいかない。
+　ネットワーク初期化周りを調整する必要がありそうだ。
+　
+　NetworkInterface.c で リンク状態をチェックするためにソフトウェアタイマを立ち上げているが
+　起動後しばらくしないと動かないようだ。受信タスクは動いているので受信タスクと同じよう
+　タスクでリンク状態を確認するよう変更。
+　共通コードなので他の環境に影響していないか要確認。（多分大丈夫なはず）
+　
+　テストが動き出した。以下でFailになっている。
+　TEST(Full_TCP, AFQP_SOCKETS_Socket_InvalidTooManySockets)
+　FAIL: Expected 1 Was 0. Max num sockets test failed
+　
+　aws_test_tcp.c でテストOKになっているテストケースは#if 0で省略しておく。（コミットはしない）
+　
+　デバッガで中身を見てみると、2個目のソケットの生成でエラーを吐いている様子。
+　→prvSOCKETS_Socket_InvalidTooManySockets()の1772行目
+　　xSocket = SOCKETS_Socket( SOCKETS_AF_INET, SOCKETS_SOCK_STREAM, SOCKETS_IPPROTO_TCP );
+
+　1746行目に次のようなコメントがあり、ifdef 対象環境ではテストが無効化されている。
+　/* Socket can be created as much as there is memory */
+
+　このテストはTCP/IPを無線LANモジュール側にオフロードしている場合に、無線LANモジュール側が
+　生成できるソケットの限界値を確かめるためのテストだ。
+　RXマイコンもメモリがあるだけソケットを作れるのでテストを無効化して良いはず。
+　ただし、同じRXマイコンでも環境によってはTCP/IPを無線LANモジュール側にオフロードするので
+　さらに分岐が必要。要検討。とりあえず __RX のときはテスト無効化とする。
+　AFQP_SOCKETS_Socket_InvalidTooManySocketsのテストがOKとなった。
+　
+　次のエラーはAFQP_SOCKETS_Socket_InvalidInputParamsだがよく分からない。保留。
+　ここまででTCPのパラメータ入出力関係のテストがOKになるようだ。
+　
+　次のテストは暗号化されたエコーサーバとの通信テスト。
+　AWSのクレデンシャルを設定してそれを使ってテストするようだ。
+　以下のようにaws_test_tcp.hにコメントがある。
+　
+　/* Encrypted Echo Server.
+　* If tcptestSECURE_SERVER is set to 1, the following must be updated:
+　* 1. aws_clientcredential.h to use a valid AWS endpoint.
+　* 2. aws_clientcredential_keys.h with corresponding AWS keys.
+　* 3. tcptestECHO_SERVER_TLS_ADDR0-3 with the IP address of an
+　* echo server using TLS.
+　* 4. tcptestECHO_PORT_TLS, with the port number of the echo server
+　* using TLS.
+　* 5. tcptestECHO_HOST_ROOT_CA with the trusted root certificate of the
+　* echo server using TLS. */
+　
+　1と2は実験用のクレデンシャルデータを使えばOK。
+　tcptestECHO_SERVER_TLS_ADDR0-3はなんぞ？
+　デフォルトで入っている 34.218.25.197 は何だろう。
+
+　whoisで調べたら以下がでてきた。
+　ec2-34-218-25-197.us-west-2.compute.amazonaws.com
+　
+　よく分からないのでマニュアルを見てみよう。
+　https://github.com/renesas-rx/amazon-freertos/tree/master/tests
+　　→Amazon FreeRTOS Qualification Program Developer Guide.pdf
+　　
+　tcptestECHO_SERVER_TLS_ADDR0で検索したら出てきた。
+　Appendix L: TLS Server Setup
+　
+　ローカルでTLSサーバを立ててそれを対向にしてテストを実行するようだ。
+　OpenSSL の go を使うようだ。cygwinで動かしてみよう。
+　go をWindowsにインストールしたら cygwin で動いた。
+　https://golang.org/dl/
+　
+　RXマイコン側に設定を施す。ローカルのTLSサーバのIPアドレスを
+　tcptestECHO_SERVER_TLS_ADDR0-3に入れて、tcptestECHO_PORT_TLSのポート番号をセット。
+　TLSサーバ側のポート番号は9000番になった。
+　tcptestECHO_HOST_ROOT_CAは、適当に作ったオレオレ証明書を貼れば良いようだ。
+
+　確かAmazon FreeRTOSのパッケージの中のtoolsフォルダに
+　PEMをC言語に変換する便利ツールが入っていたはず。気が利いてますな。
+　https://github.com/renesas-rx/amazon-freertos/blob/master/tools/certificate_configuration/PEMfileToCString.html
+　
+　ここまでで以下テストがパスするようになった。
+　TEST(Full_TCP, AFQP_SECURE_SOCKETS_CloseInvalidParams) PASS
+　TEST(Full_TCP, AFQP_SECURE_SOCKETS_CloseWithoutReceiving) PASS
+　TEST(Full_TCP, AFQP_SECURE_SOCKETS_ShutdownInvalidParams) PAS
+　TEST(Full_TCP, AFQP_SECURE_SOCKETS_ShutdownWithoutReceiving) PASS
+　TEST(Full_TCP, AFQP_SECURE_SOCKETS_Recv_On_Unconnected_Socket) PASS
+　
+　NGが出ているのは以下。
+　TEST(Full_TCP, AFQP_SECURE_SOCKETS_Threadsafe_SameSocketDifferentTasks)
+　
+　ひとまずここまでコミットしてみる。
+
+2018/11/23
+　しばらくGitHub上の公式のアップデートを行っていなかったが開発自体は順調に推移。
+　主にボードの量産手配やテストの段取りを進めている。
+　テストはAmazon FreeRTOSのかなり前のバージョンを土台にして6エラーを残して通った状況。
+　最新版でPKCS周りの実装及びテストが変更になったため、GitHub上で関係者間でコード共有し
+　最新版でテスト環境の最終整備を行う方向で進める。
+　とはいえ11/23-25の3連休は休みであるためシェルティの私物のGR-SAKURAとE2 Liteで
+　開発を進める。26日以降に受験対象の環境であるRX65N RSK (Ether)の環境で
+　テスト環境の最終整備を継続していく。
+　
+　まずはRX63N GR-SAKURAの環境の再確認。
+　e2 studioのCC-RX環境から。
+　特に問題なくビルドは通るがRAMが128KBギリギリになっている。
+　NoMaY氏と相談し、256KBのRAM搭載のGR-SAKURA限定にすることで調整済み。
+　各種デバイス設定を「R5F563NYDDFP」に変更。これでRAMが厳しい状況が改善した。
+　合わせてFreeRTOSのヒープ量も86KBから128KBに変更。動作確認OK。
+　
+　CS+のCC-RX環境の動作確認。
+　各種デバイス設定を「R5F563NYDDFP」に変更。
+　セクション設定でROMの開始位置が0xffc00000から0xfff00000に変更。
+　特に問題なし。動作確認OK。
+　
+　続いてe2 studioのGCC環境。
+　各種デバイス設定を「R5F563NYDDFP」に変更。
+　特に問題なし。動作確認OK。
+　ただし1個課題発見。現状SCI経由UARTでPCにシステムログを送っているが、
+　printf()経由で仮想コンソール（E1_DBG_PORT.RX_DATA/E1_DBG_PORT.TX_DATA)と通信する場合に
+　パスが分からない。CC-RXの場合は、printf()->標準関数ライブラリ->charput() (r_bspのlowlvl.c)->E1_DBG_PORT.TX_DATAの
+　経路であるがGCCの場合はどうか。GCCのマニュアルを確認してBSPに実装する必要がある。
+　⇒BSPの開発者にインプット。
+　
+2018/09/24
+　NoMaY氏がBSPを共通化してくれている。
+　この状態でひとまず全環境の動作を確認し、リリースビルドを作成する。
+
+　RX65N RSK CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N RSK GCC e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite...NG
+　RX65N Target Board + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite (on board)
+　RX65N Target Board + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite (on board)
+　RX65N Target Board + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite (on board)
+　RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite
+　RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite
+　RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite
+　RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite
+　RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite
+　RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite
+　
+　RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite の環境でNGとなった。
+　追いかけていったところ、sx_ulpgn_driver.c の sx_ulpgn_uart_sci_handle が
+　main.c の198行目のconfigPRINTF( ( "WiFi module initialized. Connecting to AP...\r\n" ) );、
+　奥底のsnprintf()を実行したところで破壊される。
+　
+　FreeRTOSのスタックを増やしたら直った。
+　#define configMINIMAL_STACK_SIZE                   ( ( unsigned short ) 140 )
+　#define configMINIMAL_STACK_SIZE                   ( ( unsigned short ) 180 )
+　
+　他のプロジェクトもスタックを増やしておく。
+　もう一度テストやりなおし。
+　
+　RX65N RSK CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N RSK GCC e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite...OK
+　RX65N Target Board + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite (on board)...OK デバッガのデバイス設定を修正
+　RX65N Target Board + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite (on board)...OK デバッガの電源設定を修正
+　RX65N Target Board + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite (on board)
+　RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite...OK
+　RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite...OK
+　RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite...OK
+　RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite...OK
+　
+2018/09/08
+　NoMaY氏が本家最新版v141に追従してくれている。
+　RX65N Target Board用の拡張ボードが仕上がってきた。
+　最終的にはRX65N Target Board + 拡張ボード + Silex SX-ULPGN のセット品で
+　販売する計画。現状は拡張ボードの仕様がまだウェブ公開されてないため、
+　RX65N Target Boardに直接Silex SX-ULPGNを接続した体でGitHubにはコード登録を
+　行っていく。あと、BSPをマージする話が持ち上がっているがまだ作戦が完璧に
+　仕上がってないため、BSPは現状維持（GNU、CC-RX別個）のままとする。
+　BSP周りは別途調整する。
+　この状態でひとまず全環境の動作を確認し、リリースビルドを作成する。
+
+　RX65N RSK CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N RSK GCC e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite...OK
+　RX65N Target Board + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N Target Board + Silex SX-ULPGN PMOD CC-RX CS+with E2 Emulator Lite (on board)...OK
+　RX65N Target Board + Silex SX-ULPGN PMOD GCC e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite...OK
+　RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite...OK
+　RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite...OK
+　RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite...OK
+
+　RX65N GR-ROSEのEtherのLINKSTA設定がなぜか有効になっていたので無効化した。
+　
+2018/08/26
+　NoMaY氏が本家最新版v132に追従してくれている。
+　その他、細かい調整を実施したり、モッチー氏の協力もありGR-KAEDE用の
+　プロジェクトも追加できた。それぞれのプロジェクトの動作確認を実施し
+　リリースビルドを作成する。
+　
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Liteの
+　プロジェクトのスマートコンフィグレータ設定に不要なEtherドライバが含まれているので
+　スマートコンフィグレータの設定を変更する必要がある。NoMaY氏に相談。
+　
+　また、性能評価を実施した。性能評価の過程で、Etherドライバのハンドリングに
+　不備があることが分かった。
+　\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.c
+　ソフトウェアが追い付かずに、FIFOにデータが溜まる状況において、
+　FIFOに溜まったデータを適切に解放できないケースがあり、それが続くと
+　やがてFIFOが溢れて通信が止まるというもの。パケットロスがあったら
+　FIFOから処理しきれなかったパケットを取り出し捨てる機構を追加。
+　
+　以下は性能評価レポート。
+　
+　FreeRTOS+TCPは非常によくできている。
+　性能を引き出すためにはネットワーク関連パラメータの調整が必要。
+
+　まず、\demos\renesas\rx65n-rsk\common\config_files\FreeRTOSIPConfig.h
+　デフォルトOFFになっているが、以下TCPウィンドウウィングメカニズムをONに
+　することでハードウェアの性能を最大限に引き出すことができる。
+　/* USE_WIN: Let TCP use windowing mechanism. */
+　#define ipconfigUSE_TCP_WIN                            ( 0 )
+　
+　また、性能を出すためにはTCPウィンドウウィングのために多くのRAMが
+　必要となる。以下設定変更を施すことでハードウェア性能が引き出せる。
+　/* Define the size of Tx buffer for TCP sockets. */
+　#define ipconfigTCP_TX_BUFFER_LENGTH                   ( 1460*8 )
+
+　さらにEtherドライバの受信ディスクリプタも複数用意する必要がある。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio\src\smc_gen\r_config\r_ether_rx_config.h
+　/* The number of Rx descriptors. */
+　#define ETHER_CFG_EMAC_RX_DESCRIPTORS               (12)
+　/* The number of Tx descriptors. */
+　#define ETHER_CFG_EMAC_TX_DESCRIPTORS               (4)
+
+　RX65N@120MHzでTCP/IP通信の中で最も性能を出すことが難しいTCP送信において、
+　45Mbpsを安定的に出せることを確認。
+　改善点がまだありそうな予感がするので tracealyzer を導入して詳細評価する予定。
+　https://percepio.com/tracealyzer/
+　
+　この状態でリリースビルドを作成。以下環境を順次実機動作確認していく。
+　
+　RX65N RSK CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N RSK CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N RSK GCC e2 studio with E2 Emulator Lite...OK
+　RX65N RSK + Silex SX-ULPGN PMOD CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N Envision Kit CC-RX CS+ with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit CC-RX e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N Envision Kit GCC e2 studio with E2 Emulator Lite (on board)...OK
+　RX65N GR-ROSE CC-RX e2 studio with E2 Emulator Lite...OK
+　RX65N GR-ROSE CC-RX CS+ with E2 Emulator Lite...OK
+　RX65N GR-ROSE GCC e2 studio with E2 Emulator Lite...OK
+　RX64M GR-KAEDE CC-RX e2 studio with E2 Emulator Lite...OK エミュレータ設定変更：電源供給OFF
+　RX64M GR-KAEDE CC-RX CS+ with E2 Emulator Lite...OK エミュレータ設定変更：E1->E2 Lite、電源供給OFF
+　RX64M GR-KAEDE GCC e2 studio with E2 Emulator Lite...OK エミュレータ設定変更：E1->E2 Lite、電源供給OFF
+
+　全部OK。問題なし。
+　
+2018/08/10
+　夏休みだ！
+　
+　初手GitHubを確認。NoMaY氏の作業が完了し、ファイル構成が絞れている。
+　更新漏れのファイルなども補完いただいている様子。毎度感謝です。
+　担当者がWIFI関連のコードを修正完了したとのことでこのマージを行う。
+　綺麗にマージできていれば、FreeRTOS+TCP以下のコードは使用しなくて
+　済むはずだ。プロジェクト登録から外す。
+　ビルドしてみるとFreeRTOS+TCP関連のヘッダのインクルードで引っかかる。
+　このインクルードを全部削除していく。
+　FreeRTOS+TCPから呼ばれる関数も削除。
+　void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
+　get_random_number()は依然として必要なようだ。リンクエラーで残る。
+　これは、/demos/renesas/rx65n-rsk-uart-wifi/common/application_code/entropy_hardware_poll.c に
+　移植しておく。
+　ビルド。正常動作確認。OK。相変わらずAWSに繋がるまでが遅い。
+　なぜだ。とりあえず保留。
+　　⇒ちょっとアクセスポイントとボードを離すと通信がうまくいかない。電波強度の問題？
+　
+　最適化設定を2に戻しビルド。正常動作確認。OK。
+　ひとまずここまででコミット。v0.1.1-pre5。
+　
+　全プロジェクトで動作確認を行う。
+　スマートコンフィグレータによるコード生成も行い、
+　合わせてNoMaY氏のスクリプトの動作チェックも行う。
+　\demos\renesas\rx65n-rsk\ccrx-csplus ... OK
+　\demos\renesas\rx65n-rsk\ccrx-e2studio ... OK
+　\demos\renesas\rx65n-rsk\gnurx-e2studio ... OK
+　\demos\renesas\rx65n-envision-kit\ccrx-csplus ... OK
+　\demos\renesas\rx65n-envision-kit\ccrx-e2studio ... OK
+　\demos\renesas\rx65n-envision-kit\gnurx-e2studio ... OK
+　\demos\renesas\rx65n-gr-rose\ccrx-csplus ... NG -> OK (エミュレータから電源供給する設定に変更、通信方式をFINEに変更)
+　\demos\renesas\rx65n-gr-rose\ccrx-e2studio ... OK
+　
+　どうやらNoMaY氏の保存の改行コードは LF で、CS+が出力するコード、プロジェクトファイルの
+　改行コードは CR+LF のようだ。GitHub上で大量に差分が出るように見えるのはこれが原因か。
+　
+　ざっくり調べてみた。
+　
+　CS+のコード生成系: r_cg_hardware_setup.c : CR+LF # 現状何らかの要因でLFになっている
+　CS+のピンコンフィグ系: Pin.c : CR+LF # 現状N何らかの要因でLFになっている
+　CS+のピンコンフィグ系ヘッダ: r_pinset.h : LF
+　CS+のFITモジュールのピンコンフィグ系: r_ether_rx_pinset.c: CR+LF # 現状何らかの要因でLFになっている
+　CS+のFITモジュールのコンフィグ系: r_bsp_config.h: CR+LF # 現状何らかの要因でLFになっている
+　CS+のプロジェクトファイル: aws_demos.mtpj: CR+LF # 現状何らかの要因でLFになっている
+　e2 studioのコード生成系: r_cg_hardware_setup.c : CR+LF # 現状何らかの要因でLFになっている
+　e2 studioのピンコンフィグ系: Pin.c : CR+LF # 現状何らかの要因でLFになっている
+　e2 studioのピンコンフィグ系ヘッダ: r_pinset.h : LF
+　e2 studioのFITモジュールのピンコンフィグ系: r_ether_rx_pinset.c: CR+LF # 現状何らかの要因でLFになっている
+　e2 studioのプロジェクトファイル: .cproject: LF
+　
+　改行コードの件はNoMaY氏に相談。
+　コミットはe2 studioのプロジェクトファイル、本Readme等を除きCR+LFにて行う。
+　
+　ここまででコミット。
+　全プロジェクト無事に動作確認OKとなったので、v0.1.1のリリースビルドとする。
+
+2018/08/05
+　引き続き、NoMaY氏にフォルダ構成の調整行っていただいている。
+　大きくは、①/lib/third_party/mcu_vendor/renesas にFIT関連を引越ししたこと、
+　スマートコンフィグレータ周りのフォルダ調整(ccrx-e2studioNとか
+　gnurx-e2studioNとして従来プロジェクトと分離して実験)、②本家V130への追従。
+　②はcommonについて本家新規のファイルを登録だけしてあって、
+　ビルドから除外の状態になっているとのこと。
+　
+　まずはざっと変更点の確認を行って大きな問題が無いか確認していく。
+　⇒問題なし。
+　
+　RX65N RSKで動作確認を行う。他の環境の①対応はRSKでの確認が終わってから。
+　⇒CC-RX環境、GCC環境、e2/CS+環境、①②共に問題なし。GCCで割り込みベクタが未生成になる問題も解消。
+　　\demos\renesas\rx65n-rsk\ccrx-csplusN
+　　\demos\renesas\rx65n-rsk\ccrx-e2studio6N
+　　\demos\renesas\rx65n-rsk\gnurx-e2studio6N
+　　\demos\renesas\rx65n-rsk\ccrx-csplus
+　　\demos\renesas\rx65n-rsk\ccrx-e2studio6
+　　\demos\renesas\rx65n-rsk\gnurx-e2studio6
+　
+　問題なかったので本Readme更新だけだが、ここまでで一旦コミットを行う。
+　pre版としてコミット。v0.1.1-pre1。
+　
+　続いて、②本家V130を行う。(1)と(3)はNoMaY氏、(2)はシェルティの分担。
+　(1)は完了している様子。
+　
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6N の環境で作業開始。
+　
+　(1) 新規フォルダと新規ファイルの追加(ただしビルドから除外)、共通部分のCソース以外のファイル変更のマージ
+　(2) 共通部分のCソースファイル変更のマージとRXマイコン用のプロジェクトのソースへの反映(ビルドから除外の解除を含む)
+　(3) RXマイコン用のテストプロジェクトのe2 studioのプロジェクト作成(STの環境などを参考にしてトライしてみる)
+
+　(2)を進めていく。差分を確認。
+　かふぇルネに差分のスクリーンショットが既に貼ってある。
+　NoMaYさん、ありがとうございます！
+　
+　testsフォルダはtests用のプロジェクトを別途格納する形式なので、
+　ひとまず保留しておく。libフォルダの差分を適用していくことにする。
+
+　libフォルダは以下3個が増えている。
+　
+　①cbor
+　②defender
+　③FreeRTOS-Plus-POSIX
+　
+　一番簡単そうな③を登録する。
+　
+　インクルードパスを登録する。
+　\lib\FreeRTOS-Plus-POSIX\include\portableフォルダがある。
+　ヘッダのテンプレは、FreeRTOS_POSIX_portable_default.h。
+　_defaultを外して対応ボードのフォルダを作ってそこにFreeRTOS_POSIX_portable.h として設置。
+　
+　エラー3個出る。
+　E0562310:Undefined external symbol "_xTaskGetApplicationTaskTag" referenced in ".\lib\aws\FreeRTOS-Plus-POSIX\source\FreeRTOS_POSIX_pthread.obj"
+　E0562310:Undefined external symbol "_vTaskSetApplicationTaskTag" referenced in ".\lib\aws\FreeRTOS-Plus-POSIX\source\FreeRTOS_POSIX_pthread.obj"
+　E0562310:Undefined external symbol "_xTaskGetIdleTickCount" referenced in ".\lib\aws\FreeRTOS-Plus-POSIX\source\FreeRTOS_POSIX_clock.obj"
+
+　xTaskGetApplicationTaskTag を全文検索。
+　\lib\FreeRTOS\portable\Common\mpu_wrappers.c にある。
+　
+　Commonがプロジェクト登録から外れているようだ。
+　portableフォルダのリソースフィルタに Common を追加する。
+
+　"mpu_prototypes.h"が見つからないらしい。
+　
+　グーグルで検索したところ、FreeRTOS本家のSVNにあった。
+　https://sourceforge.net/p/freertos/code/HEAD/tree/trunk/FreeRTOS/Source/include/
+　
+　GitHub上のAmazon FreeRTOS内のFreeRTOSカーネルと、
+　Sourceforge上のFreeRTOSカーネルが微妙に整合取れてない感じか。
+　
+　mpu_prototypes.hをダウンロードして、\lib\include に入れておく。
+　
+　E0562310:Undefined external symbol "_vPortResetPrivilege" referenced in ".\lib\aws\FreeRTOS\portable\Common\mpu_wrappers.obj"
+　E0562310:Undefined external symbol "_xTaskCreateRestricted" referenced in ".\lib\aws\FreeRTOS\portable\Common\mpu_wrappers.obj"
+　E0562310:Undefined external symbol "_xTaskGetApplicationTaskTag" referenced in ".\lib\aws\FreeRTOS-Plus-POSIX\source\FreeRTOS_POSIX_pthread.obj"
+　E0562310:Undefined external symbol "_vTaskAllocateMPURegions" referenced in ".\lib\aws\FreeRTOS\portable\Common\mpu_wrappers.obj"
+　E0562310:Undefined external symbol "_vTaskSetApplicationTaskTag" referenced in ".\lib\aws\FreeRTOS-Plus-POSIX\source\FreeRTOS_POSIX_pthread.obj"
+　E0562310:Undefined external symbol "_xPortRaisePrivilege" referenced in ".\lib\aws\FreeRTOS\portable\Common\mpu_wrappers.obj"
+　E0562310:Undefined external symbol "_xTaskGetIdleTickCount" referenced in ".\lib\aws\FreeRTOS-Plus-POSIX\source\FreeRTOS_POSIX_clock.obj"
+　E0562310:Undefined external symbol "_xTaskCreateRestrictedStatic" referenced in ".\lib\aws\FreeRTOS\portable\Common\mpu_wrappers.obj"
+　
+　色々足りないらしい。
+　SourceforgeからFreeRTOSカーネルのSnapshotをゲットして、Amazon FreeRTOS内包のFreeRTOSカーネルとDIFFを取ってみる。
+　色々構成が違うようだ。
+　
+　アプローチを変えて、Windowsのプロジェクトがどのような構造になっているか調べる。
+　FreeRTOS-Plus-POSIXがプロジェクト登録されていない。
+　v130で追加されたコードを使うのは、ちょっと保留したほうがよさそう。
+　
+　その他、\lib\secure_sockets\portable\renesas の aws_secure_sockets.c が古いので、
+　\lib\secure_sockets\portable\freertos_plus_tcp にある最新テンプレートの内容を反映。
+
+　uRand()の実装体が、以下関数ポインタ経由で呼び出されるようだ。
+　今は未だuRand()を直接デバイス依存側で実装する方式で繋いでおこう。
+　xResult = pxPkcs11FunctionList->C_Initialize( NULL );
+　aws_secure_sockets.c 内の uRand()の実装は #if 0で無効化しておく。
+　
+　動作確認、特に問題なし。
+　アップデートしたのは結局のところ、aws_secure_sockets.c だけとなった。
+　pre版としてコミット。v0.1.1-pre2。
+　　
+　本家v1.3.0追従の作業はひとまずこれで終了として、
+　Silex WIFIモジュールの環境を新規追加する。
+　
+　\demos\renesas\rx65n-rsk-uart-wifi を新設。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6N を丸コピーで持ってくる。
+　
+　Silex WIFIモジュールとはボード上のPMOD1で、RX65NのSCI-ch6 でUARTで繋がっている。
+　スマートコンフィグレータでSCI-ch6の設定を施す。
+　⇒なんか、RX65N RSK 2MBボードの設定をしているとSCI6でP01、P00を使おうとすると
+　　警告がでる。なぜなのか。ツール部門に問い合わせてみる。★
+　　(これは担当者が動作確認していたときの暫定プロジェクトでも出てた模様)
+　
+　ひとまず無視して先に進む。
+　
+　コード生成してビルド。NoMaY氏の自動コピーがうまく働いているようだ。
+　各環境にsmc_genが生成され、各々にPDFがあったので容量が大きくなって気になっていたところ。
+　これでうまく因数分解できて容量も食わなくなったので万々歳だ。
+　しかも、いちいち、BSP_CFG_RTOS_USEDを直す必要もない。
+　一発でビルド通った・・・すごいぞこれは。
+　理屈は分かっていたけれど、目の前で実際に動くとさらに感動する。
+　
+　ひとまずここまでで、既存動作(Ether)がOKかどうかを確認する。
+　バッチリ動く。もう更新漏れで動かなくなってイライラすることもないであろう。
+　
+　あとは、担当者が動作確認してた動作確認済みのWIFI用のコードを適用していく。
+　DIFFをとってマージしていけばよいだろう。
+　
+　まずキーポイントになっている、aws_secure_sockets.c。
+　
+　aws_secure_sockets.c 補足：
+　　これはMQTT層が呼び出すSSL/TLS層の実装体。デフォルトは空っぽで、
+　　テンプレートでFreeRTOS+TCPとmbed TLSを使ったものが用意されている。
+　　で、TCP/IPとTLSの実装をWIFIモジュール側にオフロードする場合は、
+　　このコードの中身を全部WIFIモジュール側に繋いでやる必要があるが、
+　　AWS接続には、SSLクライアント認証が必要であり、Silex WIFIモジュールはこれを
+　　サポートしていない。従って、TCP/IPはWIFIモジュール側にオフロードするが、
+　　TLSの実装はmbed TLSに頼らなければならないという良くない構成となる。
+　　まあWIFIモジュールによってはこういうケースもあるであろうから、
+　　これをpattenXとして、妥協案とした。
+　　ESP32であればこの問題はなさそうなので、あとでちゃんとpattern1も作り込みたい。
+　　WIFIでもTCP/IPとTLSを完全にMCU側に持ってこれて、かつ通信路がSDIOになった
+　　高速タイプのモジュールも存在する、というよりこれが本命。pattern3の
+　　村田製作所Type 1FXである。スマホに載っている無線LANモジュールの
+　　多くは村田製作所製（中身チップセットはブロードコム製）。
+　　通常はLinuxが制御するようなチップだが、リアルタイムOSでも十分に動く。
+　　性能もUART接続のWIFIモジュールが数Mbpsが限界なのに対し、SDIO接続の
+　　モジュールはRX65NでもTCPで30Mbps程度でる。(EtherだとTCPで60Mbpsくらい出る)
+　　さらにRX65Nだと暗号器搭載モデルもあるので、この通信レートを落とさず
+　　CPU負荷も上げずにSSL通信が可能である。mbed TLSをRX65Nの暗号器を
+　　呼ぶように改造しなければならないが、これは2018年中に検討完了する計画。
+　
+　さて閑話休題。
+　EtherではFreeRTOS+TCPとmbed TLSのものを使っていた。
+　Silex WIFIモジュールの場合は、patternXでいく。patternXの場合MQTTが呼び出すのは
+　mbed TLSであるが、TCP/IPはSilex WIFIモジュールのAPIを呼ばなければならない。
+　mbed TLSは接続が確立したあとのデータ転送のR/WのAPIを関数ポインタ登録し、
+　デフォルトだと以下2関数でFreeRTOS+TCPのAPIを呼び出してくる。
+　・prvNetworkSend() からの FreeRTOS_send()
+　・prvNetworkRecv() からの FreeRTOS_recv()
+　また、TCP接続時には通常はFreeRTOS_connect()を用いてTCP接続を開始している。
+　
+　これらFreeRTOS+TCP系のAPIの代わりに、Silex WIFIモジュールが持つ等価なAPIで
+　実装していけばmbed TLSからSilex WIFIモジュールを呼び出す変な構成も作れるであろう。
+　
+　という考えで、作り込みを実施。
+　aws_secure_sockets.c は v0.1.1-pre2 で更新する前のものを使って
+　WIFIモジュールとの合わせ込みをおこなったため、古い状態である。
+　来週担当者に依頼して最新の aws_secure_sockets.c で更新、動作確認してもらう。
+　今はひとまず古い状態で進める。
+　
+　特に問題なく結合完了。
+　pre版としてコミット。v0.1.1-pre3。
+　
+　v0.1.1-pre3 のRenesas Starter Kit+ for RX65N-2MB + Silex SX-ULPGN PMOD environmentは
+　プロジェクトファイルがおかしい。リソースフィルタにおいて必要な設定がなぜか消えて
+　しまっている。修正する。
+　また、この環境、Renesas Debug Virtual ConsolにWIFI関連のログを出力するが
+　窓を開いてないと先に進まない。またこの機能をOFFにしたら動かなくなる。
+　また、まだ実験中のため通信が遅い。あと最適化をONにすると動かない。
+　このあたりをReadmeに注意事項を追加する。
+　
+　
+　本日の作業はこれまで。
+　
+　
+2018/07/22
+　スマートコンフィグレータ出力周りをNoMaY氏が整備してくれている。
+　だいぶすっきりしてきた。RX65N RSK のGCC用プロジェクトも追加された。
+　こちらでは、e2 studio v700 と CS+ v700と RX Driver Package v115への
+　更新を行っていく。ひとまず代表パタンのRX65N RSK e2 studio CC-RXの
+　組をトップバッターにして更新完了。特に問題なし。
+　一旦pre版としてコミット。v0.1.0-pre1。
+　
+　NoMaY氏の作業と1ファイル衝突。シェルティ側を優先した。
+　# Conflicts:
+　#	demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/r_config/r_bsp_config.h
+　
+　スマートコンフィグレータは、出力先にすでにコードがあると上書きしない設定が
+　デフォルトなので、RX Driver Package をスマートコンフィグレータ上で最新に交換した
+　としてそれがコードに反映されるとは限らない。
+　一方で、コンパイラ差分を吸収するマクロ(R_PRAGMA_など)はすでにコードに反映されており
+　これがスマートコンフィグレータによって消えられても困る。
+　
+　少々面倒ではあるが、代表パタン(RX65N RSK e2 studio CC-RX)を決めて、そこで
+　手動でRX Driver Packageの最新版コードとコンパイラ差分を吸収するマクロ(R_PRAGMA_など)を
+　含む旧版とのマージを行っていく。他の環境では、スマートコンフィグレータで
+　最新のRX Driver PackageのFITモジュールを使用する設定にして、代表パタンのsmc_genフォルダを
+　丸ごとコピーすればよいであろう。これでBSPを含む全FITモジュールを、
+　コンパイラ差分を吸収するマクロ(R_PRAGMA_など)を伴い更新することができる。
+　
+　あと、RX65N RSKの環境で暗号有品デバイスをスマートコンフィグレータ設定していたが、
+　暗号無し品に変更する。スマートコンフィグレータのボード設定が追加されたが、まだ
+　暗号有品のボードの設定が無いようだ。（まあデバイス以外に違いはないのだけど）
+　プロジェクトのデバイス設定も暗号無し品に変更。DUALを使おうとしていたのもやめる。
+　プロジェクトのデバイス設定：R5F565NEHxFC_DUAL->R5F565NEDxFC
+　スマートコンフィグレータのデバイス設定：R5F565NEHxFC->R5F565NEDxFC
+　
+　この状態で以下フォルダをバックアップを取り、いったん削除し、コード生成。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6\src\smc_gen
+　
+　バックアップデータとコード生成されたデータをマージしていく。
+　これで最新のRX Driver Packageのコードにコンパイラ差分を吸収するマクロ(R_PRAGMA_など)を
+　反映できるはずだ。
+　
+　スマートコンフィグレータのボード設定で RX65N RSK-2MB を選んでいるのに、
+　BSPで選択されて出力されるボード毎のフォルダが generic_rx65n になっている。
+　どういうことだ？ 新規プロジェクトで試してみる。やっぱりだめ。期待動作ではない。
+　開発元に報告する。★
+　
+　ひとまず generic で我慢しておく。端子設定周りは読み込めている様子。
+　
+　マージで具合の悪いところを洗い出す。
+　
+　r_bsp.h 以下ヘッダはAmazon FreeRTOSに存在しない。BSP開発者に修正依頼。
+　ローカルではコメントアウトしておく。
+　/*#include "croutine.h" Amazon FreeRTOS does not have this header file. */
+　/*#include "freertos_start.h" Amazon FreeRTOS does not have this header file. */
+　resetprg.c にも、#include "freertos_start.h" がある。上記と同様にコメントアウトしておく。
+　
+　コード生成すると、r_bsp_config.h の以下項目が必ず (0)に戻るようだ。
+　コード生成するたびにこの値を確認しなければならない。
+　まだ未対応ならスマートコンフィグレータ側はこの定義を無視するようにした方が良い。
+　#define BSP_CFG_RTOS_USED               (1) // <-- Updated by GUI. Do not edit this value manually
+　
+　他は特に問題なし。ビルド問題なし。実機確認問題なし。
+　
+　なんか、改行コードが LF のものと、CRLF のものが混在している。
+　FITのコーディングルールがどうであったか確認する。
+　ひとまずローカルでは Amazon FreeRTOSに倣い、LF でなるべく統一するものとする。
+　スマートコンフィグレータ出力のものは触らない方がよいであろう。
+　混在しているように見えるが、おおむねCRLFが多いようだ。
+　
+　一旦pre版としてコミット。v0.1.0-pre2。
+　
+　Etherドライバがv114からv115に更新されていないことに気付く。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6\src\smc_gen\ をZIP化してバックアップ。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6\src\smc_gen\r_ether_rx と
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6\src\smc_gen\r_config\r_ether_rx_config.h を削除。
+　スマートコンフィグレータ上でEtherドライバをv114からv115に更新。
+　Etherドライバの設定を行う。
+　r_bsp_config.h の BSP_CFG_RTOS_USEDが(0)に戻っているであろうから、(1)に設定する。
+　ZIP化したバックアップを解き、スマートコンフィグレータ出力と比較、コンパイラ差分を
+　吸収するマクロ(R_PRAGMA_など)を反映。
+　
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre3。
+
+　次はRX65N RSK CS+ CC-RXの組み合わせのメンテ。
+　まずはデバイス設定の変更。
+　プロジェクトのデバイス設定：R5F565NEHxFC_DUAL->R5F565NEDxFC
+　スマートコンフィグレータのデバイス設定：R5F565NEHxFC->R5F565NEDxFC
+　
+　RX Driver Package v114->v115においては、Amazon FreeRTOSで使用している
+　FITモジュールはBSPとEtherのみ更新がかかっている。
+　BSPとEtherのみスマートコンフィグレータで入れ替えを行う。
+　
+　コード生成を実行、
+　\demos\renesas\rx65n-rsk\ccrx-csplus\src\smc_gen を削除
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6\src\smc_gen\ を代わりにコピーペースト。
+
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre4。
+
+　さて、次は少し壁があるかもしれない。
+　RX65N RSK e2 studio GCCの組み合わせのメンテ。
+　NoMaY氏にコミットいただいた状態のものをそのままe2 studio v700で動作だけさせてみる。
+　動かない。暴走はしないが、UART出力がされない。
+　UART送信の割り込みが入ってないようだ。
+　マップファイルを確認して割り込みベクタ周りを見てみる。
+　割り込みベクタが生成されていない様子。
+　
+　リリースビルドのv0.0.9と比較してみる。割り込みベクタ周りに差が出ている。
+　\demos\renesas\rx65n-rsk\gnurx-e2studio6\src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n.c
+　v0.0.9の記述に戻したら正常動作となった。
+　
+　　NG: 現状
+　　　#if SCI_CFG_CH0_INCLUDED
+　　　R_PRAGMA_STATIC_INTERRUPT(sci0_txi0_isr, VECT(SCI0,TXI0))
+　　　R_PRAGMA_STATIC_INTERRUPT(sci0_rxi0_isr, VECT(SCI0,RXI0))
+　　　#endif
+　　　__INTERRUPT void sci0_tei0_isr(void *cb_args)
+　　　R_ATTRIB_STATIC_INTERRUPT void sci0_rxi0_isr(void)
+　
+　　v0.0.9
+　　　#if SCI_CFG_CH0_INCLUDED
+　　　R_PRAGMA_STATIC_INTERRUPT(sci0_txi0_isr, VECT(SCI0,TXI0))
+　　　static void sci0_txi0_isr(void);
+　　　R_PRAGMA_STATIC_INTERRUPT(sci0_rxi0_isr, VECT(SCI0,RXI0))
+　　　static void sci0_rxi0_isr(void);
+　　　#endif
+　　　void sci0_tei0_isr(void *cb_args)
+　　　static void sci0_rxi0_isr(void)
+　　　
+　　⇒SCIに関しては一旦v0.0.9の記述法に戻す。
+　　　CC-RXでは動作するがGCCだと動作しないようだ。
+　　　
+　　正常動作OK。逆にCC-RX環境で動作するか試してみる。問題なし。
+　
+　CS+ CC-RX環境のスマートコンフィグレータのスタック設定ができてない。
+　修正してコード生成しなおす。
+　\demos\renesas\rx65n-rsk\ccrx-csplus\src\smc_gen\
+　
+　スマートコンフィグレータ出力をCC-RXのものをGCC環境に上書き。
+　BSPはまだ1本化できてないので除く。
+　\demos\renesas\rx65n-rsk\ccrx-csplus\src\smc_gen\
+　↓
+　\demos\renesas\rx65n-rsk\gnurx-e2studio6\src\smc_gen\
+　
+　ここまででRX65N RSKの3種のプロジェクトが動作確認OKとなった。
+　コミットする。pre版としてコミット。v0.1.0-pre5。
+　
+　種類が増えてきてだいぶ大変になってきた。
+　続いてRX65N Envision Kitのプロジェクトの調整。IARはひとまず保留。
+　
+　RX65N Envision Kit CC-RX CS+ の環境からメンテ。
+　スマートコンフィグレータでBSPとEtherを最新に交換。
+　
+　出力済みのコードを削除する。
+　\test\demos\renesas\rx65n-envision-kit\ccrx-csplus\src\smc_gen
+　
+　以下のようにコピー。ボード依存の端子設定コードr_pincfgとgeneralとr_configを除く。
+　\demos\renesas\rx65n-rsk\ccrx-csplus\src\smc_gen\
+　↓
+　\demos\renesas\rx65n-envision-kit\ccrx-csplus\src\smc_gen\
+　r_bsp_config.h に追加したボードリビジョン設定を変更。(1)->(2)
+　r_sci_config.h で、SCI 2chを使用するよう変更。
+　
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre6。
+　
+　RX65N Envision Kit CC-RX e2 studio の環境メンテ。
+　スマートコンフィグレータでBSPとEtherを最新に交換。
+　
+　出力済みのコードを削除する。
+　\demos\renesas\rx65n-envision-kit\ccrx-e2studio6\src\smc_gen
+　
+　以下のようにコピー。ボード依存の端子設定コードr_pincfgとgeneralとr_configを除く。
+　\demos\renesas\rx65n-rsk\ccrx-e2studio6\src\smc_gen\
+　↓
+　\demos\renesas\rx65n-envision-kit\ccrx-e2studio6\src\smc_gen\
+　r_bsp_config.h に追加したボードリビジョン設定を変更。(1)->(2)
+　r_sci_config.h で、SCI 2chを使用するよう変更。
+　
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre7。
+　
+　RX65N Envision Kit GCC e2 studio の環境メンテ。
+　出力済みのコードを削除する。
+　\demos\renesas\rx65n-envision-kit\gnurx-e2studio6\src\smc_gen
+
+　スマートコンフィグレータが使えないので、以下のようにコピー。
+　\demos\renesas\rx65n-rsk\gnurx-e2studio6\src\smc_gen
+　↓
+　\demos\renesas\rx65n-envision-kit\gnurx-e2studio6\src\smc_gen
+
+　r_pincfgとgeneralとr_configは、RX65N Envision Kitの別プロジェクトからもってくる。
+　\demos\renesas\rx65n-envision-kit\ccrx-csplus\src\smc_gen
+　↓
+　\demos\renesas\rx65n-envision-kit\gnurx-e2studio6\src\smc_gen
+　
+　BSP_CFG_IO_LIB_ENABLE を (0)にしておく。しないと標準I/Oのライブラリ辺りでエラーがでる。
+
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre8。
+
+　RX65N GR-ROSE CC-RX e2 studio の環境メンテ。
+　スマートコンフィグレータでBSPとEtherを最新に交換。
+　
+　コード生成し、出力済みのコードを削除する。ボード依存の端子設定コードr_pincfgとgeneralを除く。
+　\demos\renesas\rx65n-gr-rose\ccrx-e2studio6\src\smc_gen
+　
+　以下のようにコピー。ボード依存の端子設定コードr_pincfgとgeneralとbspを除く。
+　\demos\renesas\rx65n-rsk\ccrx-csplus\src\smc_gen\
+　↓
+　\demos\renesas\rx65n-gr-rose\ccrx-e2studio6\src\smc_gen
+　r_bsp_config.h に追加したボードリビジョン設定を変更。(1)->(3)
+　r_sci_config.h で、SCI 12chを使用するよう変更。
+　
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre9。
+
+　RX65N GR-ROSE GCC e2 studio の環境メンテ。
+　出力済みのコードを削除する。
+　\demos\renesas\rx65n-gr-rose\gnurx-e2studio6\src\smc_gen
+
+　スマートコンフィグレータが使えないので、以下のようにコピー。
+　\demos\renesas\rx65n-rsk\gnurx-e2studio6\src\smc_gen
+　↓
+　\demos\renesas\rx65n-gr-rose\gnurx-e2studio6\src\smc_gen
+
+　r_pincfgとgeneralとr_configは、RX65N GR-ROSEの別プロジェクトからもってくる。
+　\demos\renesas\rx65n-gr-rose\ccrx-e2studio6\src\smc_gen
+　↓
+　\demos\renesas\rx65n-gr-rose\gnurx-e2studio6\src\smc_gen
+　
+　BSP_CFG_IO_LIB_ENABLE を (0)にしておく。しないと標準I/Oのライブラリ辺りでエラーがでる。
+
+　ビルド、動作確認、OK。
+　pre版としてコミット。v0.1.0-pre10。
+
+　
+2018/07/16
+　GitHub上のデータ調整。一気にファイル整理したのでいろいろボロがありそう。
+　v0.0.7-pre1では、GR-ROSE用のプロジェクト(CC-RXのe2 studio)が動作しない。
+　SCIの設定ファイルがおかしいようだ。修正してコミット。v0.0.7-pre2。
+　
+　GR-ROSE用のプロジェクト(GCCのe2 studio)を追加する。
+　Envision Kit用のプロジェクト(GCCのe2 studio)をコピーしてボード周りの
+　コンフィグを修正していくだけでいけるはず。
+　
+　いけない。なぜなのか。main()にたどり着く前に暴走する。
+　
+　コピー元のEnvision Kit用のプロジェクト(GCCのe2 studio)がいつの間にか
+　壊れたか？ Envision Kit用のプロジェクト(GCCのe2 studio)が動作した環境は
+　どれだろう。細かくGitHubにコミットしておけばよかった。
+　
+　ゴミ箱から動いていたプロジェクトを引っ張り出してきて差分確認。
+　どうやらセクション設定がおかしくなっていたようだ。元に戻す。
+　割り込みベクタ周りの記述もおかしくなっていた。元に戻す。
+　
+　ここで一旦コミット。v0.0.7-pre3。
+　(readme保存し忘れでメモ書きが残ってたので再コミット)
+　
+　今度こそ、GR-ROSE用のプロジェクト(GCCのe2 studio)を追加する。
+　Envision Kit用のプロジェクト(GCCのe2 studio)をコピーしてボード周りの
+　コンフィグを修正していくだけでいけるはず。
+　
+　いけた。
+　
+　ここでGitHubにコミット。今週の作業は終了。v0.0.7-pre4。
+　
+2018/07/15
+　道が拓けてきた。あとはIAR対応。
+　NoMaY氏から案をいただいた。
+　
+　■NoMaY氏案
+　(1) とりあえずキーワード置換無しでCC-RX＋e2 studio v6のプロジェクトを変換してみる → 失敗したら別の手を考える
+　(2) FITのR_BSPモジュールはIAR社が提供しているものに置き換える
+　(3) FITの他のモジュールはGNURXで試したものに置き換える(SCFGcompiler.hにIARコンパイラ対応の記述を試しに入れてあります)
+　(4) FreeRTOSのPortレイヤーをlib\FreeRTOS\portable\IAR\RXv2へ置き換える
+　(5) FreeRTOS-Plus-TCPのPortレイヤーをlib\FreeRTOS-Plus-TCP\source\portable\Compiler\IARへ置き換える
+　(6) 割り込みベクタの登録、セクションの確保、など
+　(7) iodefine.hはIAR社が提供しているヘッダファイルをインクルードするようにしておく
+　(8) machine.hはとりあえず中身が空のファイルにしておく
+
+　(1)を試す。
+　Project migration tools
+　　www.iar.com/jp/iar-embedded-workbench/project-migration/
+　
+　エラーがでた。バージョンが整合しないのかな。(1)は諦める。
+　幸いコードはUnified済であるので、プロジェクト新規作成してコードを追加していけばよいであろう。
+　
+　新規プロジェクトを作成してデバイスを選んだら、RX65Nがない。
+　どうやら手元のEWRXのバージョンが古い(v2.9)ようだ。最新版はv4.1。
+　更新はマイページに入らないといけないようだけれど、ID/パスが分からない。
+　コンパイラのライセンスIDは有るので、無償評価版をインストールして
+　そこにコンパイラのライセンスIDを登録する方法を試みる。
+　
+　最新版v4.1をインストールして起動してみる。ちょっと表示がおしゃれになっている。
+　起動後にライセンスマネージャが起動し、自動でライセンスIDの確認を行ってくれて
+　無事製品版に昇格した。
+　
+　(1)がエラーになったのはEWRXのバージョンが古かったからなのでは。もう一度試す。
+　予想通りうまくいった。けど、プロジェクトディレクトリ外のファイル(libフォルダ)が登録から外れている。
+　手動で登録していく必要がある。ビルドしてみた感じインクルードパスの設定も施してやる必要がありそう。
+　⇒新規プロジェクト作成で自力で組み立てたほうが不明点がなくよさげだ。
+　
+　新規プロジェクト作成で、main()のみのプロジェクトがデバッグできるか試す。
+　ビルドはOK。デバッガやデバイスの設定を施してEnvision Kit(E2Lite)に接続。
+　デバッガの設定にFreeRTOSのプラグイン追加があるので追加してみる。
+　FreeRTOS関連の便利なデバッグ機能が追加されるのかな。
+　無事ターゲット接続ができた。
+　
+　(2)に進む。
+　まずはNoMaY氏のZIPパッケージ(\src\smc_genに入れる)の取り込みを行う。
+
+　ディレクトリをまとめてツリーに登録することが出来ない(?)ようだ。
+　面倒なのでやっぱりプロジェクトコンバータを使ってFITモジュールの取り込みを行う。
+　Amazon FreeRTOS関連は手動で登録するかな。これはなかなか果てしない作業になりそう。
+　
+　まずは、Amazon FreeRTOS抜きにして、NoMaY氏のZIPパッケージとリアルタイムOS用FITパッケージを取り込む。
+　CC-RX、e2 studioの環境をコンバートして取り込む。そこにNoMaY氏のZIPパッケージを上書き。
+　リアルタイムOS用FITパッケージ(\src\realtime_OS_pkgに入れる)が付いてきたので削除。
+　
+　まとめてビルドしてみるも、エラー項目が多く厳しい。ミニマムスタートをしてみる。
+　完全新規プロジェクトに、BSPだけを組み込み、NoMaY氏の「SCFGcompiler.h」だけを組み込み
+　1個ずつエラーを潰していこう。
+　
+　新規プロジェクトにEWRXのFIT Module Importerを使用しBSPを出力する。
+　ソースコードを通し、インクルードパスを通したところでビルド。
+　r_bsp_config.h でエラーがでる。
+　どうやらスタックサイズはツールで入力する必要があるようだ。
+　ツールでスタック(ユーザ=0x3000、割り込み=0x3000、ヒープ0x2000)を設定し
+　r_bsp_config.hのエラー箇所はコメントアウト。
+　ビルドが通ったので注意点はここだけであろう。
+　r_bsp_config.hは、CC-RX+e2 studio+Envision Kitのプロジェクトから持ってくる。
+　
+　ビルドが通ったので実行してみる。無事main()に到達。
+　main()前の動きを把握するため、デバッガの設定でmain()まで自動実行の設定をやめる。
+　リセット後のプログラムはIARの標準のものが自動で組み込まれるようだ。
+　途中でBSPの__low_level_init() (公式BSPだとResetPRG())が呼ばれる。
+　続いてmain()が呼ばれる仕組みのようだ。
+　
+　(3)に進む。
+　次にGCC側のコード群から、compiler_supportフォルダのSCFGcompiler.hを持ってくる。
+　インクルードパスを通す。ビルド、特に問題なし。
+　BSP共通ヘッダのplatform.h にSCFGcompiler.hのインクルードを追加。
+　
+　コンパイルしてみると、SCFGcompiler.h の #define __LIT1 が怒られる。
+　IARではすでに存在するマクロのようだ。
+　BIGも合わせて/* nothing to do */のコメントに変えておく。
+　エラーゼロになった。
+　
+　NoMaY氏のZIPファイルからCMTタイマだけを組み込んでみる。
+　
+　static volatile struct st_cmt0 __evenaccess * const g_cmt_channels[CMT_RX_NUM_CHANNELS] =
+　
+　この行でエラーが起きた。__evenaccessが引っかかっている。
+　早速、SCFGcompiler.hのマクロを活用しようとするが、使えるマクロはまだない。
+　IARが出力するCMTのFITモジュールでは、__sfr に置き換わっていた。
+　ひとまず、#define __evenaccess    __sfr とする。
+　
+　次のエラーは割り込みベクタ。
+　
+　R_PRAGMA_STATIC_INTERRUPT(cmt0_isr, VECT(CMT0, CMI0))
+　static void cmt0_isr (void)
+　
+　これもIARが出力するCMTのFITモジュールを参照。
+　
+　#pragma vector=VECT(CMT0, CMI0)
+　__interrupt static void cmt0_isr (void)
+
+　関数の先頭に __interrupt が無いとダメなようだ。
+　これ用の共通マクロ追加必要か。
+　
+　#if defined(__CCRX__)
+　#define R_ATTRIB_INTERRUPT_FUNCTION /* none */
+　#elif defined(__GNUC__)
+　#define R_ATTRIB_INTERRUPT_FUNCTION /* none */
+　#elif defined(__ICCRX__)
+　#define __INTERRUPT    __interrupt
+　#endif
+
+　以上追加し、CMTの割り込み関数の先頭に__INTERRUPTを追加し、
+　コンパイルが通るようになった。
+　
+　main()にCMTの関数(R_CMT_CreatePeriodic())を呼び出し実験。
+　100Hz周期割り込みを発生させる。
+　割り込みが実行され、正しく時間を刻んでいるようだ。
+　
+　この調子でSCIとBYTEQとPINCFGを組み込む。
+　こちらも特に問題なし。型の暗黙変換で細かいワーニングが出ているがまあ良し。
+　
+　次はEther。以下構造体の__evenaccess で怒られる。
+　ポインタじゃないのに__evenaccessだからか？ これは元のコードがおかしい気がする。
+　__evenaccess を削除した。
+　
+　typedef struct DescriptorS
+　{
+    __evenaccess uint32_t           status;
+
+　最後はフラッシュ。
+　ワーニングが出たがエラーは出ず。ひとまず先に進む。
+　　・"unrecognized #pragma" が R_ATTRIB_BITFIELD_BIT_ORDER_LEFT_6で出ている。
+　　・引数の型ミスマッチが  xchg(&is_locked, plock);で出ている。
+　　・他にもFITのコードが元からIARだとワーニングを出す要素がいくつかあるようだ
+　
+　FITモジュールの組み込みが終わった。
+　続いてAmazon FreeRTOSのコードを登録していく。
+　
+　ひとまずビルドが通るところまで辿り着いた。以下課題。
+　・そもそもまだ動かない
+　・group_al1_handler_isr()の扱い。今コメントアウトしてある。
+　・FreeRTOSIPConfig.hの扱い。
+　・/lib/FreeRTOS/portable/IAR/RXv2/port.c の vApplicationSetupTimerInterrupt()の実装。
+　　⇒_IEN() とかをコメントアウトしてある
+　・/lib/FreeRTOS/portable/IAR/RXv2/port.c の vTickISR()の実装。
+　　⇒割り込み関数でなくしてる
+　・/lib/FreeRTOS/portable/IAR/RXv2/port_asm.s の
+　　インクルード"PriorityDefinitions.h"が見つからない
+　　⇒コメントアウトして、ヘッダに書いてあることを期待しているコンフィグ値を直打ち
+　・/lib/pkcs11/mbedtls/aws_pkcs11_mbedtls.c
+　　prvSetupPkcs11SigningForMbedTls関数
+　　⇒IARだとビルドエラーになる。
+　
+　ここまでで、一旦ExperimentalとしてGitHubに登録。
+　
+2018/07/14-(2)
+　NoMaY氏が作ってくれたGCC用のFITモジュールZIPパックを導入。
+　https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/28951#28951
+　⇒2251.smc_fit_modify_20180714.zip
+　
+　RX65N Amazon FreeRTOS v0.0.6の以下フォルダに解凍したデータを全部入れる。
+　\demos\renesas\rx65n-envision-kit\gnurx-e2studio6\src\smc_gen
+　
+　RX65N Amazon FreeRTOS v0.0.6の他のフォルダはRX Driver Package v114環境に移行したが、
+　GCC対応版はRX Driver Package v113環境を維持。
+　
+　プロジェクトエクスプローラの aws_demos.scfg をダブルクリックし、コード生成。
+　
+　ビルド実行。
+　
+　/demos/renesas/rx65n-envision-kit/common/application_code/rskrx65n_uart.c
+　⇒ r_pinset.h が無いとのことでコンパイルエラーが発生する。
+　
+　e2 studio v620からv630にアップしたことによる影響か。
+　ZIPパックからr_pinset.hを含むフォルダ「\smc_gen\r_pincfg」を
+　RX65N Amazon FreeRTOS v0.0.6の以下フォルダに解凍したデータを全部入れる。
+　\demos\renesas\rx65n-envision-kit\gnurx-e2studio6\src\smc_gen\r_pincfg
+　
+　ここでビルドOKとなる。(一度クリーンビルドが必要）
+　
+　ダウンロードして実行してみる。
+　暴走。トレースしてみる。
+　
+　reset_program.asm にて、FreeRTOSを初期化せずにmain()にジャンプし
+　その後処理が進んでいきOS内部の処理でNULLポインタアクセスとなり暴走している。
+　
+　reset_program.asm の main()呼び出しをしているところを代わりに
+　RTOSパッケージの r_bsp_rtos の resetprg.c に倣い、以下2関数を呼び出すことにする。
+　これはNoMaY氏のメモ書きの通りである。
+　
+　_Processing_Before_Start_Kernel    
+　_vTaskStartScheduler
+
+　ダウンロードして実行してみる。
+　暴走。トレースしてみる。
+
+　prvGetNextExpireTime()にて暴走するようだ。
+　どうやらスタックが足りないらしい。
+　リンカスクリプト(linker_script.ld)をe2 studio上から編集してみる。
+　他の環境では、USTACK、ISTACKをそれぞれ0x3000確保している。
+　ヒープは0x2000確保している。GCC環境もこれらを合わせ込む。
+　ヒープはBSSに配置されるであろう。たぶん。
+　　.ustack の仮想アドレス/ロードアドレスを 0x200 から 0x6000
+　　.istack の仮想アドレス/ロードアドレスを 0x100 から 0x3000
+　　.data   の仮想アドレス/ロードアドレスを 0x204 から 0x6004
+
+　ダウンロードして実行してみる。
+　暴走。トレースしてみる。
+
+　prvGetNextExpireTime()にて暴走するようだ。
+　どうやら割り込み周りでおかしくなっている。
+　NoMaY氏の割り込みベクタの記述差吸収マクロは働いていて
+　正しくCMT0割り込みに対応するベクタが生成され、割り込み自体も発生する様子。
+　試しにcmt0_isr()にブレークしてみる。ブレークするが、何度か割り込みが発生して
+　デバッガの挙動がおかしくなりデバッグ継続できなくなる。e2 studioがエラーを吐いて
+　デバッガ接続が切れる。
+　
+　フリーラン実行+ブレーク+トレースで、どこにブレークを貼った時に正常/異常動作が
+　分かれるかを検証。prvProcessTimerOrBlockTask()がreturnするところがフリーランで正常動作を
+　維持できる限界のようだ。returnする際の戻り番地が格納されたスタックが破壊されたか？
+　
+　reset_program.asm の先頭で istack と ustack を設定しているところを見てみる。
+　istack に 0x100、ustack に0x200が設定された。さっきのリンカスクリプトの設定が反映されてない様子。
+　クリーンビルドしてみる。
+　
+　ダウンロードして実行してみる。暴走しなくなった。
+　
+　■NoMaY氏の見解
+　①FreeRTOSのスケジューラを呼び出す処理がない(スタートアップルーチンもしくはmain()から呼び出す)
+　②FreeRTOSのタイマ割り込みをベクタ登録してない(lib\FreeRTOS\portable\GCC\RX600v2\port.cのvTickISR()を登録する)
+　③FreeRTOSのソフトウェア割り込みをベクタ登録していない(同port.cのvSoftwareInterruptISR()を登録する
+
+　④GNURXプロジェクトのR_BSPのR_BSP_RegisterProtectEnable()とR_BSP_RegisterProtectDisable()に割り込み禁止を追加
+　⑤GNURXプロジェクトのR_BSPのR_BSP_SoftwareLock()でXCHG命令を使用するように変更
+　⑥GNURXプロジェクトのR_CMT_RXがRTOS対応になっていないがaws_demosプロジェクトで未使用なので一旦削除
+　(・aws_demos.scfgに小細工をして本来はGNURXプロジェクトで生成出来ないFITモジュールを生成させる裏技は早めにやめる)
+
+　⑦今回のaws_demosプロジェクトをインポートするとe2 studioがlinker_script.ldの記述でエラーを表示するので調査/対処
+　⑧リンク時のあのワーニングにはどう対処すべきだろう、、、(今夜は無理かな、、、)
+
+　⑨フラッシュセルフプログラミングでコードをROMからRAMへコピーする処理がどうなっているか気掛かり(でも当面先延ばし)
+　⑩フラッシュセルフプログラミングのコードにインラインアセンブラのコードがあったので気掛かり(これも当面先延ばし)
+
+　上記NoMaY氏の見解のうち、①は完了、②③を実現してみる。
+　あとできれいに呼び出す方法は考えるとして、vTickISR()をCMT0タイマ割り込みから直接呼び出す。
+　cmt0_isr()で検索するとvTickISR()を呼んでるところが出てくる。
+　port.c でvTickISR()は割り込み関数指定されているがこれを解除。
+　vSoftwareInterruptISR()はNoMaY氏の準備してくれた共通pragmaで以下のようにport.cで定義。
+　R_PRAGMA_STATIC_INTERRUPT(vSoftwareInterruptISR, VECT(ICU, SWINT));
+　これを使用するため、port.cで#include "platform.h"を呼び出して、SCFGcompiler.hを読み込ませる必要がある。
+　port.c はFreeRTOSカーネルの奥底なので変更はなかなか大変そう。本家に問い合わせないといけない。
+　外側でどうにかする手を別途考える必要がある。課題★
+　
+　あと、Ether関連のセクションが未定義のためEtherコントローラの制限を回避できていない。
+　(制限=送信・受信バッファが32バイト境界、送信・受信ディスクリプタが16バイト境界)
+　そこで、リンカスクリプトを修正し、_ETHERNET_BUFFERSを0番地から、_RX_DESC、_TX_DESCをその続きに
+　配置して制限回避した。
+　
+　この状態で無事Amazon Web Serviceに接続するサンプルが動作した。
+　続いてIAR環境の動作確認を進めることにする。
+　
 2018/07/14
 　しばらくぶりの更新。この1か月は内部調整に奔走。この開発は、とても楽しい。
 　出張ラッシュがひと段落しての3連休。NoMaY氏がGCC対応のプロジェクトファイルを

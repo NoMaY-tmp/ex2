@@ -25,6 +25,7 @@
 * History : DD.MM.YYYY Version  Description
 *         : 07.03.2018 0.1     Development
 ***********************************************************************************************************************/
+
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
@@ -38,38 +39,65 @@ Includes   <System Includes> , "Project Includes"
 #include "task.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
+#include "FreeRTOS_DNS.h"
 #include "NetworkBufferManagement.h"
 #include "NetworkInterface.h"
 
 /* Renesas */
+#define STREAM_BUFFER_H // Prevent from including stream_buffer.h in platform.h in r_ether_rx_if.h
+// because we need FreeRTOS_Stream_Buffer.h but stream_buffer.h has following incompatibilities at least.
+//
+// stream_buffer.h(628):W0520147:Declaration is incompatible with "BaseType_t xStreamBufferIsFull(const StreamBuffer_t *)" (declared at line 179 of FreeRTOS_Stream_Buffer.h)
+// stream_buffer.h(648):W0520147:Declaration is incompatible with "BaseType_t xStreamBufferIsEmpty(const StreamBuffer_t *)" (declared at line 161 of FreeRTOS_Stream_Buffer.h)
+//
+// lib\FreeRTOS-Plus-TCP\include\FreeRTOS_Stream_Buffer.h
+//
+// static portINLINE BaseType_t xStreamBufferIsFull( const StreamBuffer_t *pxBuffer );
+// static portINLINE BaseType_t xStreamBufferIsEmpty( const StreamBuffer_t *pxBuffer );
+//
+// lib\include\stream_buffer.h
+//
+// BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
+// BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
+//
 #include "r_ether_rx_if.h"
 #include "r_pinset.h"
-
-extern int32_t callback_ether_regist();
 
 /***********************************************************************************************************************
  Macro definitions
  **********************************************************************************************************************/
 #define ETHER_BUFSIZE_MIN 60
 
-void get_random_number(uint8_t *data, uint32_t len);
+#if defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+    #if ETHER_CFG_MODE_SEL == 0
+        #define R_ETHER_PinSet_CHANNEL_0()  R_ETHER_PinSet_ETHERC0_MII()
+    #elif ETHER_CFG_MODE_SEL == 1
+        #define R_ETHER_PinSet_CHANNEL_0()  R_ETHER_PinSet_ETHERC0_RMII()
+    #endif
+#elif defined(BSP_MCU_RX63N)
+    #if ETHER_CFG_MODE_SEL == 0
+        #define R_ETHER_PinSet_CHANNEL_0()  R_ETHER_PinSet_ETHERC_MII()
+    #elif ETHER_CFG_MODE_SEL == 1
+        #define R_ETHER_PinSet_CHANNEL_0()  R_ETHER_PinSet_ETHERC_RMII()
+    #endif
+#endif
 
 /***********************************************************************************************************************
  Private global variables and functions
  **********************************************************************************************************************/
 static TaskHandle_t ether_receive_check_task_handle = 0;
+static TaskHandle_t ether_link_check_task_handle = 0;
 static TaskHandle_t xTaskToNotify = NULL;
-static TimerHandle_t timer_handle;
-static uint32_t timer_id;
-
-static uint32_t tcpudp_time_cnt;
-
 
 static int16_t SendData( uint8_t *pucBuffer, size_t length );
 static int InitializeNetwork(void);
-static void check_ether_link(TimerHandle_t xTimer );
+static void check_ether_link(void);
 static void prvEMACDeferredInterruptHandlerTask( void *pvParameters );
+static void clear_all_ether_rx_discriptors(uint32_t event);
 
+int32_t callback_ether_regist(void);
+void EINT_Trig_isr(void *);
+void get_random_number(uint8_t *data, uint32_t len);
 
 /***********************************************************************************************************************
  * Function Name: xNetworkInterfaceInitialise ()
@@ -146,7 +174,10 @@ BaseType_t xNetworkInterfaceOutput( NetworkBufferDescriptor_t * const pxDescript
 static void prvEMACDeferredInterruptHandlerTask( void *pvParameters )
 {
 NetworkBufferDescriptor_t *pxBufferDescriptor;
-size_t xBytesReceived;
+int32_t xBytesReceived;
+
+/* Avoid compiler warning about unreferenced parameter. */
+( void ) pvParameters;
 
 /* Used to indicate that xSendEventStructToIPTask() is being called because
 of an Ethernet receive event. */
@@ -156,8 +187,7 @@ uint8_t *buffer_pointer;
 
     for( ;; )
     {
-		vTaskDelay(10);
-    	xTaskToNotify = ether_receive_check_task_handle;
+        xTaskToNotify = ether_receive_check_task_handle;
 
         /* Wait for the Ethernet MAC interrupt to indicate that another packet
         has been received.  */
@@ -166,13 +196,17 @@ uint8_t *buffer_pointer;
         /* See how much data was received.  */
         xBytesReceived = R_ETHER_Read_ZC2(ETHER_CHANNEL_0, (void **)&buffer_pointer);
 
-        if( xBytesReceived > 0 )
+        if( xBytesReceived < 0 )
+        {
+            /* This is an error. Ignored. */
+        }
+        else if( xBytesReceived > 0 )
         {
             /* Allocate a network buffer descriptor that points to a buffer
             large enough to hold the received frame.  As this is the simple
             rather than efficient example the received data will just be copied
             into this buffer. */
-            pxBufferDescriptor = pxGetNetworkBufferWithDescriptor( xBytesReceived, 0 );
+            pxBufferDescriptor = pxGetNetworkBufferWithDescriptor( (size_t)xBytesReceived, 0 );
 
             if( pxBufferDescriptor != NULL )
             {
@@ -184,9 +218,11 @@ uint8_t *buffer_pointer;
                 parameter.  Remember! While is is a simple robust technique -
                 it is not efficient.  An example that uses a zero copy technique
                 is provided further down this page. */
-            	memcpy(pxBufferDescriptor->pucEthernetBuffer, buffer_pointer, xBytesReceived);
+                memcpy(pxBufferDescriptor->pucEthernetBuffer, buffer_pointer, (size_t)xBytesReceived);
                 //ReceiveData( pxBufferDescriptor->pucEthernetBuffer );
-                pxBufferDescriptor->xDataLength = xBytesReceived;
+
+                /* Set the actual packet length, in case a larger buffer was returned. */
+                pxBufferDescriptor->xDataLength = (size_t)xBytesReceived;
 
                 R_ETHER_Read_ZC2_BufRelease(ETHER_CHANNEL_0);
 
@@ -211,13 +247,14 @@ uint8_t *buffer_pointer;
 
                         /* Make a call to the standard trace macro to log the occurrence. */
                         iptraceETHERNET_RX_EVENT_LOST();
+                        clear_all_ether_rx_discriptors(0);
                     }
                     else
                     {
                         /* The message was successfully sent to the TCP/IP stack.
                         Call the standard trace macro to log the occurrence. */
                         iptraceNETWORK_INTERFACE_RECEIVE();
-                        nop();
+                        R_NOP();
                     }
                 }
                 else
@@ -231,6 +268,7 @@ uint8_t *buffer_pointer;
                 /* The event was lost because a network buffer was not available.
                 Call the standard trace macro to log the occurrence. */
                 iptraceETHERNET_RX_EVENT_LOST();
+                clear_all_ether_rx_discriptors(1);
             }
         }
     }
@@ -259,15 +297,9 @@ void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkB
 {
 	uint32_t ul;
     uint8_t *buffer_address;
+    R_EXTERN_SEC(B_ETHERNET_BUFFERS_1)
 
-#if (__CCRX__)
-    buffer_address = __sectop("B_ETHERNET_BUFFERS_1");
-#elif (__GNUC__)
-    R_ATTRIB_SECTION_CHANGE_V(B_ETHERNET_BUFFERS_1)
-    static uint8_t B_ETHERNET_BUFFERS_1[1];
-    R_ATTRIB_SECTION_CHANGE_END
-    buffer_address = B_ETHERNET_BUFFERS_1;
-#endif
+    buffer_address = R_SECTOP(B_ETHERNET_BUFFERS_1);
 
 	for( ul = 0; ul < ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS; ul++ )
 	{
@@ -297,13 +329,7 @@ static int InitializeNetwork(void)
 	    configMAC_ADDR5
 	}; //XXX Fix me
 
-#if (BSP_CFG_BOARD_REVISION == 0) || (BSP_CFG_BOARD_REVISION == 1)	/* RX65N RSK */
-	R_ETHER_PinSet_ETHERC0_MII();
-#elif (BSP_CFG_BOARD_REVISION == 2) 	/* RX65N Envision Kit */
-	R_ETHER_PinSet_ETHERC0_RMII();
-#elif (BSP_CFG_BOARD_REVISION == 3) 	/* RX65N GR-ROSE proto1 */
-	R_ETHER_PinSet_ETHERC0_RMII();
-#endif
+	R_ETHER_PinSet_CHANNEL_0();
 	R_ETHER_Initial();
 	callback_ether_regist();
 
@@ -327,8 +353,6 @@ static int InitializeNetwork(void)
 		eth_ret = R_ETHER_CheckLink_ZC(0);
 	} while(ETHER_SUCCESS != eth_ret);
 
-	vTaskDelay(3000);
-
 	return_code = xTaskCreate(prvEMACDeferredInterruptHandlerTask,
                               "ETHER_RECEIVE_CHECK_TASK",
 							  100,
@@ -341,15 +365,16 @@ static int InitializeNetwork(void)
         return pdFALSE;
     }
 
-	timer_id = 1;
-
-	timer_handle = xTimerCreate("ETHER_TIMER",
-                                250,
-								pdTRUE,
-								&timer_id,
-								&check_ether_link);
-
-	xTimerStart(timer_handle, 0);
+	return_code = xTaskCreate(check_ether_link,
+                              "CHECK_ETHER_LINK_TIMER",
+							  100,
+							  0,
+							  configMAX_PRIORITIES,
+							  &ether_link_check_task_handle);
+    if (pdFALSE == return_code)
+    {
+        return pdFALSE;
+    }
 
     return pdTRUE;
 } /* End of function InitializeNetwork() */
@@ -432,12 +457,42 @@ void EINT_Trig_isr(void *ectrl)
  * Arguments    : none
  * Return Value : none
  **********************************************************************************************************************/
-static void check_ether_link(TimerHandle_t xTimer )
+static void check_ether_link(void)
 {
-	R_ETHER_LinkProcess(0);
-	tcpudp_time_cnt++;
+	while(1)
+	{
+    	vTaskDelay(1000);
+		R_ETHER_LinkProcess(0);
+	}
 } /* End of function check_ether_link() */
 
+static void clear_all_ether_rx_discriptors(uint32_t event)
+{
+	int32_t xBytesReceived;
+	uint8_t *buffer_pointer;
+
+	/* Avoid compiler warning about unreferenced parameter. */
+	(void)event;
+
+	while(1)
+	{
+		/* See how much data was received.  */
+		xBytesReceived = R_ETHER_Read_ZC2(ETHER_CHANNEL_0, (void **)&buffer_pointer);
+		if(0 > xBytesReceived)
+		{
+			/* This is an error. Ignored. */
+		}
+		else if(0 < xBytesReceived)
+		{
+			R_ETHER_Read_ZC2_BufRelease(ETHER_CHANNEL_0);
+			iptraceETHERNET_RX_EVENT_LOST();
+		}
+		else
+		{
+			break;
+		}
+	}
+}
 
 /***********************************************************************************************************************
  * Function Name: ulRand ()
@@ -448,77 +503,9 @@ static void check_ether_link(TimerHandle_t xTimer )
 uint32_t ulRand( void )   //TODO make true random number
 {
 	uint32_t tmp;
-	get_random_number(&tmp, 4);
+	get_random_number((uint8_t*)&tmp, 4);
 	return tmp;
 } /* End of function ulRand() */
-
-/******************************************************************************
-Functions : random number generator(XorShift method)
-******************************************************************************/
-void get_random_number(uint8_t *data, uint32_t len)
-{
-    static uint32_t y = 2463534242;
-    uint32_t res;
-    uint32_t lp;
-    uint8_t *bPtr;
-
-    y += tcpudp_time_cnt;
-    res = len / 4;
-    for (lp = 0; lp < res; lp++)
-    {
-        y = y ^ (y << 13);
-        y = y ^ (y >> 17);
-        y = y ^ (y << 5);
-        bPtr = (uint8_t*) & y;
-#if __LIT
-        *((uint32_t *)data) = (*(bPtr + 3) << 24) | (*(bPtr + 2) << 16) | (*(bPtr + 1) << 8) | *(bPtr + 0);
-#else
-        *((uint32_t *)data) = y;
-#endif
-        data += 4;
-    }
-    y = y ^ (y << 13);
-    y = y ^ (y >> 17);
-    y = y ^ (y << 5);
-    res = (uint32_t)len % 4;
-    bPtr = (uint8_t*) & y;
-    switch (res)
-    {
-        case 3:
-#if __LIT
-            *data++ = bPtr[3];
-            *data++ = bPtr[2];
-            *data++ = bPtr[1];
-#else
-            *data++ = bPtr[0];
-            *data++ = bPtr[1];
-            *data++ = bPtr[2];
-#endif
-            break;
-
-        case 2:
-#if __LIT
-            *data++ = bPtr[3];
-            *data++ = bPtr[2];
-#else
-            *data++ = bPtr[0];
-            *data++ = bPtr[1];
-#endif
-            break;
-
-        case 1:
-#if __LIT
-            *data++ = bPtr[3];
-#else
-            *data++ = bPtr[0];
-#endif
-            break;
-
-        default:
-            /* no op */
-            break;
-    }
-}
 
 /***********************************************************************************************************************
  End of file "NetworkInterface.c"

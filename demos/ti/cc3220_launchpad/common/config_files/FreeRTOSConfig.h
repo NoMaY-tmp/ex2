@@ -67,6 +67,7 @@
 #define configUSE_RECURSIVE_MUTEXES              1
 #define configUSE_QUEUE_SETS                     0
 #define configUSE_COUNTING_SEMAPHORES            1
+#define configUSE_POSIX_ERRNO                    1
 
 #define configMAX_PRIORITIES                     ( 10UL )
 #define configQUEUE_REGISTRY_SIZE                0
@@ -107,7 +108,7 @@ extern void vLoggingPrintf( const char * pcFormat,
 
 /* Sets the length of the buffers into which logging messages are written - so
  * also defines the maximum length of each log message. */
-#define configLOGGING_MAX_MESSAGE_LENGTH            128
+#define configLOGGING_MAX_MESSAGE_LENGTH            192
 
 /* Set to 1 to prepend each log message with a message number, the task name,
  * and a time stamp. */
@@ -184,5 +185,8 @@ function. */
 #define configECHO_SERVER_ADDR2                     2
 #define configECHO_SERVER_ADDR3                     6
 #define configTCP_ECHO_CLIENT_PORT                  7
+
+/* The platform FreeRTOS is running on. */
+#define configPLATFORM_NAME    "TICC3220"
 
 #endif /* FREERTOS_CONFIG_H */

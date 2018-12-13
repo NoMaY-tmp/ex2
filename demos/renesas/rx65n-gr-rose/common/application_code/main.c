@@ -23,27 +23,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  http://www.FreeRTOS.org
 */
 
-/* FreeRTOS includes. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "FreeRTOS_IP.h"
-#include <stdio.h>
-#include <string.h>
+#if !defined(CPPAPP)
 
-/* Renesas */
-#include "rskrx65n_uart.h"
-
-/* Demo includes */
-#include "aws_demo_runner.h"
-
-/* Aws Library Includes includes. */
-#include "aws_system_init.h"
-//#include "aws_wifi.h"
-#include "aws_clientcredential.h"
+/* Application Framework include. */
+#include "StdAfx.h"
+#include "RenesasRX.h" // unnecessary but for checking compile warnings and errors
 
 #define mainLOGGING_TASK_STACK_SIZE         ( configMINIMAL_STACK_SIZE * 6 )
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
 #define mainTEST_RUNNER_TASK_STACK_SIZE    ( configMINIMAL_STACK_SIZE * 8 )
+
+/* Declare the firmware version structure for all to see. */
+const AppVersion32_t xAppFirmwareVersion = {
+   .u.x.ucMajor = APP_VERSION_MAJOR,
+   .u.x.ucMinor = APP_VERSION_MINOR,
+   .u.x.usBuild = APP_VERSION_BUILD,
+};
 
 /* The MAC address array is not declared const as the MAC address will
 normally be read from an EEPROM and not hard coded (in real deployed
@@ -111,7 +106,7 @@ static void prvMiscInitialization( void );
 /**
  * @brief Application runtime entry point.
  */
-int main( void )
+void main( void )
 {
     /* Perform any hardware initialization that does not require the RTOS to be
      * running.  */
@@ -125,8 +120,6 @@ int main( void )
     {
     	vTaskDelay(10000);
     }
-
-    return 0;
 }
 /*-----------------------------------------------------------*/
 
@@ -134,7 +127,7 @@ static void prvMiscInitialization( void )
 {
     /* FIX ME. */
 	uart_config();
-	//configPRINT_STRING(("Hello World.\r\n"));
+	configPRINT_STRING(("Hello World.\r\n"));
     /* Start logging task. */
     xLoggingTaskInitialize( mainLOGGING_TASK_STACK_SIZE,
                             tskIDLE_PRIORITY,
@@ -146,7 +139,7 @@ void vApplicationDaemonTaskStartupHook( void )
 {
     prvMiscInitialization();
 
-	if( SYSTEM_Init() == pdPASS )
+    if( SYSTEM_Init() == pdPASS )
     {
 #if(1)
         /* Initialise the RTOS's TCP/IP stack.  The tasks that use the network
@@ -162,6 +155,8 @@ void vApplicationDaemonTaskStartupHook( void )
     	/* Connect to the wifi before running the demos */
         //prvWifiConnect();
 
+        /* Provision the device with AWS certificate and private key. */
+        vDevModeKeyProvisioning();
 
         /* Run all demos. */
         DEMO_RUNNER_RunDemos();
@@ -222,60 +217,13 @@ void prvWifiConnect( void )
 #endif
 /*-----------------------------------------------------------*/
 
-/* configUSE_STATIC_ALLOCATION is set to 1, so the application must provide an
- * implementation of vApplicationGetIdleTaskMemory() to provide the memory that is
- * used by the Idle task. */
-void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
-                                    StackType_t ** ppxIdleTaskStackBuffer,
-                                    uint32_t * pulIdleTaskStackSize )
+const char * pcApplicationHostnameHook( void )
 {
-/* If the buffers to be provided to the Idle task are declared inside this
- * function then they must be declared static - otherwise they will be allocated on
- * the stack and so not exists after this function exits. */
-    static StaticTask_t xIdleTaskTCB;
-    static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
-
-    /* Pass out a pointer to the StaticTask_t structure in which the Idle
-     * task's state will be stored. */
-    *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
-
-    /* Pass out the array that will be used as the Idle task's stack. */
-    *ppxIdleTaskStackBuffer = uxIdleTaskStack;
-
-    /* Pass out the size of the array pointed to by *ppxIdleTaskStackBuffer.
-     * Note that, as the array is necessarily of type StackType_t,
-     * configMINIMAL_STACK_SIZE is specified in words, not bytes. */
-    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+    /* Assign the name "FreeRTOS" to this network node.  This function will
+     * be called during the DHCP: the machine will be registered with an IP
+     * address plus this name. */
+    return "RX65N_FREERTOS_TCP_TEST";
 }
 /*-----------------------------------------------------------*/
 
-/* configUSE_STATIC_ALLOCATION is set to 1, so the application must provide an
- * implementation of vApplicationGetTimerTaskMemory() to provide the memory that is
- * used by the RTOS daemon/time task. */
-void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
-                                     StackType_t ** ppxTimerTaskStackBuffer,
-                                     uint32_t * pulTimerTaskStackSize )
-{
-/* If the buffers to be provided to the Timer task are declared inside this
- * function then they must be declared static - otherwise they will be allocated on
- * the stack and so not exists after this function exits. */
-    static StaticTask_t xTimerTaskTCB;
-    static StackType_t uxTimerTaskStack[ configMINIMAL_STACK_SIZE ];
-
-    /* Pass out a pointer to the StaticTask_t structure in which the Idle
-     * task's state will be stored. */
-    *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
-
-    /* Pass out the array that will be used as the Timer task's stack. */
-    *ppxTimerTaskStackBuffer = uxTimerTaskStack;
-
-    /* Pass out the size of the array pointed to by *ppxTimerTaskStackBuffer.
-     * Note that, as the array is necessarily of type StackType_t,
-     * configMINIMAL_STACK_SIZE is specified in words, not bytes. */
-    *pulTimerTaskStackSize = configMINIMAL_STACK_SIZE;
-}
-/*-----------------------------------------------------------*/
-
-
-
-
+#endif /* !defined(CPPAPP) */

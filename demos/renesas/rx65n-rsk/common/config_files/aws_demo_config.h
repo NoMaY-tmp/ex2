@@ -1,6 +1,6 @@
 /*
  * Amazon FreeRTOS V1.2.2
- * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -77,5 +77,24 @@ to perform a TLS negotiation. */
 
 /* Send AWS IoT MQTT traffic encrypted. */
 #define democonfigMQTT_AGENT_CONNECT_FLAGS          	     ( mqttagentREQUIRE_TLS )
+
+/* Workaround for missing function prototypes for various demo programs. */
+extern void vOTAUpdateDemoTask( void * pvParameters );
+extern void vStartTCPEchoClientTasks_SeparateTasks( void );
+extern void vStartTCPEchoClientTasks_SeparateTasks( void );
+extern void vStartTCPEchoClientTasks_SingleTasks( void );
+extern BaseType_t xAreSeparateTaskTCPEchoClientsStillRunning( void );
+extern BaseType_t xAreSingleTaskTCPEchoClientsStillRunning( void );
+extern int convert_pem_to_der( const unsigned char * pucInput,
+                               size_t xLen,
+                               unsigned char * pucOutput,
+                               size_t * pxOlen );
+extern CK_RV xProvisionDevice( CK_SESSION_HANDLE xSession,
+                               ProvisioningParams_t * pxParams );
+
+/* Workaround for the incompatibility between GNU/IAR C compilers and the CC-RX compiler. */
+#if defined(__CCRX__)
+#define __FUNCTION__    __func__
+#endif
 
 #endif /* _AWS_DEMO_CONFIG_H_ */

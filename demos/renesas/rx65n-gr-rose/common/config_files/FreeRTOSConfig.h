@@ -1,6 +1,6 @@
 /*
  * FreeRTOS Kernel V10.0.1
- * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -26,7 +26,12 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "rskrx65n_uart.h"
+#include "serial_term_uart.h"
+
+#if defined(AMAZON_FREERTOS_ENABLE_UNIT_TESTS)
+/* Unity includes. */
+#include "unity_internals.h"
+#endif
 
 /*-----------------------------------------------------------
 * Application specific definitions.
@@ -47,8 +52,8 @@
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION    0
 #define configMAX_PRIORITIES                       ( 7 )
 #define configTICK_RATE_HZ                         ( 1000 )
-#define configMINIMAL_STACK_SIZE                   ( ( unsigned short ) 140 )
-#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 128U * 1024U ) )
+#define configMINIMAL_STACK_SIZE                   ( ( unsigned short ) 180 )
+#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 68U * 1024U ) )
 #define configMAX_TASK_NAME_LEN                    ( 12 )
 #define configUSE_TRACE_FACILITY                   1
 #define configUSE_16_BIT_TICKS                     0
@@ -65,8 +70,8 @@
 
 #define configUSE_DAEMON_TASK_STARTUP_HOOK 1
 
-#define configCPU_CLOCK_HZ				( 120000000UL )
-#define configPERIPHERAL_CLOCK_HZ		( 60000000UL )
+#define configCPU_CLOCK_HZ				( 96000000UL )
+#define configPERIPHERAL_CLOCK_HZ		( 48000000UL )
 #define configUSE_QUEUE_SETS			1
 
 /* Hook function related definitions. */
@@ -79,7 +84,7 @@
 #define configUSE_TIMERS                           1
 #define configTIMER_TASK_PRIORITY                  ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH                   5
-#define configTIMER_TASK_STACK_DEPTH               ( configMINIMAL_STACK_SIZE)
+#define configTIMER_TASK_STACK_DEPTH               ( configMINIMAL_STACK_SIZE * 6 )
 
 /* The interrupt priority used by the kernel itself for the tick interrupt and
 the pended interrupt.  This would normally be the lowest priority. */
@@ -146,28 +151,32 @@ void vConfigureTimerForRunTimeStats( void );
  * functions. */
 #define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
-#if(1)
+#if defined(AMAZON_FREERTOS_ENABLE_UNIT_TESTS)
+#define configASSERT( x ) do { if( ( x ) == 0 ) TEST_ABORT(); } while( 0 )
+#elif (1) // FIX ME: Is it better to use macros like 'defined(AMAZON_FREERTOS_ENABLE_ASSERT) || !defined(AMAZON_FREERTOS_DISABLE_ASSERT)'?
 /* Assert call defined for debug builds. */
 extern void vAssertCalled( void );
-#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled()
-
-//extern TEST_ABORT();
-//#define configASSERT( x )   if( ( x ) == 0 )  TEST_ABORT()
+#define configASSERT( x ) do { if( ( x ) == 0 ) vAssertCalled(); } while( 0 )
+#else
+/* Disable Assert call for release builds. */
+#define configASSERT( x ) ( ( void ) 0 )
 #endif
 
 /* The function that implements FreeRTOS printf style output, and the macro
  * that maps the configPRINTF() macros to that function. */
 extern void vLoggingPrintf( const char * pcFormat, ... );
-
 #define configPRINTF( X )    vLoggingPrintf X
 
+/* Non-format version thread-safe print */
+extern void vLoggingPrint( const char * pcMessage );
+#define configPRINT( X )     vLoggingPrint( X )
 
 /* Map the logging task's printf to the board specific output function. */
-#define configPRINT_STRING( x )    uart_string_printf( x );
+#define configPRINT_STRING( x )    uart_string_printf( x )
 
 /* Sets the length of the buffers into which logging messages are written - so
  * also defines the maximum length of each log message. */
-#define configLOGGING_MAX_MESSAGE_LENGTH            120
+#define configLOGGING_MAX_MESSAGE_LENGTH            192
 
 /* Set to 1 to prepend each log message with a message number, the task name,
  * and a time stamp. */
@@ -261,19 +270,71 @@ extern void vLoggingPrintf( const char * pcFormat, ... );
 #define configPROFILING                      ( 0 )
 
 /* Pseudo random number generater used by some demo tasks. */
-extern uint32_t ulRand();
+uint32_t ulRand(void);
 #define configRAND32()    ulRand()
 
-
+/* The platform FreeRTOS is running on. */
+#define configPLATFORM_NAME    "RenesasRX65N"
 
 /* Header required for the tracealyzer recorder library. */
 //#include "trcRecorder.h"
 
-/*********************************************
- * Amazon FreeRTOS aws_demos project
- ********************************************/
+/* When the FIT configurator or the Smart Configurator is used, platform.h has to be used. */
+#define configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H  1
 
-#define __FUNCTION__ __func__ /* GCC <--> CC-RX */
-#define __attribute__( attr ) /* GCC <--> CC-RX */
+/* TODO: Improve configASSERT() implementation. */
+#if 0 // For example, ESP32's FreeRTOSConfig.h has following code. */
+ * FreeRTOS Kernel V10.0.1
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+/* configASSERT behaviour */
+#if defined(CONFIG_FREERTOS_ASSERT_DISABLE)
+    #define configASSERT(a) /* assertions disabled */
+#elif defined(CONFIG_FREERTOS_ASSERT_FAIL_PRINT_CONTINUE)
+    #define configASSERT(a) if (!(a)) {                                     \
+            ets_printf("%s:%d (%s)- assert failed!\n", __FILE__, __LINE__,  \
+                    __FUNCTION__);                                       \
+            }
+#else /* CONFIG_FREERTOS_ASSERT_FAIL_ABORT */
+    #define configASSERT(a) if (!(a)) {                                         \
+                ets_printf("%s:%d (%s)- assert failed!\n", __FILE__, __LINE__,  \
+                        __FUNCTION__);                                          \
+                abort();                                                        \
+            }
+#endif
+#endif /* #if 0 */
+#if 0 // For example, XMC4800's FreeRTOSConfig.h has following code. */
+ * FreeRTOS Kernel V10.0.1
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+/* Define configASSERT() to disable interrupts and sit in a loop. */
+#define configASSERT( x )     if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+#endif /* #if 0 */
+#if 0 // Or to be orthodox? For example, Zynq7000's FreeRTOSConfig.h has following code. */
+ * FreeRTOS Kernel V10.0.1
+ * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+#define configASSERT( x )    if( ( x ) == 0 )  vAssertCalled(__FILE__, __LINE__)
+#endif /* #if 0 */
+#if 0 // Or to be ANSI standard? For example, newlib has following code. */
+#ifdef NDEBUG           /* required by ANSI standard */
+# define assert(__e) ((void)0)
+#else
+# define assert(__e) ((__e) ? (void)0 : __assert_func (__FILE__, __LINE__, \
+                                                       __ASSERT_FUNC, #__e))
+# ifndef __ASSERT_FUNC
+  /* Use g++'s demangled names in C++.  */
+#  if defined __cplusplus && defined __GNUC__
+#   define __ASSERT_FUNC __PRETTY_FUNCTION__
+  /* C99 requires the use of __func__.  */
+#  elif __STDC_VERSION__ >= 199901L
+#   define __ASSERT_FUNC __func__
+  /* Older versions of gcc don't have __func__ but can use __FUNCTION__.  */
+#  elif __GNUC__ >= 2
+#   define __ASSERT_FUNC __FUNCTION__
+  /* failed to detect __func__ support.  */
+#  else
+#   define __ASSERT_FUNC ((char *) 0)
+#  endif
+# endif /* !__ASSERT_FUNC */
+#endif /* !NDEBUG */
+#endif /* #if 0 */
 
 #endif /* FREERTOS_CONFIG_H */
