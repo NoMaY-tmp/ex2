@@ -23,9 +23,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  http://www.FreeRTOS.org
 */
 
-/* Application Framework include. */
-#include "StdAfx.h"
-#include "RenesasRX.h" // unnecessary but for checking compile warnings and errors
+/* FreeRTOS includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+
+/* Version includes. */
+#include "aws_application_version.h"
+
+/* System init includes. */
+#include "aws_system_init.h"
+
+/* Logging includes. */
+#include "aws_logging_task.h"
+
+/* Key provisioning includes. */
+#include "aws_dev_mode_key_provisioning.h"
+
+/* FreeRTOS+TCP includes. */
+#include "FreeRTOS_IP.h"
+
+/* Demo includes */
+#include "aws_demo_runner.h"
 
 #define mainLOGGING_TASK_STACK_SIZE         ( configMINIMAL_STACK_SIZE * 6 )
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
@@ -63,37 +81,32 @@ static const uint8_t ucIPAddress[ 4 ] =
 };
 static const uint8_t ucNetMask[ 4 ] =
 {
-	configNET_MASK0,
-	configNET_MASK1,
-	configNET_MASK2,
-	configNET_MASK3
+    configNET_MASK0,
+    configNET_MASK1,
+    configNET_MASK2,
+    configNET_MASK3
 };
 static const uint8_t ucGatewayAddress[ 4 ] =
 {
-	configGATEWAY_ADDR0,
-	configGATEWAY_ADDR1,
-	configGATEWAY_ADDR2,
-	configGATEWAY_ADDR3
+    configGATEWAY_ADDR0,
+    configGATEWAY_ADDR1,
+    configGATEWAY_ADDR2,
+    configGATEWAY_ADDR3
 };
 
 /* The following is the address of an OpenDNS server. */
 static const uint8_t ucDNSServerAddress[ 4 ] =
 {
-	configDNS_SERVER_ADDR0,
-	configDNS_SERVER_ADDR1,
-	configDNS_SERVER_ADDR2,
-	configDNS_SERVER_ADDR3
+    configDNS_SERVER_ADDR0,
+    configDNS_SERVER_ADDR1,
+    configDNS_SERVER_ADDR2,
+    configDNS_SERVER_ADDR3
 };
 
 /**
  * @brief Application task startup hook.
  */
 void vApplicationDaemonTaskStartupHook( void );
-
-/**
- * @brief Connects to WiFi.
- */
-//static void prvWifiConnect( void );
 
 /**
  * @brief Initializes the board.
@@ -106,26 +119,19 @@ static void prvMiscInitialization( void );
  */
 void main( void )
 {
-    /* Perform any hardware initialization that does not require the RTOS to be
-     * running.  */
-
-    /* Start the scheduler.  Initialization that requires the OS to be running,
-     * including the WiFi initialization, is performed in the RTOS daemon task
-     * startup hook. */
-    // vTaskStartScheduler();
-
     while(1)
     {
-    	vTaskDelay(10000);
+        vTaskDelay(10000);
     }
 }
 /*-----------------------------------------------------------*/
 
 static void prvMiscInitialization( void )
 {
-    /* FIX ME. */
-	uart_config();
-	configPRINT_STRING(("Hello World.\r\n"));
+    /* Initialize UART for serial terminal. */
+    uart_config();
+    configPRINT_STRING(("Hello World.\r\n"));
+
     /* Start logging task. */
     xLoggingTaskInitialize( mainLOGGING_TASK_STACK_SIZE,
                             tskIDLE_PRIORITY,
@@ -139,7 +145,6 @@ void vApplicationDaemonTaskStartupHook( void )
 
     if( SYSTEM_Init() == pdPASS )
     {
-#if(1)
         /* Initialise the RTOS's TCP/IP stack.  The tasks that use the network
         are created in the vApplicationIPNetworkEventHook() hook function
         below.  The hook function is called when the network connects. */
@@ -148,71 +153,14 @@ void vApplicationDaemonTaskStartupHook( void )
                          ucGatewayAddress,
                          ucDNSServerAddress,
                          ucMACAddress );
-#endif
-
-    	/* Connect to the wifi before running the demos */
-        //prvWifiConnect();
 
         /* Provision the device with AWS certificate and private key. */
         vDevModeKeyProvisioning();
 
         /* Run all demos. */
         DEMO_RUNNER_RunDemos();
-#if(0)
-        /* Create the task to run tests. */
-        xTaskCreate( TEST_RUNNER_RunTests_task,
-                     "RunTests_task",
-                     mainTEST_RUNNER_TASK_STACK_SIZE,
-                     NULL,
-                     tskIDLE_PRIORITY,
-                     NULL );
-#endif
     }
 }
-/*-----------------------------------------------------------*/
-
-#if(0)
-void prvWifiConnect( void )
-{
-    WiFiNetworkParams_t xJoinAPParams;
-    WiFiReturnCode_t xWifiStatus;
-
-    xWifiStatus = WIFI_On();
-
-    if( xWifiStatus == eWiFiSuccess )
-    {
-        configPRINTF( ( "WiFi module initialized. Connecting to AP...\r\n" ) );
-    }
-    else
-    {
-        configPRINTF( ( "WiFi module failed to initialize.\r\n" ) );
-
-        while( 1 )
-        {
-        }
-    }
-
-    /* Setup parameters. */
-    xJoinAPParams.pcSSID = clientcredentialWIFI_SSID;
-    xJoinAPParams.pcPassword = clientcredentialWIFI_PASSWORD;
-    xJoinAPParams.xSecurity = clientcredentialWIFI_SECURITY;
-
-    xWifiStatus = WIFI_ConnectAP( &( xJoinAPParams ) );
-
-    if( xWifiStatus == eWiFiSuccess )
-    {
-        configPRINTF( ( "WiFi Connected to AP. Creating tasks which use network...\r\n" ) );
-    }
-    else
-    {
-        configPRINTF( ( "WiFi failed to connect to AP.\r\n" ) );
-
-        while( 1 )
-        {
-        }
-    }
-}
-#endif
 /*-----------------------------------------------------------*/
 
 const char * pcApplicationHostnameHook( void )
@@ -220,6 +168,6 @@ const char * pcApplicationHostnameHook( void )
     /* Assign the name "FreeRTOS" to this network node.  This function will
      * be called during the DHCP: the machine will be registered with an IP
      * address plus this name. */
-    return "RX65N_FREERTOS_TCP_TEST";
+    return "RenesasRX_FREERTOS_TCP_TEST";
 }
 /*-----------------------------------------------------------*/

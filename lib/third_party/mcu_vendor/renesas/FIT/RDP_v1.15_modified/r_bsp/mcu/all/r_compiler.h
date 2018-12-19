@@ -62,8 +62,8 @@ Exported global functions (to be accessed by other files)
 /* #define __RX 1 */ /* This is already defined by CCRX. */
 /* #define __LIT 1 */ /* This is automatically defined by CCRX. */
 /* #define __BIG 1 */ /* This is automatically defined by CCRX. */
-/* #define __FPU 1 */ /* This is automatically defined by ICCRX. */
-/* #define __RXV2 1 */ /* This is automatically defined by ICCRX. */
+/* #define __FPU 1 */ /* This is automatically defined by CCRX. */
+/* #define __RXV2 1 */ /* This is automatically defined by CCRX. */
 
 #elif defined(__GNUC__)
 
@@ -298,6 +298,9 @@ extern uint8_t                    ustack[]; /* This symbol means the end address
 #define _R_ATTRIB_SECTION_CHANGE_B1(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(B, B##section_tag) /* The CC-RX adds postfix '_1' automatically */
 #define _R_ATTRIB_SECTION_CHANGE_B2(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(B, B##section_tag) /* The CC-RX adds postfix '_2' automatically */
 #define _R_ATTRIB_SECTION_CHANGE_B4(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(B, B##section_tag) /* The CC-RX does not add postfix '_4' */
+#define _R_ATTRIB_SECTION_CHANGE_C1(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(C, C##section_tag) /* The CC-RX adds postfix '_1' automatically */
+#define _R_ATTRIB_SECTION_CHANGE_C2(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(C, C##section_tag) /* The CC-RX adds postfix '_2' automatically */
+#define _R_ATTRIB_SECTION_CHANGE_C4(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(C, C##section_tag) /* The CC-RX does not add postfix '_4' */
 #define _R_ATTRIB_SECTION_CHANGE_P(section_tag)            __R_ATTRIB_SECTION_CHANGE_F(P, P##section_tag)
 
 #if !defined(__cplusplus)
@@ -315,6 +318,9 @@ extern uint8_t                    ustack[]; /* This symbol means the end address
 #define _R_ATTRIB_SECTION_CHANGE_B1(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(B##section_tag##_1)
 #define _R_ATTRIB_SECTION_CHANGE_B2(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(B##section_tag##_2)
 #define _R_ATTRIB_SECTION_CHANGE_B4(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(B##section_tag) /* No postfix '_4' because the CC-RX does not add it */
+#define _R_ATTRIB_SECTION_CHANGE_C1(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(C##section_tag##_1)
+#define _R_ATTRIB_SECTION_CHANGE_C2(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(C##section_tag##_2)
+#define _R_ATTRIB_SECTION_CHANGE_C4(section_tag)           __R_ATTRIB_SECTION_CHANGE_V(C##section_tag) /* No postfix '_4' because the CC-RX does not add it */
 #define _R_ATTRIB_SECTION_CHANGE_P(section_tag)            __R_ATTRIB_SECTION_CHANGE_F(P##section_tag)
 
 #define R_ATTRIB_SECTION_CHANGE(type, section_tag, ...)    _R_ATTRIB_SECTION_CHANGE_##type##__VA_ARGS__(section_tag)
@@ -6568,6 +6574,19 @@ R_PRAGMA(bitfields=reversed_disjoint_types)\
 #endif
 
 
+/* ========== Warning supression macro ========== */
+/* This macro is used to suppress compiler messages about not only a parameter but also a auto variable not being used
+ * in a function. The nice thing about using this implementation is that it does not take any extra RAM or ROM.
+ * This macro is available for the followings:
+ * CC-RX's 'M0520826:Parameter "XXXX" was never referenced'
+ * CC-RX's 'W0520550:Variable "XXXX" was set but never used'
+ * GNURX's 'unused parameter 'XXXX' [-Wunused-parameter]'
+ * GNURX's 'variable 'XXXX' set but not used [-Wunused-but-set-variable]'
+ * When the variable is declared as volatile, the '&' can be applied like 'R_INTERNAL_NOT_USED(&volatile_variable);'.
+ */
+#define R_INTERNAL_NOT_USED(p)    ((void)(p))
+
+
 /* ========== Intrinsic Functions ========== */
 #if defined(__CCRX__)
 
@@ -6625,6 +6644,19 @@ R_PRAGMA(bitfields=reversed_disjoint_types)\
 #define R_WAIT()    __asm("wait")
 #define R_NOP()     __asm("nop")
 
+/* It is useful to define the following commonly used functions.
+ * These are the same as CG source code for GNURX.
+ */
+#if !defined(brk)
+#define brk()       asm("brk;")
+#endif
+#if !defined(wait)
+#define wait()      asm("wait;")
+#endif
+#if !defined(nop)
+#define nop()       asm("nop;")
+#endif
+
 /* ---------- Processor interrupt priority level (IPL) ---------- */
 //#define R_SET_IPL(x)    /* none */
 //#define R_GET_IPL()     /* none */
@@ -6670,6 +6702,19 @@ R_PRAGMA(bitfields=reversed_disjoint_types)\
 #define R_BRK()     __break()                 /* void __break(void) */
 #define R_WAIT()    __wait_for_interrupt()    /* void __wait_for_interrupt(void) */
 #define R_NOP()     __no_operation()          /* void __no_operation(void) */
+
+/* It is useful to define the following commonly used functions.
+ * TODO: Are these the same as CG source code for ICCRX?
+ */
+#if !defined(brk)
+#define brk()       __break()
+#endif
+#if !defined(wait)
+#define wait()      __wait_for_interrupt()
+#endif
+#if !defined(nop)
+#define nop()       __no_operation()
+#endif
 
 /* ---------- Processor interrupt priority level (IPL) ---------- */
 //#define R_SET_IPL(x)    __set_interrupt_level((__ilevel_t)(x))    /* void __set_interrupt_level(__ilevel_t) */

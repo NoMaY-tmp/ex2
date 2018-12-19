@@ -25,9 +25,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #if !defined(CPPAPP)
 
-/* Application Framework include. */
-#include "StdAfx.h"
-#include "RenesasRX.h" // unnecessary but for checking compile warnings and errors
+/* FreeRTOS includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+
+/* Version includes. */
+#include "aws_application_version.h"
+
+/* System init includes. */
+#include "aws_system_init.h"
+
+/* Logging includes. */
+#include "aws_logging_task.h"
+
+/* Key provisioning includes. */
+#include "aws_dev_mode_key_provisioning.h"
+
+/* FreeRTOS+TCP includes. */
+#include "FreeRTOS_IP.h"
+
+/* Demo includes */
+#include "aws_demo_runner.h"
 
 #define mainLOGGING_TASK_STACK_SIZE         ( configMINIMAL_STACK_SIZE * 6 )
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
@@ -222,7 +240,7 @@ const char * pcApplicationHostnameHook( void )
     /* Assign the name "FreeRTOS" to this network node.  This function will
      * be called during the DHCP: the machine will be registered with an IP
      * address plus this name. */
-    return "RX65N_FREERTOS_TCP_TEST";
+    return "RenesasRX_FREERTOS_TCP_TEST";
 }
 /*-----------------------------------------------------------*/
 

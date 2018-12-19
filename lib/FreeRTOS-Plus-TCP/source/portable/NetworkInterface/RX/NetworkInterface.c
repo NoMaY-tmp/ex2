@@ -39,7 +39,7 @@ Includes   <System Includes> , "Project Includes"
 #include "task.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_IP_Private.h"
-#include "FreeRTOS_DNS.h"
+//#include "FreeRTOS_DNS.h"
 #include "NetworkBufferManagement.h"
 #include "NetworkInterface.h"
 
@@ -91,7 +91,7 @@ static TaskHandle_t xTaskToNotify = NULL;
 
 static int16_t SendData( uint8_t *pucBuffer, size_t length );
 static int InitializeNetwork(void);
-static void check_ether_link(void);
+static void check_ether_link(void * pvParameters);
 static void prvEMACDeferredInterruptHandlerTask( void *pvParameters );
 static void clear_all_ether_rx_discriptors(uint32_t event);
 
@@ -281,10 +281,10 @@ uint8_t *buffer_pointer;
  * Arguments    : pcName string pointer
  * Return Value :
  **********************************************************************************************************************/
-BaseType_t xApplicationDNSQueryHook(const char *pcName )
-{
-    return strcmp( pcName, "RX65N" ); //TODO complete stub function
-} /* End of function xApplicationDNSQueryHook() */
+//BaseType_t xApplicationDNSQueryHook(const char *pcName )
+//{
+//    return strcmp( pcName, "RenesasRX" ); //TODO complete stub function
+//} /* End of function xApplicationDNSQueryHook() */
 
 
 /***********************************************************************************************************************
@@ -457,8 +457,10 @@ void EINT_Trig_isr(void *ectrl)
  * Arguments    : none
  * Return Value : none
  **********************************************************************************************************************/
-static void check_ether_link(void)
+static void check_ether_link(void * pvParameters)
 {
+    R_INTERNAL_NOT_USED(pvParameters);
+
 	while(1)
 	{
     	vTaskDelay(1000);
